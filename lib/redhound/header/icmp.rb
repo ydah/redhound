@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Redhound
   class Header
     class Icmp
@@ -9,6 +11,7 @@ module Redhound
 
       def initialize(bytes:)
         raise ArgumentError, 'bytes must be bigger than 8 bytes' unless bytes.size >= 8
+
         @bytes = bytes
       end
 
@@ -17,23 +20,23 @@ module Redhound
         @code = @bytes[1]
         @check = @bytes[2..3]
         # refs: https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-types
-        if @type == 0 || @type == 8
+        if @type.zero? || @type == 8
           @id = @bytes[4..5]
           @seq = @bytes[6..7]
-          @data = @bytes[8..-1]
+          @data = @bytes[8..]
         else
-          @data = @bytes[4..-1]
+          @data = @bytes[4..]
         end
         self
       end
 
       def dump
-        puts "ICMP HEADER----------------"
+        puts 'ICMP HEADER----------------'
         puts self
       end
 
       def to_s
-        if @type == 0 || @type == 8
+        if @type.zero? || @type == 8
           <<~ICMP
             Type: #{@type}
             Code: #{@code}
@@ -55,19 +58,19 @@ module Redhound
       private
 
       def check
-        @check.map { |b| b.to_s(16).rjust(2, "0") }.join
+        @check.map { |b| b.to_s(16).rjust(2, '0') }.join
       end
 
       def id
-        @id.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @id.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
       def seq
-        @seq.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @seq.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
       def data
-        @data.map { |b| b.chr }.join
+        @data.map(&:chr).join
       end
     end
   end

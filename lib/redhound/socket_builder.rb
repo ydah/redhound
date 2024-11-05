@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'socket'
 
 module Redhound
@@ -11,7 +13,7 @@ module Redhound
     SOL_PACKET            = 0x0107 # bits/socket.h
     PACKET_ADD_MEMBERSHIP = 0x0001 # NOTE: netpacket/packet.h
     ETH_P_ALL             = 768    # NOTE: htons(ETH_P_ALL) => linux/if_ether.h
-    PACKED_ETH_P_ALL = [ETH_P_ALL].pack('S').unpack('S>').first
+    PACKED_ETH_P_ALL = [ETH_P_ALL].pack('S').unpack1('S>')
 
     def initialize(ifname:)
       @ifname = ifname

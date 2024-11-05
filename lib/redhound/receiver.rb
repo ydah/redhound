@@ -1,4 +1,6 @@
-require "socket"
+# frozen_string_literal: true
+
+require 'socket'
 
 module Redhound
   class Receiver
@@ -15,7 +17,7 @@ module Redhound
 
     def run
       loop do
-        msg, _ = @socket.recvfrom(2048)
+        msg, = @socket.recvfrom(2048)
         Analyzer.analyze(msg:)
       end
     end

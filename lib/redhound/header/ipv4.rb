@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Redhound
   class Header
     class Ipv4
@@ -13,6 +15,7 @@ module Redhound
 
       def initialize(bytes:)
         raise ArgumentError, 'bytes must be 20 bytes' unless bytes.size == 20
+
         @bytes = bytes
       end
 
@@ -40,7 +43,7 @@ module Redhound
       end
 
       def dump
-        puts "IPv4 HEADER----------------"
+        puts 'IPv4 HEADER----------------'
         puts self
       end
 
@@ -71,38 +74,38 @@ module Redhound
       end
 
       def tot_len
-        @tot_len.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @tot_len.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
       def id
-        @id.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @id.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
       def frag_off
-        @frag_off.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16) & 0x1FFF
+        @frag_off.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16) & 0x1FFF
       end
 
       def protocol
         case @protocol
         when ICMP
-          "ICMP"
+          'ICMP'
         when UDP
-          "UDP"
+          'UDP'
         else
-          "Unknown"
+          'Unknown'
         end
       end
 
       def check
-        @check.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @check.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
       def saddr
-        @saddr.map { |b| b.to_s(16).rjust(2, "0") }.join(".")
+        @saddr.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
       end
 
       def daddr
-        @daddr.map { |b| b.to_s(16).rjust(2, "0") }.join(".")
+        @daddr.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
       end
     end
   end

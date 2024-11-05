@@ -1,5 +1,7 @@
-require "optparse"
-require "socket"
+# frozen_string_literal: true
+
+require 'optparse'
+require 'socket'
 
 module Redhound
   class Command
@@ -10,7 +12,7 @@ module Redhound
     def run(argv)
       parse(argv)
       if @options[:ifname].nil?
-        warn "Error: interface is required"
+        warn 'Error: interface is required'
         exit 1
       end
       Receiver.run(ifname: @options[:ifname])
@@ -30,12 +32,21 @@ module Redhound
 
           Usage: redhound [options] ...
         BANNER2
-        o.separator ""
-        o.separator "Options:"
-        o.on("-i", "--interface INTERFACE", "name or idx of interface") { |v| @options[:ifname] = v }
-        o.on("-D", "--list-interfaces", "print list of interfaces and exit") { list_interfaces; exit }
-        o.on("-h", "--help", "display this help and exit") { puts o; exit }
-        o.on("-v", "--version", "display version information and exit") { puts "Redhound #{Redhound::VERSION}"; exit }
+        o.separator ''
+        o.separator 'Options:'
+        o.on('-i', '--interface INTERFACE', 'name or idx of interface') { |v| @options[:ifname] = v }
+        o.on('-D', '--list-interfaces', 'print list of interfaces and exit') do
+          list_interfaces
+          exit
+        end
+        o.on('-h', '--help', 'display this help and exit') do
+          puts o
+          exit
+        end
+        o.on('-v', '--version', 'display version information and exit') do
+          puts "Redhound #{Redhound::VERSION}"
+          exit
+        end
         o.on_tail
         o.parse!(argv)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Redhound
   class Header
     class Ether
@@ -11,6 +13,7 @@ module Redhound
 
       def initialize(bytes:)
         raise ArgumentError, 'bytes must be 14 bytes' unless bytes.size == 14
+
         @bytes = bytes
       end
 
@@ -27,7 +30,7 @@ module Redhound
       end
 
       def dump
-        puts "ETHERNET HEADER----------------"
+        puts 'ETHERNET HEADER----------------'
         puts self
       end
 
@@ -40,25 +43,25 @@ module Redhound
       end
 
       def dhost
-        @dhost.map { |b| b.to_s(16).rjust(2, "0") }.join(":")
+        @dhost.map { |b| b.to_s(16).rjust(2, '0') }.join(':')
       end
 
       def shost
-        @shost.map { |b| b.to_s(16).rjust(2, "0") }.join(":")
+        @shost.map { |b| b.to_s(16).rjust(2, '0') }.join(':')
       end
 
       def type
         if ipv4?
-          "IPv4"
+          'IPv4'
         else
-          "Unknown"
+          'Unknown'
         end
       end
 
       private
 
       def hex_type
-        @hex_type ||= @type.map { |b| b.to_s(16).rjust(2, "0") }.join.to_i(16)
+        @hex_type ||= @type.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
     end
   end

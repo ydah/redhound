@@ -1,4 +1,6 @@
-require "socket"
+# frozen_string_literal: true
+
+require 'socket'
 
 module Redhound
   class PacketMreq
@@ -20,7 +22,7 @@ module Redhound
     end
 
     def mr_ifindex
-      @mr_ifindex ||= [[index].pack("c")].pack("a4")
+      @mr_ifindex ||= [[index].pack('c')].pack('a4')
     end
 
     private
@@ -30,15 +32,15 @@ module Redhound
     end
 
     def mr_type
-      @mr_type ||= [PACKET_MR_PROMISC].pack("S")
+      @mr_type ||= [PACKET_MR_PROMISC].pack('S')
     end
 
     def mr_alen
-      @mr_alen ||= [0].pack("S")
+      @mr_alen ||= [0].pack('S')
     end
 
     def mr_address
-      @mr_address ||= [0].pack("C") * 8
+      @mr_address ||= [0].pack('C') * 8
     end
   end
 end
