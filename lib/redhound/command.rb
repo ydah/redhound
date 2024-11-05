@@ -18,16 +18,18 @@ module Redhound
 
     def parse(argv)
       OptionParser.new do |o|
-        o.banner = <<~'BANNER'
+        o.banner = <<~'BANNER' + <<~BANNER2
              ___         ____                     __
             / _ \___ ___/ / /  ___  __ _____  ___/ /
            / , _/ -_) _  / _ \/ _ \/ // / _ \/ _  /
           /_/|_|\__/\_,_/_//_/\___/\_,_/_//_/\_,_/
+
+        BANNER
           Version: #{Redhound::VERSION}
           Dump and analyze network packets.
 
           Usage: redhound [options] ...
-        BANNER
+        BANNER2
         o.separator ""
         o.separator "Options:"
         o.on("-i", "--interface INTERFACE", "name or idx of interface") { |v| @options[:ifname] = v }
