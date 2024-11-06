@@ -18,7 +18,6 @@ module Redhound
       end
 
       def generate
-        pp @bytes[0..5]
         @dhost = @bytes[0..5]
         @shost = @bytes[6..11]
         @type = @bytes[12..13]
