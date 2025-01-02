@@ -20,11 +20,20 @@ gem install redhound
 ## Usage
 
 ```command
+   ___         ____                     __
+  / _ \___ ___/ / /  ___  __ _____  ___/ /
+ / , _/ -_) _  / _ \/ _ \/ // / _ \/ _  /
+/_/|_|\__/\_,_/_//_/\___/\_,_/_//_/\_,_/
+
+Version: 0.1.0
+Dump and analyze network packets.
+
 Usage: redhound [options] ...
 
 Options:
     -i, --interface INTERFACE        name or idx of interface
     -D, --list-interfaces            print list of interfaces and exit
+    -w FILE                          write packets to a pcap capture file format to file
     -h, --help                       display this help and exit
     -v, --version                    display version information and exit
 ```

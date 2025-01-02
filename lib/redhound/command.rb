@@ -15,7 +15,7 @@ module Redhound
         warn 'Error: interface is required'
         exit 1
       end
-      Receiver.run(ifname: @options[:ifname])
+      Receiver.run(ifname: @options[:ifname], filename: @options[:filename])
     end
 
     def parse(argv)
@@ -39,6 +39,7 @@ module Redhound
           list_interfaces
           exit
         end
+        o.on('-w FILE', 'write packets to a pcap capture file format to file') { |v| @options[:filename] = v }
         o.on('-h', '--help', 'display this help and exit') do
           puts o
           exit
