@@ -1,4 +1,4 @@
-# Redhound
+# Redhound [![Gem Version](https://badge.fury.io/rb/redhound.svg)](https://badge.fury.io/rb/redhound)
 
 Pure Ruby packet analyzer.
 At this time, it is only guaranteed to work on Linux.
