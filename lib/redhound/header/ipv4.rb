@@ -30,6 +30,7 @@ module Redhound
         @protocol = @bytes[9]
         @check = @bytes[10..11]
         @saddr = @bytes[12..15]
+        pp @saddr.class
         @daddr = @bytes[16..19]
         self
       end
@@ -101,11 +102,11 @@ module Redhound
       end
 
       def saddr
-        @saddr.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
+        @saddr.join('.')
       end
 
       def daddr
-        @daddr.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
+        @daddr.join('.')
       end
     end
   end
