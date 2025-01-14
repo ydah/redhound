@@ -12,7 +12,7 @@ module Redhound
 
     def initialize(ifname:, filename:)
       @ifname = ifname
-      @socket = SocketBuilder.build(ifname:)
+      @source = Resolver.resolve(ifname:)
       if filename
         @writer = Writer.new(filename:)
         @writer.start
@@ -21,7 +21,7 @@ module Redhound
 
     def run
       loop do
-        msg, = @socket.recvfrom(2048)
+        msg, = @source.next_packet
         Analyzer.analyze(msg:)
         @writer.write(msg) if @writer
       rescue Interrupt
