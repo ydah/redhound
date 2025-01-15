@@ -23,9 +23,9 @@ module Redhound
       loop do
         msg, = @source.next_packet
         Analyzer.analyze(msg:)
-        @writer.write(msg) if @writer
+        @writer&.write(msg)
       rescue Interrupt
-        @writer.stop if @writer
+        @writer&.stop
         break
       end
     end
