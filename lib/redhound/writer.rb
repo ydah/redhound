@@ -37,7 +37,7 @@ module Redhound
     def packet_record(timestamp, captured_length, original_length)
       [
         timestamp.to_i,           # Timestamp seconds
-        (timestamp.usec || 0),    # Timestamp microseconds
+        timestamp.usec || 0,      # Timestamp microseconds
         captured_length,          # Captured packet length
         original_length           # Original packet length
       ].pack('VVVV')
