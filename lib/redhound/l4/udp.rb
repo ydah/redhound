@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
+  class L4
     class Udp
       class << self
         def generate(bytes:)

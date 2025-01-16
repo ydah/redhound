@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
+  class L3
     class Ipv6
       class << self
         def generate(bytes:)
@@ -29,7 +29,7 @@ module Redhound
         @hop_limit = @bytes[7]
         @saddr = @bytes[8..23]
         @daddr = @bytes[24..39]
-        @protocol = InternetProtocol.new(protocol: @next_header)
+        @protocol = Protocol.new(protocol: @next_header)
       end
 
       def dump

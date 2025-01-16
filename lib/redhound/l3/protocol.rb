@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
-    class InternetProtocol
+  class L3
+    class Protocol
       # refs: https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml#protocol-numbers-1
-      INTERNET_PROTOCOL = {
+      PROTO_TABLE = {
         0 => 'HOPOPT',
         1 => 'ICMP',
         2 => 'IGMP',
@@ -156,10 +156,10 @@ module Redhound
       end
 
       def to_s
-        INTERNET_PROTOCOL[@protocol] || 'Unknown'
+        PROTO_TABLE[@protocol] || 'Unknown'
       end
 
-      INTERNET_PROTOCOL.each do |code, name|
+      PROTO_TABLE.each do |code, name|
         method_name = name.downcase.gsub(/[ \-]/, '_') + '?'
         define_method(method_name) do
           @protocol == code

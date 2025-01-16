@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
+  class L3
     class Ipv4
       class << self
         def generate(bytes:)
@@ -25,7 +25,7 @@ module Redhound
         @id = @bytes[4..5]
         @frag_off = @bytes[6..7]
         @ttl = @bytes[8]
-        @protocol = InternetProtocol.new(protocol: @bytes[9])
+        @protocol = Protocol.new(protocol: @bytes[9])
         @check = @bytes[10..11]
         @saddr = @bytes[12..15]
         @daddr = @bytes[16..19]

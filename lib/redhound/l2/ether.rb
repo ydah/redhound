@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
+  class L2
     class Ether
       attr_reader :type
 
@@ -23,7 +23,7 @@ module Redhound
       def generate
         @dhost = @bytes[0..5]
         @shost = @bytes[6..11]
-        @type = EthernetProtocol.new(protocol: hex_type(@bytes[12..13]))
+        @type = Protocol.new(protocol: hex_type(@bytes[12..13]))
         self
       end
 

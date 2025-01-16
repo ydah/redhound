@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
-    class EthernetProtocol
-      ETHERNET_PROTOCOL = {
+  class L2
+    class Protocol
+      PROTO_TABLE = {
         0x0060 => 'Loopback',
         0x0800 => 'IPv4',
         0x0806 => 'ARP',
@@ -16,10 +16,10 @@ module Redhound
       end
 
       def to_s
-        ETHERNET_PROTOCOL[@protocol] || 'Unknown'
+        PROTO_TABLE[@protocol] || 'Unknown'
       end
 
-      ETHERNET_PROTOCOL.each do |id, name|
+      PROTO_TABLE.each do |id, name|
         method_name = name.downcase.gsub(/[ \-]/, '_') + '?'
         define_method(method_name) do
           @protocol == id

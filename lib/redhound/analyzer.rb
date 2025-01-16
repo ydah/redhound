@@ -12,11 +12,11 @@ module Redhound
     end
 
     def analyze
-      l2 = Header::Ether.generate(bytes: @msg.bytes[0..], count: @count)
+      l2 = L2::Ether.generate(bytes: @msg.bytes[0..], count: @count)
       l2.dump
       return unless l2.supported_type?
 
-      l3 = layer3_header(l2, l2.size)
+      l3 = L3::Resolver.resolve(bytes: @msg.bytes[l2.size..], l2:)
       l3.dump
       return if @msg.bytes.size <= l2.size + l3.size
       unless l3.supported_protocol?
@@ -24,26 +24,7 @@ module Redhound
         return
       end
 
-
-      layer4_header(l3, l2.size + l3.size).dump
-    end
-
-    def layer3_header(l2, offset)
-      if l2.type.ipv4?
-        Header::Ipv4.generate(bytes: @msg.bytes[offset..])
-      elsif l2.type.ipv6?
-        Header::Ipv6.generate(bytes: @msg.bytes[offset..])
-      elsif l2.type.arp?
-        Header::Arp.generate(bytes: @msg.bytes[offset..])
-      end
-    end
-
-    def layer4_header(l3, offset)
-      if l3.protocol.udp?
-        Header::Udp.generate(bytes: @msg.bytes[offset..])
-      elsif l3.protocol.icmp?
-        Header::Icmp.generate(bytes: @msg.bytes[offset..])
-      end
+      L4::Resolver.resolve(bytes: @msg.bytes[(l2.size + l3.size)..], l3: l3).dump
     end
   end
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Redhound
-  class Header
+  class L3
     class Arp
       class << self
         def generate(bytes:)
@@ -25,7 +25,7 @@ module Redhound
         @spa = @bytes[14..17]
         @tha = @bytes[18..23]
         @tpa = @bytes[24..27]
-        @type = EthernetProtocol.new(protocol: ptype)
+        @type = Redhound::L2::Protocol.new(protocol: ptype)
         @l3 = generate_l3
         self
       end
@@ -90,9 +90,9 @@ module Redhound
         return if @bytes.size == arp_size
 
         if @type.ipv4?
-          Header::Ipv4.generate(bytes: @bytes[arp_size..])
+          Ipv4.generate(bytes: @bytes[arp_size..])
         elsif @type.ipv6?
-          Header::Ipv6.generate(bytes: @bytes[arp_size..])
+          Ipv6.generate(bytes: @bytes[arp_size..])
         end
       end
     end
