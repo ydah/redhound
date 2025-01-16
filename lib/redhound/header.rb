@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative 'header/arp'
 require_relative 'header/ether'
 require_relative 'header/ethernet_protocol'
 require_relative 'header/icmp'

@@ -18,10 +18,12 @@ module Redhound
 
       l3 = layer3_header(l2, l2.size)
       l3.dump
+      return if @msg.bytes.size <= l2.size + l3.size
       unless l3.supported_protocol?
         puts "    └─ Unsupported protocol #{l3.protocol}"
         return
       end
+
 
       layer4_header(l3, l2.size + l3.size).dump
     end
@@ -31,6 +33,8 @@ module Redhound
         Header::Ipv4.generate(bytes: @msg.bytes[offset..])
       elsif l2.type.ipv6?
         Header::Ipv6.generate(bytes: @msg.bytes[offset..])
+      elsif l2.type.arp?
+        Header::Arp.generate(bytes: @msg.bytes[offset..])
       end
     end
 

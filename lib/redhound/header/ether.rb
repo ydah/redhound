@@ -44,7 +44,7 @@ module Redhound
       end
 
       def supported_type?
-        @type.ipv4? || @type.ipv6?
+        @type.ipv4? || @type.ipv6? || @type.arp?
       end
 
       private
