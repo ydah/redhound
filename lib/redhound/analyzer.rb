@@ -14,7 +14,7 @@ module Redhound
     def analyze
       ether = Header::Ether.generate(bytes: @msg.bytes[0..13], count: @count)
       ether.dump
-      return unless ether.ipv4?
+      return unless ether.type.ipv4?
 
       ip = Header::Ipv4.generate(bytes: @msg.bytes[14..33])
       ip.dump
