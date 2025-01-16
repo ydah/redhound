@@ -23,7 +23,7 @@ module Redhound
       end
 
       def mr_ifindex
-        @mr_ifindex ||= [[index].pack('c')].pack('a4')
+        @mr_ifindex ||= [[index].pack('I')].pack('a4')
       end
 
       private
