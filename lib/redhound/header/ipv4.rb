@@ -30,7 +30,6 @@ module Redhound
         @protocol = @bytes[9]
         @check = @bytes[10..11]
         @saddr = @bytes[12..15]
-        pp @saddr.class
         @daddr = @bytes[16..19]
         self
       end
