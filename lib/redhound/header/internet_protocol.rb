@@ -1,7 +1,10 @@
+# frozen_string_literal: true
+
 module Redhound
   class Header
-    class Protocol
-      PROTOCOL = {
+    class InternetProtocol
+      # refs: https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml#protocol-numbers-1
+      INTERNET_PROTOCOL = {
         0 => 'HOPOPT',
         1 => 'ICMP',
         2 => 'IGMP',
@@ -148,8 +151,19 @@ module Redhound
         255 => 'Reserved'
       }.freeze
 
-      def to_name(protocol)
-        PROTOCOL[protocol] || 'Unknown'
+      def initialize(protocol:)
+        @protocol = protocol
+      end
+
+      def to_s
+        INTERNET_PROTOCOL[@protocol] || 'Unknown'
+      end
+
+      INTERNET_PROTOCOL.each do |code, name|
+        method_name = name.downcase.gsub(/[ \-]/, '_') + '?'
+        define_method(method_name) do
+          @protocol == code
+        end
       end
     end
   end

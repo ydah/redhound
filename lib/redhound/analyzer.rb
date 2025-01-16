@@ -18,12 +18,14 @@ module Redhound
 
       ip = Header::Ipv4.generate(bytes: @msg.bytes[14..33])
       ip.dump
-      if ip.udp?
+      if ip.protocol.udp?
         udp = Header::Udp.generate(bytes: @msg.bytes[34..])
         udp.dump
-      elsif ip.icmp?
+      elsif ip.protocol.icmp?
         icmp = Header::Icmp.generate(bytes: @msg.bytes[34..])
         icmp.dump
+      else
+        puts "    └─ Unknown protocol #{ip.protocol}"
       end
     end
   end

@@ -9,9 +9,7 @@ module Redhound
         end
       end
 
-      # ref: https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml#protocol-numbers-1
-      ICMP = 1
-      UDP = 17
+      attr_reader :protocol
 
       def initialize(bytes:)
         raise ArgumentError, 'bytes must be 20 bytes' unless bytes.size == 20
@@ -27,19 +25,11 @@ module Redhound
         @id = @bytes[4..5]
         @frag_off = @bytes[6..7]
         @ttl = @bytes[8]
-        @protocol = @bytes[9]
+        @protocol = InternetProtocol.new(protocol: @bytes[9])
         @check = @bytes[10..11]
         @saddr = @bytes[12..15]
         @daddr = @bytes[16..19]
         self
-      end
-
-      def icmp?
-        @protocol == ICMP
-      end
-
-      def udp?
-        @protocol == UDP
       end
 
       def dump
@@ -47,7 +37,7 @@ module Redhound
       end
 
       def to_s
-        " └─ IPv4 Ver: #{version} IHL: #{ihl} TOS: #{@tos} Total Length: #{tot_len} ID: #{id} Offset: #{frag_off} TTL: #{@ttl} Protocol: #{protocol} Checksum: #{check} Src: #{saddr} Dst: #{daddr}"
+        " └─ IPv4 Ver: #{version} IHL: #{ihl} TOS: #{@tos} Total Length: #{tot_len} ID: #{id} Offset: #{frag_off} TTL: #{@ttl} Protocol: #{@protocol} Checksum: #{check} Src: #{saddr} Dst: #{daddr}"
       end
 
       private
@@ -70,17 +60,6 @@ module Redhound
 
       def frag_off
         @frag_off.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16) & 0x1FFF
-      end
-
-      def protocol
-        case @protocol
-        when ICMP
-          'ICMP'
-        when UDP
-          'UDP'
-        else
-          'Unknown'
-        end
       end
 
       def check
