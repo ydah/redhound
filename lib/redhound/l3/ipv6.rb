@@ -20,7 +20,7 @@ module Redhound
       def size = 40
 
       def generate
-        version_traffic_flow = @bytes[0..3]
+        version_traffic_flow = @bytes[0..3].join.to_i(16)
         @version = (version_traffic_flow >> 28) & 0xF
         @traffic_class = (version_traffic_flow >> 20) & 0xFF
         @flow_label = version_traffic_flow & 0xFFFFF
@@ -30,6 +30,7 @@ module Redhound
         @saddr = @bytes[8..23]
         @daddr = @bytes[24..39]
         @protocol = Protocol.new(protocol: @next_header)
+        self
       end
 
       def dump
