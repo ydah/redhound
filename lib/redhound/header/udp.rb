@@ -10,7 +10,7 @@ module Redhound
       end
 
       def initialize(bytes:)
-        raise ArgumentError, 'bytes must be bigger than 8 bytes' unless bytes.size >= 8
+        raise ArgumentError, "bytes must be bigger than #{size} bytes" unless bytes.size >= size
 
         @bytes = bytes
       end
@@ -23,6 +23,8 @@ module Redhound
         @data = @bytes[8..]
         self
       end
+
+      def size = 8
 
       def dump
         puts self

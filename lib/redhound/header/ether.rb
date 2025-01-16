@@ -12,11 +12,13 @@ module Redhound
       end
 
       def initialize(bytes:, count:)
-        raise ArgumentError, 'bytes must be 14 bytes' unless bytes.size == 14
+        raise ArgumentError, "bytes must be #{size} bytes" unless bytes.size >= size
 
         @bytes = bytes
         @count = count
       end
+
+      def size = 14
 
       def generate
         @dhost = @bytes[0..5]
@@ -39,6 +41,10 @@ module Redhound
 
       def shost
         @shost.map { |b| b.to_s(16).rjust(2, '0') }.join(':')
+      end
+
+      def supported_type?
+        @type.ipv4? || @type.ipv6?
       end
 
       private

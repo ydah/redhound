@@ -12,20 +12,33 @@ module Redhound
     end
 
     def analyze
-      ether = Header::Ether.generate(bytes: @msg.bytes[0..13], count: @count)
-      ether.dump
-      return unless ether.type.ipv4?
+      l2 = Header::Ether.generate(bytes: @msg.bytes[0..], count: @count)
+      l2.dump
+      return unless l2.supported_type?
 
-      ip = Header::Ipv4.generate(bytes: @msg.bytes[14..33])
-      ip.dump
-      if ip.protocol.udp?
-        udp = Header::Udp.generate(bytes: @msg.bytes[34..])
-        udp.dump
-      elsif ip.protocol.icmp?
-        icmp = Header::Icmp.generate(bytes: @msg.bytes[34..])
-        icmp.dump
-      else
-        puts "    └─ Unknown protocol #{ip.protocol}"
+      l3 = layer3_header(l2, l2.size)
+      l3.dump
+      unless l3.supported_protocol?
+        puts "    └─ Unsupported protocol #{l3.protocol}"
+        return
+      end
+
+      layer4_header(l3, l2.size + l3.size).dump
+    end
+
+    def layer3_header(l2, offset)
+      if l2.type.ipv4?
+        Header::Ipv4.generate(bytes: @msg.bytes[offset..])
+      elsif l2.type.ipv6?
+        Header::Ipv6.generate(bytes: @msg.bytes[offset..])
+      end
+    end
+
+    def layer4_header(l3, offset)
+      if l3.protocol.udp?
+        Header::Udp.generate(bytes: @msg.bytes[offset..])
+      elsif l3.protocol.icmp?
+        Header::Icmp.generate(bytes: @msg.bytes[offset..])
       end
     end
   end

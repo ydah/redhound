@@ -12,7 +12,7 @@ module Redhound
       attr_reader :protocol
 
       def initialize(bytes:)
-        raise ArgumentError, 'bytes must be 20 bytes' unless bytes.size == 20
+        raise ArgumentError, "bytes must be #{size} bytes" unless bytes.size >= size
 
         @bytes = bytes
       end
@@ -32,12 +32,18 @@ module Redhound
         self
       end
 
+      def size = 20
+
       def dump
         puts self
       end
 
       def to_s
         " └─ IPv4 Ver: #{version} IHL: #{ihl} TOS: #{@tos} Total Length: #{tot_len} ID: #{id} Offset: #{frag_off} TTL: #{@ttl} Protocol: #{@protocol} Checksum: #{check} Src: #{saddr} Dst: #{daddr}"
+      end
+
+      def supported_protocol?
+        @protocol.udp? || @protocol.icmp?
       end
 
       private
