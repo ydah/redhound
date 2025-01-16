@@ -20,7 +20,7 @@ module Redhound
       def size = 40
 
       def generate
-        version_traffic_flow = @bytes[0..3].unpack('N')
+        version_traffic_flow = @bytes[0..3]
         @version = (version_traffic_flow >> 28) & 0xF
         @traffic_class = (version_traffic_flow >> 20) & 0xFF
         @flow_label = version_traffic_flow & 0xFFFFF
