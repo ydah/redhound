@@ -2,17 +2,17 @@
 
 module Redhound
   class Analyzer
-    def self.analyze(msg:)
-      new(msg: msg).analyze
+    def self.analyze(msg:, count:)
+      new(msg:, count:).analyze
     end
 
-    def initialize(msg:)
+    def initialize(msg:, count:)
       @msg = msg
+      @count = count
     end
 
     def analyze
-      puts 'Analyzing...'
-      ether = Header::Ether.generate(bytes: @msg.bytes[0..13])
+      ether = Header::Ether.generate(bytes: @msg.bytes[0..13], count: @count)
       ether.dump
       return unless ether.ipv4?
 
@@ -25,7 +25,6 @@ module Redhound
         icmp = Header::Icmp.generate(bytes: @msg.bytes[34..])
         icmp.dump
       end
-      puts
     end
   end
 end

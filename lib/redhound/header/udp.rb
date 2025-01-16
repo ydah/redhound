@@ -25,17 +25,13 @@ module Redhound
       end
 
       def dump
-        puts 'UDP HEADER----------------'
         puts self
       end
 
       def to_s
-        <<~UDP
-          Source Port: #{sport}
-          Destination Port: #{dport}
-          Length: #{len}
-          Checksum: #{check}
-          Data: #{data}
+        <<-UDP
+    └─ UDP Src: #{sport} Dst: #{dport} Len: #{len} Checksum: #{check}
+        └─ Payload: #{data}
         UDP
       end
 

@@ -17,17 +17,24 @@ module Redhound
         @writer = Writer.new(filename:)
         @writer.start
       end
+      @count = 0
     end
 
     def run
       loop do
         msg, = @source.next_packet
-        Analyzer.analyze(msg:)
+        Analyzer.analyze(msg:, count: increment)
         @writer&.write(msg)
       rescue Interrupt
         @writer&.stop
         break
       end
+    end
+
+    private
+
+    def increment
+      @count.tap { @count += 1 }
     end
   end
 end

@@ -43,24 +43,11 @@ module Redhound
       end
 
       def dump
-        puts 'IPv4 HEADER----------------'
         puts self
       end
 
       def to_s
-        <<~IPV4
-          Version: #{@version}
-          IHL: #{@ihl}
-          TOS: #{@tos}
-          Total Length: #{tot_len}
-          ID: #{id}
-          Fragment Offset: #{frag_off}
-          TTL: #{@ttl}
-          Protocol: #{protocol}
-          Checksum: #{check}
-          Source IP: #{saddr}
-          Destination IP: #{daddr}
-        IPV4
+        " └─ IPv4 Ver: #{version} IHL: #{ihl} TOS: #{@tos} Total Length: #{tot_len} ID: #{id} Offset: #{frag_off} TTL: #{@ttl} Protocol: #{protocol} Checksum: #{check} Src: #{saddr} Dst: #{daddr}"
       end
 
       private

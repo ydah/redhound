@@ -6,15 +6,16 @@ module Redhound
       ETH_P_IP = 0x0800
 
       class << self
-        def generate(bytes:)
-          new(bytes:).generate
+        def generate(bytes:, count:)
+          new(bytes:, count:).generate
         end
       end
 
-      def initialize(bytes:)
+      def initialize(bytes:, count:)
         raise ArgumentError, 'bytes must be 14 bytes' unless bytes.size == 14
 
         @bytes = bytes
+        @count = count
       end
 
       def generate
@@ -29,16 +30,11 @@ module Redhound
       end
 
       def dump
-        puts 'ETHERNET HEADER----------------'
         puts self
       end
 
       def to_s
-        <<~ETHER
-          Destination MAC: #{dhost}
-          Source MAC: #{shost}
-          Type: #{type}
-        ETHER
+        "[#{@count}] Ethernet Dst: #{dhost} Src: #{shost} Type: #{type}"
       end
 
       def dhost

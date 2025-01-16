@@ -31,26 +31,19 @@ module Redhound
       end
 
       def dump
-        puts 'ICMP HEADER----------------'
         puts self
       end
 
       def to_s
         if @type.zero? || @type == 8
-          <<~ICMP
-            Type: #{@type}
-            Code: #{@code}
-            Checksum: #{check}
-            ID: #{id}
-            Sequence: #{seq}
-            Data: #{data}
+          <<-ICMP.chomp
+    └─ ICMP Type: #{@type} Code: #{@code} Checksum: #{check} ID: #{id} Sequence: #{seq}
+        └─ Payload: #{data}
           ICMP
         else
-          <<~ICMP
-            Type: #{@type}
-            Code: #{@code}
-            Checksum: #{check}
-            Data: #{data}
+          <<-ICMP.chomp
+    └─ ICMP Type: #{@type} Code: #{@code} Checksum: #{check}
+        └─ Payload: #{data}
           ICMP
         end
       end
@@ -70,7 +63,7 @@ module Redhound
       end
 
       def data
-        @data.map(&:chr).join
+        @data.map(&:chr).join.force_encoding("UTF-8")
       end
     end
   end
