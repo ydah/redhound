@@ -147,6 +147,10 @@ module Redhound
         142 => 'ROHC',
         255 => 'Reserved'
       }.freeze
+
+      def to_name(protocol)
+        PROTOCOL[protocol] || 'Unknown'
+      end
     end
   end
 end
