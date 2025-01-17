@@ -1,0 +1,16 @@
+# Generated from lib/redhound/l3/protocol.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Protocol
+      # refs: https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml#protocol-numbers-1
+      PROTO_TABLE: untyped
+
+      # @rbs (protocol: Integer) -> void
+      def initialize: (protocol: Integer) -> void
+
+      # @rbs () -> String
+      def to_s: () -> String
+    end
+  end
+end

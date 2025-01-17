@@ -1,0 +1,36 @@
+# Generated from lib/redhound/l4/udp.rb with RBS::Inline
+
+module Redhound
+  class L4
+    class Udp < Base
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L4::Udp
+      def generate: () -> Redhound::L4::Udp
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      private
+
+      # @rbs () -> Integer
+      def sport: () -> Integer
+
+      # @rbs () -> Integer
+      def dport: () -> Integer
+
+      # @rbs () -> Integer
+      def len: () -> Integer
+
+      # @rbs () -> Integer
+      def check: () -> Integer
+
+      # @rbs () -> String
+      def data: () -> String
+    end
+  end
+end

@@ -1,0 +1,19 @@
+# Generated from lib/redhound/receiver.rb with RBS::Inline
+
+module Redhound
+  class Receiver
+    # @rbs (ifname: String, filename: String) -> void
+    def self.run: (ifname: String, filename: String) -> void
+
+    # @rbs (ifname: String, filename: String) -> void
+    def initialize: (ifname: String, filename: String) -> void
+
+    # @rbs () -> void
+    def run: () -> void
+
+    private
+
+    # @rbs () -> Integer
+    def increment: () -> Integer
+  end
+end

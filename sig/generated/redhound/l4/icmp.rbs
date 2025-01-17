@@ -1,0 +1,33 @@
+# Generated from lib/redhound/l4/icmp.rb with RBS::Inline
+
+module Redhound
+  class L4
+    class Icmp < Base
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L4::Icmp
+      def generate: () -> Redhound::L4::Icmp
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      private
+
+      # @rbs () -> Integer
+      def check: () -> Integer
+
+      # @rbs () -> Integer
+      def id: () -> Integer
+
+      # @rbs () -> Integer
+      def seq: () -> Integer
+
+      # @rbs () -> String
+      def data: () -> String
+    end
+  end
+end

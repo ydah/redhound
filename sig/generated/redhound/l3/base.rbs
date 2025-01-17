@@ -1,0 +1,28 @@
+# Generated from lib/redhound/l3/base.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Base
+      # @rbs (bytes: Array[Integer]) -> Redhound::L3::Base
+      def self.generate: (bytes: Array[Integer]) -> Redhound::L3::Base
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L3::Base
+      def generate: () -> Redhound::L3::Base
+
+      # @rbs () -> void
+      def dump: () -> void
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> bool
+      def supported_protocol?: () -> bool
+
+      # @rbs () -> Protocol
+      def protocol: () -> Protocol
+    end
+  end
+end

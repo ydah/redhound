@@ -1,0 +1,57 @@
+# Generated from lib/redhound/l3/arp.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Arp < Base
+      # @rbs (bytes: Array[Integer]) -> Redhound::L3::Arp
+      def self.generate: (bytes: Array[Integer]) -> Redhound::L3::Arp
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L3::Arp
+      def generate: () -> Redhound::L3::Arp
+
+      # @rbs () -> Integer
+      def arp_size: () -> Integer
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      # @rbs () -> bool
+      def supported_protocol?: () -> bool
+
+      # @rbs () -> String?
+      def protocol: () -> String?
+
+      private
+
+      # @rbs () -> Integer
+      def htype: () -> Integer
+
+      # @rbs () -> Integer
+      def ptype: () -> Integer
+
+      # @rbs () -> Integer
+      def oper: () -> Integer
+
+      # @rbs () -> String
+      def sha: () -> String
+
+      # @rbs () -> String
+      def spa: () -> String
+
+      # @rbs () -> String
+      def tha: () -> String
+
+      # @rbs () -> String
+      def tpa: () -> String
+
+      # @rbs () -> Redhound::L3::Base?
+      def generate_l3: () -> Redhound::L3::Base?
+    end
+  end
+end

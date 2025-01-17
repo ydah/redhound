@@ -1,3 +1,4 @@
+# rbs_inline: enabled
 # frozen_string_literal: true
 
 require 'optparse'
@@ -5,10 +6,12 @@ require 'socket'
 
 module Redhound
   class Command
+    # @rbs () -> void
     def initialize
       @options = { ifname: nil }
     end
 
+    # @rbs (Array[untyped] argv) -> void
     def run(argv)
       parse(argv)
       if @options[:ifname].nil?
@@ -18,8 +21,9 @@ module Redhound
       Receiver.run(ifname: @options[:ifname], filename: @options[:filename])
     end
 
+    # @rbs (Array[untyped] argv) -> void
     def parse(argv)
-      OptionParser.new do |o|
+      OptionParser.new do |o| # steep:ignore
         o.banner = <<~'BANNER' + <<~BANNER2
              ___         ____                     __
             / _ \___ ___/ / /  ___  __ _____  ___/ /
@@ -55,6 +59,7 @@ module Redhound
 
     private
 
+    # @rbs () -> void
     def list_interfaces
       ::Socket.getifaddrs.each { |ifaddr| puts ifaddr.name }
     end

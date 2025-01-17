@@ -1,0 +1,41 @@
+# Generated from lib/redhound/l2/ether.rb with RBS::Inline
+
+module Redhound
+  class L2
+    class Ether
+      attr_reader type: Protocol
+
+      # @rbs (bytes: Array[Integer], count: Integer) -> Redhound::L2::Ether
+      def self.generate: (bytes: Array[Integer], count: Integer) -> Redhound::L2::Ether
+
+      # @rbs (bytes: Array[Integer], count: Integer) -> void
+      def initialize: (bytes: Array[Integer], count: Integer) -> void
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> Redhound::L2::Ether
+      def generate: () -> Redhound::L2::Ether
+
+      # @rbs () -> void
+      def dump: () -> void
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      # @rbs () -> bool
+      def supported_type?: () -> bool
+
+      private
+
+      # @rbs () -> String
+      def dhost: () -> String
+
+      # @rbs () -> String
+      def shost: () -> String
+
+      # @rbs (Array[Integer] type) -> Integer
+      def hex_type: (Array[Integer] type) -> Integer
+    end
+  end
+end

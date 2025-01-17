@@ -1,3 +1,4 @@
+# rbs_inline: enabled
 # frozen_string_literal: true
 
 module Redhound
@@ -151,10 +152,12 @@ module Redhound
         255 => 'Reserved'
       }.freeze
 
+      # @rbs (protocol: Integer) -> void
       def initialize(protocol:)
         @protocol = protocol
       end
 
+      # @rbs () -> String
       def to_s
         PROTO_TABLE[@protocol] || 'Unknown'
       end

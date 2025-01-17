@@ -1,0 +1,20 @@
+---
+path: ".gem_rbs_collection"
+gems:
+- name: fileutils
+  version: '0'
+  source:
+    type: stdlib
+- name: rake
+  version: '13.0'
+  source:
+    type: git
+    name: ruby/gem_rbs_collection
+    revision: f83c613ed7d038c0031f25fcbcdf12603ba36e79
+    remote: https://github.com/ruby/gem_rbs_collection.git
+    repo_dir: gems
+- name: socket
+  version: '0'
+  source:
+    type: stdlib
+gemfile_lock_path: Gemfile.lock

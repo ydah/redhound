@@ -1,0 +1,19 @@
+# Generated from lib/redhound/l4/base.rb with RBS::Inline
+
+module Redhound
+  class L4
+    class Base
+      # @rbs (bytes: Array[Integer]) -> Redhound::L4::Base
+      def self.generate: (bytes: Array[Integer]) -> Redhound::L4::Base
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L4::Base
+      def generate: () -> Redhound::L4::Base
+
+      # @rbs () -> void
+      def dump: () -> void
+    end
+  end
+end

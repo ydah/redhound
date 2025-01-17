@@ -1,0 +1,53 @@
+# Generated from lib/redhound/l3/ipv4.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Ipv4 < Base
+      # @rbs (bytes: Array[Integer]) -> Redhound::L3::Ipv4
+      def self.generate: (bytes: Array[Integer]) -> Redhound::L3::Ipv4
+
+      attr_reader protocol: Protocol
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L3::Ipv4
+      def generate: () -> Redhound::L3::Ipv4
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      # @rbs () -> bool
+      def supported_protocol?: () -> bool
+
+      private
+
+      # @rbs () -> Integer
+      def version: () -> Integer
+
+      # @rbs () -> Integer
+      def ihl: () -> Integer
+
+      # @rbs () -> Integer
+      def tot_len: () -> Integer
+
+      # @rbs () -> Integer
+      def id: () -> Integer
+
+      # @rbs () -> Integer
+      def frag_off: () -> Integer
+
+      # @rbs () -> Integer
+      def check: () -> Integer
+
+      # @rbs () -> String
+      def saddr: () -> String
+
+      # @rbs () -> String
+      def daddr: () -> String
+    end
+  end
+end

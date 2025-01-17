@@ -1,0 +1,13 @@
+# Generated from lib/redhound/source/socket.rb with RBS::Inline
+
+module Redhound
+  module Source
+    class Socket
+      # @rbs (socket: ::Socket) -> void
+      def initialize: (socket: ::Socket) -> void
+
+      # @rbs (Integer size) -> [String, Addrinfo]
+      def next_packet: (Integer size) -> [ String, Addrinfo ]
+    end
+  end
+end

@@ -1,27 +1,33 @@
+# rbs_inline: enabled
 # frozen_string_literal: true
 
 module Redhound
   class Writer
+    # @rbs (filename: String) -> void
     def initialize(filename:)
       @filename = filename
     end
 
+    # @rbs () -> void
     def start
       @file = File.open(@filename, 'wb')
       @file.write(file_header)
     end
 
-    def write(msg)
+    # @rbs (msg: String) -> void
+    def write(msg:)
       @file.write(packet_record(Time.now, msg.bytesize, msg.bytesize))
       @file.write(msg)
     end
 
+    # @rbs () -> void
     def stop
       @file.close
     end
 
     private
 
+    # @rbs () -> String
     def file_header
       [
         0xa1b2c3d4, # Magic Number (little-endian)
@@ -34,6 +40,7 @@ module Redhound
       ].pack('VvvVVVV')
     end
 
+    # @rbs (Time timestamp, Integer captured_length, Integer original_length) -> String
     def packet_record(timestamp, captured_length, original_length)
       [
         timestamp.to_i,           # Timestamp seconds

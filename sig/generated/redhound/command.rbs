@@ -1,0 +1,19 @@
+# Generated from lib/redhound/command.rb with RBS::Inline
+
+module Redhound
+  class Command
+    # @rbs () -> void
+    def initialize: () -> void
+
+    # @rbs (Array[untyped] argv) -> void
+    def run: (Array[untyped] argv) -> void
+
+    # @rbs (Array[untyped] argv) -> void
+    def parse: (Array[untyped] argv) -> void
+
+    private
+
+    # @rbs () -> void
+    def list_interfaces: () -> void
+  end
+end

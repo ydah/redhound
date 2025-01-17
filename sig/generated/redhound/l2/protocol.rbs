@@ -1,0 +1,15 @@
+# Generated from lib/redhound/l2/protocol.rb with RBS::Inline
+
+module Redhound
+  class L2
+    class Protocol
+      PROTO_TABLE: ::Hash[untyped, untyped]
+
+      # @rbs (protocol: Integer) -> void
+      def initialize: (protocol: Integer) -> void
+
+      # @rbs () -> String
+      def to_s: () -> String
+    end
+  end
+end

@@ -1,3 +1,4 @@
+# rbs_inline: enabled
 # frozen_string_literal: true
 
 require 'socket'
@@ -5,11 +6,13 @@ require 'socket'
 module Redhound
   class Receiver
     class << self
+      # @rbs (ifname: String, filename: String) -> void
       def run(ifname:, filename:)
         new(ifname:, filename:).run
       end
     end
 
+    # @rbs (ifname: String, filename: String) -> void
     def initialize(ifname:, filename:)
       @ifname = ifname
       @source = Resolver.resolve(ifname:)
@@ -20,11 +23,12 @@ module Redhound
       @count = 0
     end
 
+    # @rbs () -> void
     def run
       loop do
         msg, = @source.next_packet
         Analyzer.analyze(msg:, count: increment)
-        @writer&.write(msg)
+        @writer&.write(msg:)
       rescue Interrupt
         @writer&.stop
         break
@@ -33,6 +37,7 @@ module Redhound
 
     private
 
+    # @rbs () -> Integer
     def increment
       @count.tap { @count += 1 }
     end

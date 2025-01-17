@@ -1,0 +1,38 @@
+# Generated from lib/redhound/l3/ipv6.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Ipv6 < Base
+      # @rbs (bytes: Array[Integer]) -> Redhound::L3::Ipv6
+      def self.generate: (bytes: Array[Integer]) -> Redhound::L3::Ipv6
+
+      attr_reader protocol: Protocol
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> Redhound::L3::Ipv6
+      def generate: () -> Redhound::L3::Ipv6
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      # @rbs () -> bool
+      def supported_protocol?: () -> bool
+
+      private
+
+      # @rbs () -> Integer
+      def payload_length: () -> Integer
+
+      # @rbs () -> Integer
+      def saddr: () -> Integer
+
+      # @rbs () -> Integer
+      def daddr: () -> Integer
+    end
+  end
+end

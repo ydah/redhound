@@ -1,0 +1,11 @@
+# Generated from lib/redhound/resolver.rb with RBS::Inline
+
+module Redhound
+  class Resolver
+    # @rbs (ifname: String) -> void
+    def self.resolve: (ifname: String) -> void
+
+    # @rbs (ifname: String) -> Redhound::Source::Socket
+    def resolve: (ifname: String) -> Redhound::Source::Socket
+  end
+end

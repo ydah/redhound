@@ -1,0 +1,24 @@
+# Generated from lib/redhound/builder/socket.rb with RBS::Inline
+
+module Redhound
+  module Builder
+    class Socket
+      SOL_PACKET: ::Integer
+
+      PACKET_ADD_MEMBERSHIP: ::Integer
+
+      ETH_P_ALL: ::Integer
+
+      PACKED_ETH_P_ALL: untyped
+
+      # @rbs (ifname: String) -> Redhound::Source::Socket
+      def self.build: (ifname: String) -> Redhound::Source::Socket
+
+      # @rbs (ifname: String) -> void
+      def initialize: (ifname: String) -> void
+
+      # @rbs () -> Redhound::Source::Socket
+      def build: () -> Redhound::Source::Socket
+    end
+  end
+end

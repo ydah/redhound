@@ -1,0 +1,14 @@
+# Generated from lib/redhound/analyzer.rb with RBS::Inline
+
+module Redhound
+  class Analyzer
+    # @rbs (msg: String, count: Integer) -> void
+    def self.analyze: (msg: String, count: Integer) -> void
+
+    # @rbs (msg: String, count: Integer) -> void
+    def initialize: (msg: String, count: Integer) -> void
+
+    # @rbs () -> void
+    def analyze: () -> void
+  end
+end

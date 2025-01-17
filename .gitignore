@@ -1,6 +1,9 @@
 /.bundle/
 /.yardoc
+/.gem_rbs_collection/
 /_yardoc/
+/.irbrc
+/.vscode/
 /coverage/
 /doc/
 /pkg/

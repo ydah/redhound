@@ -1,0 +1,16 @@
+# Generated from lib/redhound/l3/resolver.rb with RBS::Inline
+
+module Redhound
+  class L3
+    class Resolver
+      # @rbs (bytes: Array[Integer], l2: Redhound::L2::Ether) -> Redhound::L3::Base?
+      def self.resolve: (bytes: Array[Integer], l2: Redhound::L2::Ether) -> Redhound::L3::Base?
+
+      # @rbs (bytes: Array[Integer], l2: Redhound::L2::Ether) -> void
+      def initialize: (bytes: Array[Integer], l2: Redhound::L2::Ether) -> void
+
+      # @rbs () -> Redhound::L3::Base?
+      def resolve: () -> Redhound::L3::Base?
+    end
+  end
+end

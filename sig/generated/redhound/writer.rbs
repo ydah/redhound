@@ -1,0 +1,25 @@
+# Generated from lib/redhound/writer.rb with RBS::Inline
+
+module Redhound
+  class Writer
+    # @rbs (filename: String) -> void
+    def initialize: (filename: String) -> void
+
+    # @rbs () -> void
+    def start: () -> void
+
+    # @rbs (msg: String) -> void
+    def write: (msg: String) -> void
+
+    # @rbs () -> void
+    def stop: () -> void
+
+    private
+
+    # @rbs () -> String
+    def file_header: () -> String
+
+    # @rbs (Time timestamp, Integer captured_length, Integer original_length) -> String
+    def packet_record: (Time timestamp, Integer captured_length, Integer original_length) -> String
+  end
+end
