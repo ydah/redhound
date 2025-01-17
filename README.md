@@ -25,7 +25,7 @@ gem install redhound
  / , _/ -_) _  / _ \/ _ \/ // / _ \/ _  /
 /_/|_|\__/\_,_/_//_/\___/\_,_/_//_/\_,_/
 
-Version: 0.1.0
+Version: 1.0.0
 Dump and analyze network packets.
 
 Usage: redhound [options] ...
