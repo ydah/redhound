@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 1.0.1 - 2025-01-17
+
+- Fix an NameError in Redhound::L3::Arp
+
 ## 1.0.0 - 2025-01-16
 
 - Add ARP header support.
