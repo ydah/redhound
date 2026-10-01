@@ -6,7 +6,7 @@
 
 ### Bug fixes
 
-- Improve file reading throughput while keeping stdin responsive.
+- Improve file reading and packet summary throughput while keeping stdin responsive.
 - Preserve readable fields in truncated headers and correct ICMP errors, IGMP reports, signed NTP precision, IPv6 extension boundaries and variable field locations.
 - Reject malformed TCP options and empty or conflicting HTTP Content-Length values; recognize HTTP when its first line spans segments on nonstandard ports.
 - Report incomplete IP/TCP data at EOF and flow eviction, distinguish retransmitted SYN/FIN packets, and handle IPv6 atomic fragments independently.

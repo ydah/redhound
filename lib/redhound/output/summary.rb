@@ -65,7 +65,8 @@ module Redhound
         diagnostics = packet.layers.flat_map(&:diagnostics)
         parts << diagnostics.map { |d| "[#{d.code}]" }.join(' ') unless diagnostics.empty?
         # All protocol summaries and interface names pass this terminal boundary.
-        parts.reject(&:empty?).join(' ').b.gsub(/[^\x20-\x7e]/n) { |c| Kernel.format('\\x%02x', c.getbyte(0)) }
+        text = parts.reject(&:empty?).join(' ').b
+        text.match?(/[^\x20-\x7e]/n) ? text.gsub(/[^\x20-\x7e]/n) { |c| Kernel.format('\\x%02x', c.getbyte(0)) } : text
       end
       # @rbs (Packet packet, untyped io) -> void
       def format(packet, io) = io.write(line(packet) + "\n")
