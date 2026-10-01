@@ -34,6 +34,18 @@ RSpec.describe 'application field source ranges' do
     expect(packet.data.byteslice(field.offset, field.length)).to eq('example.test')
   end
 
+  it 'trims only boundary HTTP whitespace and preserves long interior tabs and invalid control bytes' do
+    interior = 'a' + "\t" * 4096 + 'b'
+    [[" \tvalue \t", 'value'], ["\t \t", ''],
+     [" \t#{interior}" + "\t" * 4096, interior], ["\tvalue\v\t", "value\v"]].each do |raw, expected|
+      packet = application_packet("GET / HTTP/1.1\r\nHost:#{raw}\r\n\r\n", port: 80, tcp: true)
+      field = packet[:http].fields.find { |item| item.name == 'http.host' }
+      expect(field.value).to eq(expected)
+      expect(packet.data.byteslice(field.offset, field.length)).to eq(expected)
+      expect(packet[:http].diagnostics.map(&:code)).to include(:malformed) if expected.include?("\v")
+    end
+  end
+
   it 'bounds every normal application source range within its packet payload' do
     sample_messages.each_value do |bytes, tcp, port|
       packet = application_packet(bytes, port: port, tcp: tcp)
