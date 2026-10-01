@@ -1,0 +1,63 @@
+name: Live acceptance
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: Capture duration in seconds (up to 3600)
+        type: number
+        default: 10
+      rate:
+        description: Requested incoming packets per second
+        type: number
+        default: 200000
+      backend:
+        description: Capture backend
+        type: choice
+        options: [ring, socket, compare]
+        default: ring
+      rotate:
+        description: Validate bounded pcapng rotation
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '4.0'
+      - name: Install inspection tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y iproute2 tcpdump tshark
+      - name: Measure file throughput on one CPU
+        run: |
+          ruby bench/generate.rb
+          cpu=$(awk '/Cpus_allowed_list/ {split($2, ids, /[-,]/); print ids[1]}' /proc/self/status)
+          for format in summary tree filter write; do
+            taskset -c "$cpu" ruby --yjit bench/dissect.rb --format "$format" | tee "$RUNNER_TEMP/$format.txt"
+          done
+      - name: Validate live capture
+        env:
+          DURATION: ${{ inputs.duration }}
+          RATE: ${{ inputs.rate }}
+          BACKEND: ${{ inputs.backend }}
+          ROTATE: ${{ inputs.rotate }}
+        run: |
+          ruby -e 'abort "duration must be in (0,3600]" unless Float(ENV.fetch("DURATION")).between?(0.001, 3600)'
+          args=(--duration "$DURATION" --rate "$RATE" --backend "$BACKEND" --out "$RUNNER_TEMP/live" --sample 10)
+          if [ "$ROTATE" = true ]; then args+=(--rotate --rotation-interval 2); fi
+          sudo -E env "PATH=$PATH" ruby --yjit bench/live.rb "${args[@]}"
+      - name: Preserve acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: acceptance-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/*.txt
+            ${{ runner.temp }}/live
+          retention-days: 30

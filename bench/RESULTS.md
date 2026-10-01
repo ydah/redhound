@@ -59,3 +59,29 @@ The previous commit measured 23,031 summary pps in the same job (a 4.1%
 improvement, within runner noise). The initial x86_64 absolute targets were
 not reached; performance acceptance remains open for GA. These figures are
 reported rather than lowering the targets to classify an unmet gate as passed.
+
+## Reproducible live acceptance
+
+On Linux with NET_RAW, NET_ADMIN and SYS_ADMIN, `bench/live.rb` creates its own
+veth pair and network namespace, sends numbered 600-byte UDP frames and checks
+captured bytes, sequence gaps, wire lengths, kernel drops and completion delay:
+
+```sh
+sudo ruby --yjit bench/live.rb --duration 10 --rate 200000 --backend ring --out tmp/ring-200k
+sudo ruby --yjit bench/live.rb --duration 10 --rate 80000 --backend socket --out tmp/socket-80k
+sudo ruby --yjit bench/live.rb --duration 3600 --rate 50000 --backend compare --out tmp/arm-hour
+sudo ruby --yjit bench/live.rb --duration 259200 --rate 100 --backend ring --rotate --out tmp/rotation-72h
+```
+
+The comparison also requires identical byte digests and kernel timestamps within
+1 ms. A sender that cannot produce the requested rate fails acceptance. Capture
+processes write pcap to `/dev/null`, or bounded pcapng rotation with `--rotate`;
+every completed rotated file is checked with capinfos and tshark. JSON results
+and periodic RSS, descriptor and drop samples are retained in the output
+directory. Each run needs a new directory. The manual **Live acceptance** GitHub
+workflow runs the same check on x86_64 and measures file throughput on one CPU.
+
+Short aarch64 Linux checks on 2026-10-02, Ruby 3.4.11/YJIT, passed 50,000 pps
+with both backends (500,000 identical frames each) and 80,000 pps with the socket
+backend (800,000 frames), without kernel drops. These are short ARM measurements;
+they do not establish the one-hour ARM, x86_64 or 72-hour acceptance gates.

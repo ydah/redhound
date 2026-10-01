@@ -12,22 +12,27 @@ RSpec.describe 'bounded dissection', :fuzz do
     count = Integer(ENV.fetch('FUZZ_ITERATIONS', '10000'))
     random = Random.new(Integer(ENV.fetch('FUZZ_SEED', '1')))
     seeds = [ether(arp, type: 0x0806), ether(ipv4(udp('hello', dport: 9999))),
-             ether(ipv6(tcp('GET / HTTP/1.1\r\n\r\n', dport: 80), next_header: 6), type: 0x86dd),
-             ether(ipv4(icmp_echo, proto: 1))]
+             ether(ipv6(tcp("GET / HTTP/1.1\r\n\r\n", dport: 80), next_header: 6), type: 0x86dd),
+             ether(ipv4(icmp_echo, proto: 1))].map { |bytes| [bytes, 1] }
     Dir[File.expand_path('../fixtures/pcap/*.pcap', __dir__)].each do |path|
-      Redhound.open(path) { |reader| reader.each { |packet| seeds << packet.data if seeds.length < 200 } }
+      Redhound.open(path) { |reader| reader.each { |packet| seeds << [packet.data, packet.linktype] if seeds.length < 200 } }
     end
-    seeds.each do |bytes|
-      (0..bytes.bytesize).each { |n| Redhound.dissect(bytes.byteslice(0, n)).to_h }
+    seeds.each do |bytes, linktype|
+      (0..bytes.bytesize).each { |n| Redhound.dissect(bytes.byteslice(0, n), linktype: linktype).to_h }
     end
     count.times do |i|
-      bytes = i.even? ? seeds.sample(random: random).dup : random.bytes(random.rand(0..256))
+      if i.even?
+        original, linktype = seeds.sample(random: random)
+        bytes = original.dup
+      else
+        bytes = random.bytes(random.rand(0..256))
+        linktype = [1, 0, 101, 108, 113, 276, 228, 229].sample(random: random)
+      end
       random.rand(1..4).times do
         break if bytes.empty?
         pos = random.rand(bytes.bytesize)
         bytes.setbyte(pos, random.rand(256))
       end
-      linktype = [1, 0, 101, 108, 113, 276, 228, 229].sample(random: random)
       packet = Redhound.dissect(bytes, linktype: linktype)
       packet.to_h
       Redhound::Output::Summary.new.line(packet)
