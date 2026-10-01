@@ -88,4 +88,31 @@ RSpec.describe 'v2 live capture', :live do
     _out, err, status = Open3.capture3(RbConfig.ruby, '-I', library, '-e', code)
     expect(status.success?).to be(true), err
   end
+
+  if RUBY_PLATFORM.include?('darwin')
+    it 'captures filtered outgoing Ethernet on en0 and preserves it in pcapng' do
+      marker = "redhound-ethernet-#{Process.pid}"
+      expression = 'udp dst port 54321'
+      source = Redhound::Capture.open(interface: 'en0', backend: :bpf, promiscuous: false,
+                                     direction: :out, filter: expression)
+      UDPSocket.open { |socket| socket.send(marker, 0, '192.0.2.1', 54321) }
+      packet = source.next_packet(timeout: 2)
+      expect(packet).to be_a(Redhound::Packet)
+      expect(packet.linktype).to eq(1)
+      expect(packet.direction).to eq(:out)
+      expect(packet['udp.dstport']).to eq(54321)
+      expect(packet.data).to include(marker)
+      io = StringIO.new
+      Redhound::Writer.open(io, format: :pcapng, filter: expression) { |writer| writer << packet }
+      io.rewind
+      Redhound.open(io) do |reader|
+        restored = reader.next_packet
+        expect(restored.data).to eq(packet.data)
+        expect(restored.interface.filter).to eq(expression)
+        expect(restored.direction).to eq(:out)
+      end
+    ensure
+      source&.close
+    end
+  end
 end
