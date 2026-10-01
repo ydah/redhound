@@ -1,3 +1,8 @@
+---
+title: Ruby API
+description: Readers, writers, packets, typed fields, analysis sessions, and custom Ruby dissectors.
+permalink: /guide/api/
+---
 # Ruby API
 
 ```ruby

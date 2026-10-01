@@ -1,3 +1,8 @@
+---
+title: Protocols and fields
+description: Supported network and application protocols, field semantics, and dissection limits.
+permalink: /guide/protocols/
+---
 # Supported protocols
 
 Built-in protocol registry (regenerate with `redhound --list-protocols`):

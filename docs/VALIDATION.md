@@ -1,3 +1,8 @@
+---
+title: Release validation
+description: Completed release-candidate checks and the remaining GA acceptance gates.
+permalink: /guide/validation/
+---
 # Release validation
 
 ## Adversarial review after rc1
@@ -19,7 +24,7 @@ large TCP streams, checking every update and final buffer release. Its retained
 state accounting includes String capacity and object storage. Process RSS is
 reported separately: Ruby may retain allocator pages after state is released.
 
-The manual [Live acceptance workflow](../.github/workflows/acceptance.yml) and
+The manual [Live acceptance workflow](https://github.com/ydah/redhound/blob/main/.github/workflows/acceptance.yml) and
 `bench/live.rb` record requested/sent/captured counts, gaps, byte digests, kernel
 timestamps, drops, RSS and descriptor counts. An insufficient sender rate fails
 the check. Controlled aarch64 runs passed 50,000 pps with simultaneous socket and
@@ -157,7 +162,7 @@ termination, privilege dropping and pcapng metadata passed the macOS CI job.
 The Linux namespace test passed socket/ring parity and offloaded VLAN checks.
 Ruby 3.3/3.4/4.0/head all passed the CI type, signature and coverage gates.
 Whole-library line coverage measured 90.92%; isolated protocol line coverage
-measured 99.90%. See [benchmarks](../bench/RESULTS.md)
+measured 99.90%. See [benchmarks](https://github.com/ydah/redhound/blob/main/bench/RESULTS.md)
 for throughput figures and measurement limits.
 
 ## Remaining GA acceptance gates

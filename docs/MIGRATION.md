@@ -1,3 +1,8 @@
+---
+title: Migration from 1.x
+description: Move from the Redhound 1.x API and CLI to the v2 packet model.
+permalink: /guide/migration/
+---
 # Migrating from 1.x
 
 Redhound 2 replaces the former Analyzer/Builder/L2/L3/L4 classes with Packet,

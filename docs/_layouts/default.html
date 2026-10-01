@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ page.description | default: site.description | escape }}">
+  <meta name="theme-color" content="#101825">
+  <meta property="og:title" content="{{ page.title | escape }} · {{ site.title }}">
+  <meta property="og:description" content="{{ page.description | default: site.description | escape }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ page.url | absolute_url }}">
+  <link rel="canonical" href="{{ page.url | absolute_url }}">
+  <link rel="stylesheet" href="{{ '/assets/site.css' | relative_url }}">
+  <title>{{ page.title | escape }} · {{ site.title }}</title>
+</head>
+<body>
+  <a class="skip-link" href="#content">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="{{ '/' | relative_url }}">Redhound</a>
+    <nav aria-label="Primary navigation">
+      <a href="{{ '/' | relative_url }}#features">Features</a>
+      <a href="{{ '/' | relative_url }}#quick-start">Quick start</a>
+      <a href="{{ '/guide/' | relative_url }}"{% if page.layout == 'guide' %} aria-current="true"{% endif %}>User Guide</a>
+      <a href="https://github.com/ydah/redhound">GitHub</a>
+    </nav>
+  </header>
+  {{ content }}
+  <footer class="site-footer">
+    <p>Redhound is open source under the <a href="https://github.com/ydah/redhound/blob/main/LICENSE.txt">MIT License</a>.</p>
+    <a href="https://rubygems.org/gems/redhound">RubyGems</a>
+  </footer>
+</body>
+</html>

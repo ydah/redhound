@@ -1,3 +1,8 @@
+---
+title: Capture filters
+description: Tcpdump-style filter expressions, arithmetic, link types, and the Ruby cBPF compiler.
+permalink: /guide/filters/
+---
 # Capture filters
 
 Redhound compiles filters to classic BPF in Ruby. Live capture attaches the verified program to the kernel; file capture executes the same instructions in the Ruby VM. No libpcap or external command is needed at runtime.

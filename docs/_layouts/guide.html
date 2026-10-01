@@ -1,0 +1,31 @@
+---
+layout: default
+---
+<div class="docs-shell">
+  <details class="docs-navigation" open>
+    <summary>Browse documentation</summary>
+    <nav aria-label="Documentation navigation">
+      {% for group in site.navigation %}
+      <div class="nav-group">
+        <h2>{{ group.title }}</h2>
+        {% for item in group.pages %}
+        <a href="{{ item.url | relative_url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.title }}</a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </nav>
+  </details>
+  <main id="content" class="prose" tabindex="-1">
+    <p class="breadcrumb"><a href="{{ '/guide/' | relative_url }}">User Guide</a> / {{ page.title }}</p>
+    {{ content }}
+    <div class="doc-footer">
+      <a href="https://github.com/ydah/redhound/blob/main/docs/{{ page.path }}">View this page on GitHub</a>
+      <a href="{{ '/guide/validation/' | relative_url }}">v2 release candidate</a>
+    </div>
+  </main>
+  <nav class="page-toc" aria-label="On this page" hidden>
+    <h2>On this page</h2>
+    <ul></ul>
+  </nav>
+</div>
+<script src="{{ '/assets/guide.js' | relative_url }}" defer></script>

@@ -1,3 +1,8 @@
+---
+title: CLI usage
+description: Capture options, output formats, rotation, privileges, and platform limits.
+permalink: /guide/cli/
+---
 # Using Redhound
 
 Ruby 3.3 or later is required. File analysis needs no capture privileges.
@@ -9,6 +14,7 @@ standard libraries; neither libpcap nor a native extension is required.
 redhound -D
 sudo redhound -i any 'tcp port 443'
 sudo redhound -i en0 -c 100 -w trace.pcapng
+sudo chown "$(id -un)" trace.pcapng
 redhound -r trace.pcapng -T tree
 redhound -r trace.pcap -T ndjson 'udp port 53'
 redhound -r trace.pcap -T fields -e ip.src -e tcp.dstport

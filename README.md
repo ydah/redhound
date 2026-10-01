@@ -16,6 +16,8 @@
   <a href="#features">Features</a> ·
   <a href="#installation">Installation</a> ·
   <a href="#quick-start">Quick start</a> ·
+  <a href="https://ydah.github.io/redhound/">Website</a> ·
+  <a href="https://ydah.github.io/redhound/guide/">User Guide</a> ·
   <a href="#ruby-api">Ruby API</a> ·
   <a href="#documentation">Documentation</a> ·
   <a href="#development">Development</a>
@@ -151,8 +153,13 @@ backend selection, VLAN metadata, and supported capture-filter syntax.
 
 ## Documentation
 
+Visit the [website](https://ydah.github.io/redhound/) and follow the
+[User Guide](https://ydah.github.io/redhound/guide/) for installation, your first
+capture, and common analysis tasks.
+
 | Guide | Covers |
 | --- | --- |
+| [User Guide](docs/USER_GUIDE.md) | Getting started, common workflows, and troubleshooting |
 | [Usage](docs/USAGE.md) | CLI options, tcpdump mapping, capture files, rotation, and privileges |
 | [Protocols](docs/PROTOCOLS.md) | Supported protocols and fields |
 | [Capture filters](docs/FILTERS.md) | Filter syntax, examples, and cBPF inspection |
@@ -174,6 +181,10 @@ bundle exec rake
 
 The Rake task runs RSpec, generates RBS signatures, and checks types with Steep.
 Differential tests use tcpdump and tshark as development tools.
+
+The website lives in `docs/`. The Pages workflow builds it with GitHub's Jekyll
+action, checks internal links, and publishes main to GitHub Pages. Pull requests
+build and check the site without publishing it.
 
 <details>
 <summary>Additional checks and fixture maintenance</summary>

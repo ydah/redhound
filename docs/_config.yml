@@ -1,0 +1,31 @@
+title: Redhound
+description: Capture, inspect, and save network packets in pure Ruby.
+url: https://ydah.github.io
+baseurl: /redhound
+repository: ydah/redhound
+markdown: kramdown
+plugins:
+  - jekyll-relative-links
+defaults:
+  - scope:
+      path: ''
+      type: pages
+    values:
+      layout: guide
+navigation:
+  - title: Getting started
+    pages:
+      - {title: User Guide, url: /guide/}
+      - {title: Migration from 1.x, url: /guide/migration/}
+  - title: Reference
+    pages:
+      - {title: CLI usage, url: /guide/cli/}
+      - {title: Capture filters, url: /guide/filters/}
+      - {title: Protocols and fields, url: /guide/protocols/}
+      - {title: Ruby API, url: /guide/api/}
+  - title: Project
+    pages:
+      - {title: Release validation, url: /guide/validation/}
+exclude:
+  - .jekyll-cache
+  - .jekyll-metadata

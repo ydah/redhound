@@ -1,0 +1,78 @@
+---
+layout: default
+title: Packet analysis in pure Ruby
+---
+<main id="content" tabindex="-1">
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-inner">
+      <div>
+        <a class="release-note" href="{{ '/guide/validation/' | relative_url }}">Version 2 is a release candidate</a>
+        <h1 id="hero-heading">Packet analysis.<br>Pure Ruby.</h1>
+        <p class="lead">Capture live traffic, read pcap files, and inspect protocols from the command line or your Ruby application. Runs on Linux and macOS using Ruby's standard libraries.</p>
+        <div class="actions">
+          <a class="button primary" href="{{ '/guide/' | relative_url }}">Read the User Guide</a>
+          <a class="button" href="https://github.com/ydah/redhound">View on GitHub</a>
+        </div>
+      </div>
+      <div class="terminal">
+        <div class="terminal-heading"><span>Protocol tree</span><span>Output excerpt</span></div>
+        <pre><code><span class="command">$ redhound -r trace.pcapng -T tree</span>
+
+Frame 1: 60 bytes on wire, 60 captured
+└─ Ethernet
+   <span class="dim">eth.src:</span> 02:00:00:00:00:01
+   └─ Internet Protocol v4
+      <span class="dim">ip.src:</span> 192.0.2.1
+      <span class="dim">ip.dst:</span> 192.0.2.2
+      └─ Transmission Control Protocol
+         <span class="dim">tcp.srcport:</span> 40000
+         <span class="dim">tcp.dstport:</span> 9999
+         <span class="dim">tcp.flags.syn:</span> true
+         <span class="dim">tcp.stream:</span> 0</code></pre>
+      </div>
+    </div>
+  </section>
+  <div class="platforms" aria-label="Requirements and supported platforms">
+    <span>Ruby 3.3+</span><span>Linux · macOS</span><span>pcap · pcapng</span><span>CLI · Ruby API</span>
+  </div>
+  <section id="features" class="features" aria-labelledby="features-heading">
+    <div>
+      <h2 id="features-heading">From live traffic<br>to decoded fields.</h2>
+      <p class="lead">Use the same capture files, filters, and packet model in a terminal session or inside your application.</p>
+    </div>
+    <dl>
+      <div><dt>Live capture</dt><dd>Linux socket/ring and macOS BPF backends, kernel timestamps, direction selection, and drop statistics.</dd></div>
+      <div><dt>Portable capture files</dt><dd>Read and write pcap/pcapng, stream through standard input/output, and rotate files by size or time.</dd></div>
+      <div><dt>Protocol dissection</dt><dd>Inspect Ethernet, IPv4/IPv6, TCP/UDP, DNS, HTTP/1.x, TLS hellos, and tunneled traffic.</dd></div>
+      <div><dt>Capture filters</dt><dd>Compile tcpdump-style expressions to classic BPF in Ruby, with the same filter for live traffic and saved files.</dd></div>
+      <div><dt>Stateful analysis</dt><dd>Follow TCP streams, reassemble application data, and report conversations, endpoints, and traffic intervals.</dd></div>
+      <div><dt>Ruby integration</dt><dd>Access typed fields and structured diagnostics, export JSON, and register custom protocol dissectors.</dd></div>
+    </dl>
+  </section>
+  <section id="quick-start" class="quick-start-section" aria-labelledby="quick-start-heading">
+    <div class="quick-start">
+      <div>
+        <pre><code>gem install redhound --pre
+redhound --version
+
+# Open an existing capture; no root required.
+redhound -r trace.pcapng -T tree
+redhound -r trace.pcapng -T ndjson 'udp port 53'</code></pre>
+        <p class="note">Live capture needs root or capture permissions. Start with the <a href="{{ '/guide/' | relative_url }}#read-your-first-capture">sample capture</a> to try file analysis as your regular user.</p>
+      </div>
+      <div>
+        <h2 id="quick-start-heading">Start with a capture.<br>Keep going in Ruby.</h2>
+        <p class="lead">Install the release candidate, choose the output you need, and use the packet API when you're ready to build.</p>
+        <pre><code>require 'redhound'
+
+Redhound.open('trace.pcapng') do |reader|
+  reader.each do |packet|
+    puts packet.summary
+    p packet['ip.src']
+  end
+end</code></pre>
+        <a href="{{ '/guide/api/' | relative_url }}">Explore the Ruby API</a>
+      </div>
+    </div>
+  </section>
+</main>
