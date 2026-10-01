@@ -315,7 +315,7 @@ Frame 12: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.011000000
       ip.src: 192.0.2.1
       ip.dst: 192.0.2.2
       └─ Internet Control Message Protocol
-         icmp.type: 8
+         icmp.type: Echo Request (8)
          icmp.code: 0
          icmp.checksum: 0x192d
          icmp.ident: 1
@@ -345,8 +345,8 @@ Frame 13: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.012000000
       ip.src: 192.0.2.1
       ip.dst: 192.0.2.2
       └─ Internet Control Message Protocol
-         icmp.type: 3
-         icmp.code: 3
+         icmp.type: Destination Unreachable (3)
+         icmp.code: Port Unreachable (3)
          icmp.checksum: 0xe855
          icmp.ident: 0
          icmp.seq: 0
@@ -389,7 +389,7 @@ Frame 14: 66 bytes on wire, 66 captured, 2023-11-14 22:13:20.013000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 128
+         icmpv6.type: Echo Request (128)
          icmpv6.code: 0
          icmpv6.checksum: 17763
          icmpv6.echo.identifier: 7
@@ -412,7 +412,7 @@ Frame 15: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.014000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 135
+         icmpv6.type: Neighbor Solicitation (135)
          icmpv6.code: 0
          icmpv6.checksum: 60530
          icmpv6.nd.ns.target_address: 2001:db8::2
@@ -434,7 +434,7 @@ Frame 16: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.015000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 136
+         icmpv6.type: Neighbor Advertisement (136)
          icmpv6.code: 0
          icmpv6.checksum: 2673
          icmpv6.nd.na.target_address: 2001:db8::2
@@ -460,7 +460,7 @@ Frame 17: 62 bytes on wire, 62 captured, 2023-11-14 22:13:20.016000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 133
+         icmpv6.type: Router Solicitation (133)
          icmpv6.code: 0
          icmpv6.checksum: 8008
 Frame 18: 110 bytes on wire, 110 captured, 2023-11-14 22:13:20.017000000
@@ -478,7 +478,7 @@ Frame 18: 110 bytes on wire, 110 captured, 2023-11-14 22:13:20.017000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 134
+         icmpv6.type: Router Advertisement (134)
          icmpv6.code: 0
          icmpv6.checksum: 14629
          icmpv6.nd.ra.cur_hop_limit: 64
@@ -515,7 +515,7 @@ Frame 19: 94 bytes on wire, 94 captured, 2023-11-14 22:13:20.018000000
       ipv6.src: 2001:db8::1
       ipv6.dst: 2001:db8::2
       └─ ICMPv6 / Neighbor Discovery
-         icmpv6.type: 137
+         icmpv6.type: Redirect (137)
          icmpv6.code: 0
          icmpv6.checksum: 49074
          icmpv6.nd.rd.target_address: 2001:db8::1

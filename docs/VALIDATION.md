@@ -28,12 +28,13 @@ The CI matrix checks Ruby 3.3/3.4/4.0/head, Linux/macOS live capture and tool
 comparisons. Scheduled runs execute one million fuzz cases. Benchmark jobs warn
 on a summary throughput regression over 15% compared with the previous commit.
 
-Local validation on 2026-10-01: Linux aarch64 Ruby 3.4 passed all 164 non-live
+Local validation on 2026-10-01: Linux aarch64 Ruby 3.4 passed all 165 non-live
 examples, including tcpdump/tshark differential checks, and five live capture
 examples using socket and ring backends. Native macOS Ruby 4.0 passed unit,
 golden and filter checks; BPF ioctl constants match the installed SDK. Native
-BPF capture is verified by the macOS CI job because local sudo requires an
-interactive password. Whole-library line coverage measured 90.69%; isolated
+BPF loopback capture, attached filters, timestamps, truncation, termination and
+privilege dropping passed the macOS CI job. Ruby 3.3/3.4/4.0/head all passed
+the CI type, signature and coverage gates. Whole-library line coverage measured 90.71%; isolated
 protocol line coverage measured 99.90%. See [benchmarks](../bench/RESULTS.md)
 for throughput figures and measurement limits.
 

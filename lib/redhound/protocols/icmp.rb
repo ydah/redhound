@@ -6,17 +6,33 @@ module Redhound
   module Protocols
     # @api private
     class Icmp < Dissector
+      TYPES = { 0 => 'Echo Reply', 3 => 'Destination Unreachable', 4 => 'Source Quench', 5 => 'Redirect',
+                8 => 'Echo Request', 9 => 'Router Advertisement', 10 => 'Router Solicitation', 11 => 'Time Exceeded',
+                12 => 'Parameter Problem', 13 => 'Timestamp', 14 => 'Timestamp Reply', 17 => 'Address Mask Request', 18 => 'Address Mask Reply' }.freeze
+      CODES = {
+        3 => { 0 => 'Network Unreachable', 1 => 'Host Unreachable', 2 => 'Protocol Unreachable', 3 => 'Port Unreachable',
+               4 => 'Fragmentation Needed', 5 => 'Source Route Failed', 6 => 'Network Unknown', 7 => 'Host Unknown',
+               8 => 'Source Host Isolated', 9 => 'Network Administratively Prohibited', 10 => 'Host Administratively Prohibited',
+               11 => 'Network Unreachable for TOS', 12 => 'Host Unreachable for TOS', 13 => 'Administratively Prohibited',
+               14 => 'Host Precedence Violation', 15 => 'Precedence Cutoff' },
+        5 => { 0 => 'Redirect Network', 1 => 'Redirect Host', 2 => 'Redirect TOS Network', 3 => 'Redirect TOS Host' },
+        11 => { 0 => 'TTL Expired', 1 => 'Reassembly Timeout' },
+        12 => { 0 => 'Invalid Pointer', 1 => 'Missing Option', 2 => 'Invalid Length' }
+      }.freeze
       protocol :icmp, name: 'Internet Control Message Protocol', short: 'ICMP'
       dissects_on 'ip.proto', 1
       header do
-        uint8 :type, 'icmp.type'
+        uint8 :type, 'icmp.type', enum: TYPES
         uint8 :code, 'icmp.code'
         uint16 :checksum, 'icmp.checksum', format: :hex
         uint16 :ident, 'icmp.ident'
         uint16 :seq, 'icmp.seq'
       end
       # @rbs (Context ctx, Layer layer) -> void
-      def dissect(ctx, layer) = Checksum.verify(ctx, layer, ctx.cursor.bytes(0, ctx.cursor.remaining))
+      def dissect(ctx, layer)
+        layer.definitions[1] = layer.definitions[1].with(enum: CODES[layer[:type]])
+        Checksum.verify(ctx, layer, ctx.cursor.bytes(0, ctx.cursor.remaining))
+      end
       # @rbs (Context ctx, Layer layer) -> untyped
       def next_dissector(ctx, layer)
         return nil unless [3, 4, 5, 11, 12].include?(layer[:type])
@@ -29,16 +45,26 @@ module Redhound
 
     # @api private
     class Icmpv6 < Dissector
+      TYPES = { 1 => 'Destination Unreachable', 2 => 'Packet Too Big', 3 => 'Time Exceeded', 4 => 'Parameter Problem',
+                128 => 'Echo Request', 129 => 'Echo Reply', 133 => 'Router Solicitation', 134 => 'Router Advertisement',
+                135 => 'Neighbor Solicitation', 136 => 'Neighbor Advertisement', 137 => 'Redirect' }.freeze
+      CODES = {
+        1 => { 0 => 'No Route', 1 => 'Administratively Prohibited', 2 => 'Beyond Source Scope', 3 => 'Address Unreachable',
+               4 => 'Port Unreachable', 5 => 'Source Policy Failure', 6 => 'Reject Route', 7 => 'Source Routing Error' },
+        3 => { 0 => 'Hop Limit Exceeded', 1 => 'Reassembly Timeout' },
+        4 => { 0 => 'Invalid Header Field', 1 => 'Unknown Next Header', 2 => 'Unknown Option' }
+      }.freeze
       protocol :icmpv6, name: 'ICMPv6 / Neighbor Discovery', short: 'ICMP6'
       dissects_on 'ip.proto', 58
       header do
-        uint8 :type, 'icmpv6.type'
+        uint8 :type, 'icmpv6.type', enum: TYPES
         uint8 :code, 'icmpv6.code'
         uint16 :checksum, 'icmpv6.checksum'
       end
       # @rbs (Context ctx, Layer layer) -> void
       def dissect(ctx, layer)
         cursor, type = ctx.cursor, layer[:type]
+        layer.definitions[1] = layer.definitions[1].with(enum: CODES[type])
         length = case type
                  when 133 then 8
                  when 134 then 16

@@ -127,7 +127,8 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
   end
 
   it 'matches interval and protocol hierarchy packet and byte counts' do
-    reference = tshark(:stats, '-q', '-z', 'io,stat,1', '-z', 'io,phs')
+    # Compare packet hierarchy, not version-dependent TCP segment buffering.
+    reference = tshark(:stats, '-o', 'tcp.desegment_tcp_streams:FALSE', '-q', '-z', 'io,stat,1', '-z', 'io,phs')
     intervals = reference.lines.filter_map do |line|
       match = /\|\s*(\d+)\s*<>\s*(?:Dur|\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|/.match(line)
       [match[1].to_i, [match[2].to_i, match[3].to_i]] if match

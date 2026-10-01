@@ -5,6 +5,10 @@ module Redhound
   module Protocols
     # @api private
     class Icmp < Dissector
+      TYPES: untyped
+
+      CODES: untyped
+
       # @rbs (Context ctx, Layer layer) -> void
       def dissect: (Context ctx, Layer layer) -> void
 
@@ -17,6 +21,10 @@ module Redhound
 
     # @api private
     class Icmpv6 < Dissector
+      TYPES: untyped
+
+      CODES: untyped
+
       # @rbs (Context ctx, Layer layer) -> void
       def dissect: (Context ctx, Layer layer) -> void
 

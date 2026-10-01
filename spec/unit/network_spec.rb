@@ -92,4 +92,15 @@ RSpec.describe 'network protocols' do
     packet = Redhound.dissect(ether(ipv6(redirect, next_header: 58), type: 0x86dd))
     expect(packet['icmpv6.rd.na.destination_address']).to eq('2001:db8::2')
   end
+
+  it 'labels ICMP types and codes and skips incomplete IPv6 fragment checksums' do
+    packet = Redhound.dissect(ether(ipv4([3, 3, 0, 0].pack('CCnN') + ipv4(udp('x')), proto: 1)))
+    expect(packet[:icmp].display(:type)).to include('Destination Unreachable')
+    expect(packet[:icmp].display(:code)).to include('Port Unreachable')
+    fragment = [17, 0, 1, 123].pack('CCnN') + udp('abcdefgh', dport: 9999)
+    packet = Redhound.dissect(ether(ipv6(fragment, next_header: 44), type: 0x86dd))
+    packet.engine = Redhound::Engine.new(verify_checksums: true)
+    expect(packet[:udp].diagnostics.map(&:code)).to include(:checksum_unverified)
+    expect(packet[:udp].diagnostics.map(&:code)).not_to include(:bad_checksum)
+  end
 end

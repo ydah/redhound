@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'stringio'
+require 'json_schemer'
 
 RSpec.describe 'captured packet output snapshots' do
   around do |example|
@@ -24,6 +25,10 @@ RSpec.describe 'captured packet output snapshots' do
         path = File.expand_path("../fixtures/pcap/#{fixture}.pcap", __dir__)
         Redhound.open(path) { |reader| reader.each { |packet| formatter.format(packet, io) } }
         formatter.finish(io) if formatter.respond_to?(:finish)
+        if format == :json
+          schema = JSONSchemer.schema(JSON.parse(File.read(File.expand_path('../../docs/json-schema.json', __dir__))))
+          JSON.parse(io.string).each { |packet| expect(schema.validate(packet).to_a).to eq([]) }
+        end
         expect_golden("#{fixture}.#{format}", io.string)
       end
     end

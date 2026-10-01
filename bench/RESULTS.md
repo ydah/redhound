@@ -42,3 +42,20 @@ numbers and compares against the previous commit, warning at a 15% regression.
 The loss-free live targets and sustained aarch64 memory-ordering load require
 separate capture/traffic measurements; no throughput or soak result is inferred
 from short loopback tests.
+
+## GitHub Actions x86_64 baseline
+
+[Run 36869003834](https://github.com/ydah/redhound/actions/runs/36869003834),
+Ubuntu runner, Ruby 3.4.10, YJIT, 200,000 packets, 2026-10-01:
+
+| Scenario | Throughput |
+| --- | ---: |
+| Summary | 23,982 pps |
+| Tree | 13,981 pps |
+| Filter VM | 143,058 pps |
+| pcap rewrite | 143,008 pps |
+
+The previous commit measured 23,031 summary pps in the same job (a 4.1%
+improvement, within runner noise). The initial x86_64 absolute targets were
+not reached; performance acceptance remains open for GA. These figures are
+reported rather than lowering the targets to classify an unmet gate as passed.

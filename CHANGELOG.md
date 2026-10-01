@@ -23,7 +23,7 @@
 ### Bug fixes
 
 - Fix crashes on padded ARP, short frames and malformed packet headers.
-- Correct IPv4 and IPv6 fields, IP options and transport payload boundaries.
+- Correct IPv4 and IPv6 fields, IP options and transport payload boundaries; label ICMP types/codes and avoid false checksum failures on incomplete IPv6 fragments.
 - Display TCP ports, sequence numbers, flags and payload lengths.
 - Escape terminal control characters in captured payloads.
 - Save packets before analysis and close captures reliably on termination or errors.

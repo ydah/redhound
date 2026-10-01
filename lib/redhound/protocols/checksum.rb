@@ -17,7 +17,8 @@ module Redhound
       def self.verify(ctx, layer, bytes, proto = nil)
         return unless ctx.verify_checksums?
         network = ctx.network
-        if ctx.packet.direction == :out || ctx.packet.meta[:csum_not_ready] || ctx.embedded || network&.[](:mf) == 1
+        fragmented = network&.[](:mf) == 1 || ctx.layers.any? { |part| part.protocol == :ipv6_ext && part[:more] == 1 }
+        if ctx.packet.direction == :out || ctx.packet.meta[:csum_not_ready] || ctx.embedded || fragmented
           layer.diagnose(:note, :checksum_unverified, 'checksum not verified (offloaded or incomplete)')
           return
         end
