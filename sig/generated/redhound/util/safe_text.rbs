@@ -1,0 +1,11 @@
+# Generated from lib/redhound/util/safe_text.rb with RBS::Inline
+
+module Redhound
+  module Util
+    module SafeText
+      # 端末制御文字による表示改ざんを防ぐため、印字可能 ASCII 以外を '.' に置換する
+      # @rbs (Array[Integer] bytes) -> String
+      def self?.printable: (Array[Integer] bytes) -> String
+    end
+  end
+end

@@ -1,9 +1,23 @@
-version: '3.7'
 services:
+  # コンテナ自身のネットワークをキャプチャする（通常の開発・テスト）
   app:
     build: .
     tty: true
-    ports:
-      - 3000:3000
+    cap_add: [NET_RAW, NET_ADMIN]
+    volumes:
+      - .:/app
+  # ホストの実インターフェースをキャプチャする
+  host:
+    build: .
+    tty: true
+    network_mode: host
+    cap_add: [NET_RAW, NET_ADMIN]
+    volumes:
+      - .:/app
+  # netns / veth / VLAN を作る統合テスト用（ip netns に SYS_ADMIN 相当が必要）
+  lab:
+    build: .
+    tty: true
+    privileged: true
     volumes:
       - .:/app

@@ -14,9 +14,9 @@ module Redhound
       @file.write(file_header)
     end
 
-    # @rbs (msg: String) -> void
-    def write(msg:)
-      @file.write(packet_record(Time.now, msg.bytesize, msg.bytesize))
+    # @rbs (msg: String, ?time: Time) -> void
+    def write(msg:, time: Time.now)
+      @file.write(packet_record(time, msg.bytesize, msg.bytesize))
       @file.write(msg)
     end
 
@@ -35,7 +35,7 @@ module Redhound
         4,          # Version Minor
         0,          # Timezone offset (GMT)
         0,          # Timestamp accuracy
-        65535,      # Snapshot length
+        262_144,    # Snapshot length
         1           # Link-layer header type (Ethernet)
       ].pack('VvvVVVV')
     end

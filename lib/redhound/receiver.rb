@@ -21,17 +21,25 @@ module Redhound
         @writer.start
       end
       @count = 0
+    rescue StandardError, Interrupt
+      @source&.close
+      raise
     end
 
     # @rbs () -> void
     def run
       loop do
-        msg, = @source.next_packet
+        msg, time = @source.next_packet
+        @writer&.write(msg:, time:) # 解析より先に保存し、解析失敗でパケットを失わない
         Analyzer.analyze(msg:, count: increment)
-        @writer&.write(msg:)
       rescue Interrupt
-        @writer&.stop
         break
+      end
+    ensure
+      begin
+        @writer&.stop
+      ensure
+        @source.close
       end
     end
 

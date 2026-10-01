@@ -64,7 +64,7 @@ module Redhound
 
       # @rbs () -> String
       def data
-        @data.map(&:chr).join.force_encoding("UTF-8")
+        Util::SafeText.printable(@data)
       end
     end
   end

@@ -56,7 +56,7 @@ module Redhound
 
       # @rbs () -> String
       def data
-        @data.map(&:chr).join
+        Util::SafeText.printable(@data)
       end
     end
   end

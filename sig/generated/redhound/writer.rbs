@@ -8,8 +8,8 @@ module Redhound
     # @rbs () -> void
     def start: () -> void
 
-    # @rbs (msg: String) -> void
-    def write: (msg: String) -> void
+    # @rbs (msg: String, ?time: Time) -> void
+    def write: (msg: String, ?time: Time) -> void
 
     # @rbs () -> void
     def stop: () -> void

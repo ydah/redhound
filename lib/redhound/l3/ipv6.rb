@@ -1,6 +1,8 @@
 # rbs_inline: enabled
 # frozen_string_literal: true
 
+require 'ipaddr'
+
 module Redhound
   class L3
     class Ipv6 < Base
@@ -25,7 +27,7 @@ module Redhound
 
       # @rbs () -> Redhound::L3::Ipv6
       def generate
-        version_traffic_flow = @bytes[0..3].join.to_i(16)
+        version_traffic_flow = @bytes[0..3].pack('C4').unpack1('N')
         @version = (version_traffic_flow >> 28) & 0xF
         @traffic_class = (version_traffic_flow >> 20) & 0xFF
         @flow_label = version_traffic_flow & 0xFFFFF
@@ -45,8 +47,11 @@ module Redhound
 
       # @rbs () -> bool
       def supported_protocol?
-        @protocol.udp? # steep:ignore
+        @protocol.udp? || @protocol.tcp? # steep:ignore
       end
+
+      # @rbs () -> Integer
+      def datagram_length = size + payload_length
 
       private
 
@@ -55,15 +60,12 @@ module Redhound
         @payload_length.map { |b| b.to_s(16).rjust(2, '0') }.join.to_i(16)
       end
 
-      # @rbs () -> Integer
-      def saddr
-        @saddr.map { |b| b.to_s(16).rjust(2, '0') }.join(':')
-      end
+      # RFC 5952 形式 (例: 2001:db8::1)
+      # @rbs () -> String
+      def saddr = IPAddr.new_ntoh(@saddr.pack('C16')).to_s
 
-      # @rbs () -> Integer
-      def daddr
-        @daddr.map { |b| b.to_s(16).rjust(2, '0') }.join(':')
-      end
+      # @rbs () -> String
+      def daddr = IPAddr.new_ntoh(@daddr.pack('C16')).to_s
     end
   end
 end

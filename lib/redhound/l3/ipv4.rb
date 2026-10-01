@@ -4,6 +4,8 @@
 module Redhound
   class L3
     class Ipv4 < Base
+      MIN_SIZE = 20
+
       class << self
         # @rbs (bytes: Array[Integer]) -> Redhound::L3::Ipv4
         def generate(bytes:)
@@ -15,15 +17,17 @@ module Redhound
 
       # @rbs (bytes: Array[Integer]) -> void
       def initialize(bytes:)
-        raise ArgumentError, "bytes must be #{size} bytes" unless bytes.size >= size
+        raise ArgumentError, "IPv4 header needs #{MIN_SIZE} bytes" unless bytes.size >= MIN_SIZE
 
         @bytes = bytes
       end
 
       # @rbs () -> Redhound::L3::Ipv4
       def generate
-        @version = @bytes[0]
-        @ihl = @bytes[0]
+        @version = @bytes[0] >> 4
+        @ihl = @bytes[0] & 0x0F
+        raise ArgumentError, "invalid IHL #{@ihl}" if @ihl < 5 || @bytes.size < @ihl * 4
+
         @tos = @bytes[1]
         @tot_len = @bytes[2..3]
         @id = @bytes[4..5]
@@ -37,7 +41,11 @@ module Redhound
       end
 
       # @rbs () -> Integer
-      def size = 20
+      def size = @ihl * 4
+
+      # ヘッダ + ペイロードの長さ (Total Length)
+      # @rbs () -> Integer
+      def datagram_length = tot_len
 
       # @rbs () -> String
       def to_s
@@ -46,20 +54,16 @@ module Redhound
 
       # @rbs () -> bool
       def supported_protocol?
-        @protocol.udp? || @protocol.icmp? # steep:ignore
+        @protocol.udp? || @protocol.tcp? || @protocol.icmp? # steep:ignore
       end
 
       private
 
       # @rbs () -> Integer
-      def version
-        @version & 0xF0
-      end
+      def version = @version
 
       # @rbs () -> Integer
-      def ihl
-        @ihl & 0x0F
-      end
+      def ihl = @ihl
 
       # @rbs () -> Integer
       def tot_len

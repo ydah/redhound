@@ -23,16 +23,20 @@ module Redhound
       # @rbs () -> bool
       def supported_protocol?: () -> bool
 
+      # @rbs () -> Integer
+      def datagram_length: () -> Integer
+
       private
 
       # @rbs () -> Integer
       def payload_length: () -> Integer
 
-      # @rbs () -> Integer
-      def saddr: () -> Integer
+      # RFC 5952 形式 (例: 2001:db8::1)
+      # @rbs () -> String
+      def saddr: () -> String
 
-      # @rbs () -> Integer
-      def daddr: () -> Integer
+      # @rbs () -> String
+      def daddr: () -> String
     end
   end
 end

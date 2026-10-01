@@ -29,8 +29,6 @@ module Redhound
         @spa = @bytes[14..17]
         @tha = @bytes[18..23]
         @tpa = @bytes[24..27]
-        @type = Redhound::L2::Protocol.new(protocol: ptype)
-        @l3 = generate_l3
         self
       end
 
@@ -38,29 +36,19 @@ module Redhound
       def arp_size = 28
 
       # @rbs () -> Integer
-      def size
-        if @l3.nil?
-          arp_size
-        else
-          arp_size + @l3.size
-        end
-      end
+      def size = arp_size
 
       # @rbs () -> String
       def to_s
         "    └─ ARP HType: #{htype} PType: #{ptype} HLen: #{@hlen} PLen: #{@plen} Oper: #{oper} SHA: #{sha} SPA: #{spa} THA: #{tha} TPA: #{tpa}"
       end
 
+      # ARP は上位プロトコルを運ばない
       # @rbs () -> bool
-      def supported_protocol?
-        return false if @l3.nil?
-        @l3.supported_protocol?
-      end
+      def supported_protocol? = false
 
-      # @rbs () -> String?
-      def protocol
-        @l3.protocol if @l3
-      end
+      # @rbs () -> nil
+      def protocol = nil
 
       private
 
@@ -86,7 +74,7 @@ module Redhound
 
       # @rbs () -> String
       def spa
-        @spa.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
+        @spa.join('.')
       end
 
       # @rbs () -> String
@@ -96,19 +84,9 @@ module Redhound
 
       # @rbs () -> String
       def tpa
-        @tpa.map { |b| b.to_s(16).rjust(2, '0') }.join('.')
+        @tpa.join('.')
       end
 
-      # @rbs () -> Redhound::L3::Base?
-      def generate_l3
-        return if @bytes.size == arp_size
-
-        if @type.ipv4?
-          Ipv4.generate(bytes: @bytes[arp_size..])
-        elsif @type.ipv6?
-          Ipv6.generate(bytes: @bytes[arp_size..])
-        end
-      end
     end
   end
 end

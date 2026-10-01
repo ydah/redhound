@@ -18,6 +18,10 @@ module Redhound
       # @rbs () -> Integer
       def size: () -> Integer
 
+      # ヘッダ + ペイロードの長さ。IP 以外はヘッダ長と同じ
+      # @rbs () -> Integer
+      def datagram_length: () -> Integer
+
       # @rbs () -> bool
       def supported_protocol?: () -> bool
 

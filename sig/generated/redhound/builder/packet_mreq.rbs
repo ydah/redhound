@@ -18,13 +18,13 @@ module Redhound
       # @rbs () -> String
       def build: () -> String
 
+      # @rbs () -> Integer
+      def ifindex: () -> Integer
+
       # @rbs () -> String
       def mr_ifindex: () -> String
 
       private
-
-      # @rbs () -> Integer?
-      def index: () -> Integer?
 
       # @rbs () -> String
       def mr_type: () -> String

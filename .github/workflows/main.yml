@@ -4,20 +4,20 @@ on:
   push:
     branches:
       - main
-
   pull_request:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }}
     strategy:
+      fail-fast: false
       matrix:
         ruby:
           - '3.3'
           - '3.4'
-          - 'head'
-
+          - '4.0'
+          - head
     steps:
       - uses: actions/checkout@v4
       - name: Set up Ruby
@@ -25,5 +25,22 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Run the default task
+      - name: Install RBS collection
+        run: bundle exec rbs collection install --frozen
+      - name: Run the default task (spec, rbs-inline, steep)
         run: bundle exec rake
+      - name: Check generated RBS is committed
+        run: git diff --exit-code sig/
+
+  live:
+    runs-on: ubuntu-latest
+    name: Live capture (sudo)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Run live specs as root
+        run: sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 bundle exec rspec --tag live

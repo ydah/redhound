@@ -1,0 +1,24 @@
+# Generated from lib/redhound/l4/tcp.rb with RBS::Inline
+
+module Redhound
+  class L4
+    # Phase 0 の暫定実装。2.0 では Protocols::Tcp に置き換える
+    class Tcp < Base
+      FLAG_NAMES: untyped
+
+      # @rbs (bytes: Array[Integer]) -> void
+      def initialize: (bytes: Array[Integer]) -> void
+
+      # @rbs () -> Redhound::L4::Tcp
+      def generate: () -> Redhound::L4::Tcp
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      private
+
+      # @rbs () -> String
+      def flags: () -> String
+    end
+  end
+end

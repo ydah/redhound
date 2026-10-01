@@ -3,11 +3,33 @@
 module Redhound
   module Source
     class Socket
+      BUFFER_SIZE: untyped
+
+      SIOCGSTAMPNS: ::Integer
+
+      PACKET_OUTGOING: ::Integer
+
+      ARPHRD_LOOPBACK: ::Integer
+
       # @rbs (socket: ::Socket) -> void
       def initialize: (socket: ::Socket) -> void
 
-      # @rbs (Integer size) -> [String, Addrinfo]
-      def next_packet: (Integer size) -> [ String, Addrinfo ]
+      # 注意: recvmsg は使えない (Ruby が MSG_CMSG_CLOEXEC を付与し EINVAL)。
+      #       MSG_TRUNC も渡してはいけない (Ruby が [BUG] で abort する)。
+      # @rbs () -> [String, Time]
+      def next_packet: () -> [ String, Time ]
+
+      # @rbs () -> void
+      def close: () -> void
+
+      private
+
+      # 初回の SIOCGSTAMPNS は ENOENT を返すが、以降の受信でタイムスタンプが記録されるようになる
+      # @rbs () -> void
+      def enable_timestamp: () -> void
+
+      # @rbs () -> Time
+      def kernel_timestamp: () -> Time
     end
   end
 end

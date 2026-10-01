@@ -19,6 +19,8 @@ module Redhound
       def resolve
         if @l3.protocol.udp?
           Udp.generate(bytes: @bytes)
+        elsif @l3.protocol.tcp?
+          Tcp.generate(bytes: @bytes)
         elsif @l3.protocol.icmp?
           Icmp.generate(bytes: @bytes)
         end

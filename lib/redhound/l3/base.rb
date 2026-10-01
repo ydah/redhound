@@ -33,6 +33,10 @@ module Redhound
         0
       end
 
+      # ヘッダ + ペイロードの長さ。IP 以外はヘッダ長と同じ
+      # @rbs () -> Integer
+      def datagram_length = size
+
       # @rbs () -> bool
       def supported_protocol?
         warn 'supported_protocol? method must be implemented'

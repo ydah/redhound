@@ -3,7 +3,7 @@
 module Redhound
   class L2
     class Protocol
-      PROTO_TABLE: ::Hash[untyped, untyped]
+      PROTO_TABLE: ::Hash[::Integer, ::String]
 
       # @rbs (protocol: Integer) -> void
       def initialize: (protocol: Integer) -> void

@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Usage: bin/udp_sender DEST_IP MESSAGE [PORT]
+require 'socket'
+
+abort 'Usage: bin/udp_sender DEST_IP MESSAGE [PORT]' unless ARGV.size.between?(2, 3)
+
+dest, message, port = ARGV
+UDPSocket.new(Addrinfo.ip(dest).afamily).send(message, 0, dest, Integer(port || 12_345))

@@ -18,7 +18,15 @@ module Redhound
         warn 'Error: interface is required'
         exit 1
       end
+      # SIGTERM でも SIGINT と同様にファイルを閉じて正常終了する
+      Signal.trap('TERM') { raise Interrupt }
       Receiver.run(ifname: @options[:ifname], filename: @options[:filename])
+    rescue Errno::EPERM, Errno::EACCES
+      warn 'redhound: permission denied (run as root or grant CAP_NET_RAW)'
+      exit 1
+    rescue ArgumentError => e
+      warn "redhound: #{e.message}"
+      exit 1
     end
 
     # @rbs (Array[untyped] argv) -> void
@@ -61,7 +69,9 @@ module Redhound
 
     # @rbs () -> void
     def list_interfaces
-      ::Socket.getifaddrs.each { |ifaddr| puts ifaddr.name }
+      ::Socket.getifaddrs.uniq(&:name).sort_by(&:ifindex).each do |ifaddr|
+        puts "#{ifaddr.ifindex}.#{ifaddr.name}"
+      end
     end
   end
 end

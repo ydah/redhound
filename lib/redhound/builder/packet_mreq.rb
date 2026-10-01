@@ -25,17 +25,27 @@ module Redhound
         mr_ifindex + mr_type + mr_alen + mr_address
       end
 
+      # @rbs () -> Integer
+      def ifindex
+        @ifindex ||= begin
+          ifaddrs = ::Socket.getifaddrs
+          found = if @ifname.match?(/\A\d+\z/)
+                    ifaddrs.find { |ifaddr| ifaddr.ifindex == @ifname.to_i }
+                  else
+                    ifaddrs.find { |ifaddr| ifaddr.name == @ifname }
+                  end
+          raise ArgumentError, "no such interface: #{@ifname}" unless found
+
+          found.ifindex
+        end
+      end
+
       # @rbs () -> String
       def mr_ifindex
-        @mr_ifindex ||= [[index].pack('I')].pack('a4')
+        [ifindex].pack('i')
       end
 
       private
-
-      # @rbs () -> Integer?
-      def index
-        ::Socket.getifaddrs.find { |ifaddr| ifaddr.name == @ifname }&.ifindex
-      end
 
       # @rbs () -> String
       def mr_type

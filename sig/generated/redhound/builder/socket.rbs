@@ -9,14 +9,14 @@ module Redhound
 
       ETH_P_ALL: ::Integer
 
-      PACKED_ETH_P_ALL: untyped
+      # @rbs (ifname: String, ?promiscuous: bool) -> Redhound::Source::Socket
+      def self.build: (ifname: String, ?promiscuous: bool) -> Redhound::Source::Socket
 
-      # @rbs (ifname: String) -> Redhound::Source::Socket
-      def self.build: (ifname: String) -> Redhound::Source::Socket
+      # @rbs (ifname: String, ?promiscuous: bool) -> void
+      def initialize: (ifname: String, ?promiscuous: bool) -> void
 
-      # @rbs (ifname: String) -> void
-      def initialize: (ifname: String) -> void
-
+      # protocol=0 で作成すると bind するまで 1 パケットも受信しない (packet(7))。
+      # 先に全オプションを設定してから bind することで、他 IF のパケット混入を防ぐ。
       # @rbs () -> Redhound::Source::Socket
       def build: () -> Redhound::Source::Socket
     end

@@ -3,6 +3,8 @@
 module Redhound
   class L3
     class Ipv4 < Base
+      MIN_SIZE: ::Integer
+
       # @rbs (bytes: Array[Integer]) -> Redhound::L3::Ipv4
       def self.generate: (bytes: Array[Integer]) -> Redhound::L3::Ipv4
 
@@ -16,6 +18,10 @@ module Redhound
 
       # @rbs () -> Integer
       def size: () -> Integer
+
+      # ヘッダ + ペイロードの長さ (Total Length)
+      # @rbs () -> Integer
+      def datagram_length: () -> Integer
 
       # @rbs () -> String
       def to_s: () -> String

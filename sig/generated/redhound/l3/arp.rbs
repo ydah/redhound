@@ -21,11 +21,12 @@ module Redhound
       # @rbs () -> String
       def to_s: () -> String
 
+      # ARP は上位プロトコルを運ばない
       # @rbs () -> bool
       def supported_protocol?: () -> bool
 
-      # @rbs () -> String?
-      def protocol: () -> String?
+      # @rbs () -> nil
+      def protocol: () -> nil
 
       private
 
@@ -49,9 +50,6 @@ module Redhound
 
       # @rbs () -> String
       def tpa: () -> String
-
-      # @rbs () -> Redhound::L3::Base?
-      def generate_l3: () -> Redhound::L3::Base?
     end
   end
 end
