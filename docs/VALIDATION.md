@@ -48,9 +48,14 @@ also passed every job on the adversarial runtime fixes.
 The GitHub maintenance configuration now includes weekly Bundler/Actions
 dependency updates, actionlint, codespell, strict yamllint, zizmor and Ruby/Actions
 CodeQL analysis. Action revisions are pinned and checkout credentials are not
-retained. All four lint workflows passed on main. HTTP header trimming uses
+retained. All four lint workflows passed on main; the final CodeQL run succeeded
+with no open alerts. HTTP header trimming uses
 bounded byte ranges while preserving SP/HTAB-only whitespace semantics; controls
 remain visible to malformed-header diagnostics.
+After this final parser change, all 16 application-boundary/live-harness examples,
+the one-million-case native fuzz run (94.25 seconds), and Steep passed.
+All 5,013 binary boundary/random inputs preserved the previous trimming bytes
+and encoding. Linux tcpdump/tshark comparisons passed all 26 examples.
 
 Ruby 4.0 introduced an additional restriction in
 [`IO::Buffer.map`](https://docs.ruby-lang.org/en/4.0/IO/Buffer.html#method-c-map):
@@ -84,6 +89,16 @@ capinfos/tshark inspection now runs after capture closes, validating the three
 retained rotation files rather than blocking packet reads at every rotation.
 A four-second rotation smoke captured and verified all 4,000 frames without
 drops, gaps or malformed records and passed both external tools.
+
+A fresh frozen-source rotation run started at 2026-10-01 16:22:04 UTC, using
+capture digest
+`7fd49cc4c24664c298c99dbf35276f64e67a1195093c3e1c4f9190fa9d234014`
+and harness digest
+`55b36abe852549836350d51ea9994b71ded5409794d853777f0634ca6830c760`.
+Its private evidence is in `tmp/acceptance-rotation-72h-rc2`; completion cannot
+be checked before 2026-10-04 16:22:06 UTC. macOS idle/system sleep assertions
+were confirmed on AC power with a 72-hour-plus-ten-minute `caffeinate` timer.
+This run is still in progress and does not count as completed acceptance.
 
 The one-hour aarch64 comparison completed successfully: each backend captured
 all 180,000,000 frames with zero drops/gaps and the same complete-byte digest.
