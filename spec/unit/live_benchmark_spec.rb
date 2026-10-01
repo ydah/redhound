@@ -118,4 +118,21 @@ RSpec.describe 'live benchmark verification' do
       end
     end
   end
+
+  it 'selects an allowed sender CPU outside the capture core when possible and fails when none is available' do
+    [
+      ['0-3', 0, '0-1', 2],
+      ['2,4-6', 4, '4-5', 2],
+      ['0-3,8-9', 0, '0,2', 1],
+      ['2-3', 2, '2-3', 3],
+      ['7', 7, '7', nil],
+      ['2-3', 0, '0', nil]
+    ].each do |allowed, capture, siblings, expected|
+      if expected
+        expect(RedhoundLiveTraffic.sender_cpu(allowed, capture, siblings)).to eq(expected)
+      else
+        expect { RedhoundLiveTraffic.sender_cpu(allowed, capture, siblings) }.to raise_error(ArgumentError, /CPU/)
+      end
+    end
+  end
 end

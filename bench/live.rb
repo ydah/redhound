@@ -65,7 +65,7 @@ OptionParser.new do |parser|
   parser.on('--out DIR') { |value| options[:out] = value }
   parser.on('--rotate', 'Bounded pcapng rotation; otherwise pcap writes go to /dev/null') { options[:rotate] = true }
   parser.on('--verify-after', 'Measure capture/write alone; verify saved pcap after capture ends') { options[:verify_after] = true }
-  parser.on('--cpu CPU', Integer, 'Pin capture processes to this CPU; sender keeps its original affinity') { |value| options[:cpu] = value }
+  parser.on('--cpu CPU', Integer, 'Pin capture to this CPU and sender to another allowed CPU') { |value| options[:cpu] = value }
   parser.on('--mixed', 'Alternate valid 600-byte IPv4 TCP and UDP frames') { options[:mixed] = true }
   parser.on('--rotation-interval SECONDS', Float) { |value| options[:rotation_interval] = value }
   parser.on('--sample SECONDS', Float) { |value| options[:sample] = value }
@@ -74,6 +74,15 @@ abort 'Linux is required' unless RUBY_PLATFORM.include?('linux')
 abort 'duration, rate and intervals must be finite and positive' unless options.values_at(:duration, :rate, :sample, :rotation_interval).all? { |value| value.positive? && value.finite? }
 abort '--verify-after cannot be combined with rotation' if options[:verify_after] && options[:rotate]
 abort 'CPU must be nonnegative' if options[:cpu] && options[:cpu].negative?
+if options[:cpu]
+  begin
+    options[:original_cpu_affinity] = File.read('/proc/self/status')[/^Cpus_allowed_list:\s+(.+)/, 1]
+    options[:capture_cpu_siblings] = File.read("/sys/devices/system/cpu/cpu#{options[:cpu]}/topology/thread_siblings_list").strip
+    options[:sender_cpu] = RedhoundLiveTraffic.sender_cpu(options[:original_cpu_affinity], options[:cpu], options[:capture_cpu_siblings])
+  rescue StandardError => error
+    abort "cannot isolate sender CPU: #{error.message}"
+  end
+end
 expected_records = (options[:duration] * options[:rate]).to_i
 abort 'workload must include at least one frame' unless expected_records.positive?
 expected_storage = options[:backends].size * (24 + expected_records * 616)
@@ -210,6 +219,7 @@ begin
         elapsed = last_capture_at - start
         report = verifier.report.merge(backend: backend, captured: count, verification_passed: verifier.complete?(expected_records),
                    workload: options[:workload], frame_bytes: 600, cpu: options[:cpu], cpu_affinity: cpu_affinity,
+                   sender_cpu: options[:sender_cpu], capture_cpu_siblings: options[:capture_cpu_siblings],
                    verify_after: options[:verify_after], capture_validation_deferred: options[:verify_after],
                    capture_code_sha256: code_sha256, harness_sha256: harness_sha256,
                    elapsed: elapsed, pps: count / elapsed, finish_lag: [elapsed - options[:duration], 0].max, stats: stats.to_h,
@@ -243,17 +253,20 @@ begin
   sender_command = ['ip', 'netns', 'exec', namespace, RbConfig.ruby, '--yjit', __FILE__, '--send', namespace,
                     port.to_s, options[:duration].to_s, options[:rate].to_s, start.to_s, sender_path]
   sender_command.concat([templates_path, peer]) if templates_path
+  sender_command.unshift('taskset', '-c', options[:sender_cpu].to_s) if options[:sender_cpu]
   sender = Process.spawn(*sender_command)
   children << sender
   statuses = children.map { |pid| Process.wait2(pid).last }
   children.clear
   raise 'capture or sender failed; inspect error reports' unless statuses.all?(&:success?)
-  sent = JSON.parse(File.read(sender_path)).fetch('sent')
+  sender_report = JSON.parse(File.read(sender_path))
+  sent = sender_report.fetch('sent')
   reports = options[:backends].map { |backend| JSON.parse(File.read(File.join(options[:out], "#{backend}.json"))) }
   accepted = sent == expected_records && reports.all? do |report|
     report['captured'] == sent && report['verification_passed'] && report['stats']['received'] == sent &&
       report['stats']['dropped'].zero? && report['stats']['if_dropped'].zero? && report['finish_lag'] <= 0.1
   end
+  accepted &&= sender_report['cpu_affinity'] == options[:sender_cpu].to_s if options[:sender_cpu]
   if reports.size == 2
     accepted &&= reports.map { |report| report['sha256'] }.uniq.size == 1
     stamps = reports.map { |report| report['timestamps'].to_h }
@@ -261,9 +274,11 @@ begin
   end
   result = { passed: accepted, sent: sent, duration: options[:duration], requested_pps: options[:rate],
              workload: options[:workload], frame_bytes: 600, expected_records: expected_records, cpu: options[:cpu],
+             sender_cpu: options[:sender_cpu], capture_cpu_siblings: options[:capture_cpu_siblings],
+             original_cpu_affinity: options[:original_cpu_affinity],
              verify_after: options[:verify_after], capture_validation_deferred: options[:verify_after],
              capture_code_sha256: code_sha256, harness_sha256: harness_sha256,
-             sender: JSON.parse(File.read(sender_path)), reports: reports.map { |report| report.reject { |key, _value| %w[samples timestamps].include?(key) } } }
+             sender: sender_report, reports: reports.map { |report| report.reject { |key, _value| %w[samples timestamps].include?(key) } } }
   File.write(File.join(options[:out], 'result.json'), JSON.pretty_generate(result))
   puts JSON.pretty_generate(result)
   exit(accepted ? 0 : 1)

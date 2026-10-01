@@ -137,4 +137,23 @@ the mixed-traffic single-core acceptance gate.
 failed the 80,000 pps socket target on Ruby 4.0: 800,000 frames were sent,
 508,827 saved and 232,576 kernel drops reported, with more data pending after
 the allowed drain. Missing trailing packets count as failure even when they
-cannot appear as an internal sequence gap. Socket throughput remains open.
+cannot appear as an internal sequence gap. This socket measurement failed.
+
+The strengthened mixed-workload harness subsequently pinned capture to CPU 0
+and validated every saved frame and timestamp after capture. On
+[Ruby 3.4 run 36886257316](https://github.com/ydah/redhound/actions/runs/36886257316),
+AMD EPYC 9V74, all 800,000 frames at 80,000 pps were saved with zero drops or
+invalid records and 0.336 ms final drain. The sender retained CPUs 0–3, so the
+result establishes success under those recorded conditions; the next measurement
+isolates its CPU from capture as well.
+
+Two Ruby 4.0.7 runs used different CPU models. On
+[AMD EPYC 9V45](https://github.com/ydah/redhound/actions/runs/36886251713),
+all 800,000 frames were saved without drops, but a 133 ms final drain exceeded
+the harness's 100 ms bound. File throughput was 84,178 summary, 39,720 tree,
+562,274 filter and 552,203 write pps: tree and VM reached their targets while
+summary did not. On [AMD EPYC 7763](https://github.com/ydah/redhound/actions/runs/36886494861),
+the 30-second run sent only 2,129,920 of 2,400,000 requested frames, saved
+951,018 and reported 1,115,538 kernel drops. File summary measured 41,856 pps.
+That run failed both generation and capture conditions. These hardware-dependent
+figures are retained rather than attributed solely to the Ruby version.

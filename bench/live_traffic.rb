@@ -11,6 +11,22 @@ module RedhoundLiveTraffic
   SOURCE_IP = '10.123.0.2'
   DESTINATION_IP = '10.123.0.1'
 
+  def self.sender_cpu(allowed_list, capture_cpu, sibling_list)
+    expand = lambda do |list|
+      list.split(',').flat_map do |part|
+        first, last = part.split('-', 2).map { |value| Integer(value) }
+        (first..(last || first)).to_a
+      end
+    end
+    allowed = expand.call(allowed_list)
+    raise ArgumentError, 'capture CPU is outside the original allowed CPU list' unless allowed.include?(capture_cpu)
+
+    candidates = allowed.reject { |cpu| cpu == capture_cpu }
+    siblings = expand.call(sibling_list)
+    candidates.find { |cpu| !siblings.include?(cpu) } || candidates.first ||
+      raise(ArgumentError, 'no other allowed CPU is available for the sender')
+  end
+
   def self.templates(source_mac:, destination_mac:, port:, peer_index:)
     counter = [0].pack('Q>')
     udp = PacketFactory.udp(counter + UDP_TAIL, sport: 40_000, dport: port)

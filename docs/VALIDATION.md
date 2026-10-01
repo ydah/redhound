@@ -32,11 +32,12 @@ digests. The earlier long-running snapshot uses the original UDP workload and
 verifier; its comparison requires identical complete-frame digests and sampled
 timestamps, and does not establish the new mixed single-core throughput gate.
 
-Final local runtime validation on 2026-10-02 passed all 244 non-live examples on
-Linux, with only the macOS-specific interface test skipped. The complete macOS
-Rake task passed its 244 examples (20 tshark comparisons are run on Linux), RBS
-generation and Steep. Coverage gates passed; Linux measured 92.43% total line
-coverage. The strengthened one-million-case parser fuzz completed without an
+Local adversarial runtime validation on 2026-10-02 passed all 244 non-live examples
+on Linux, with only the macOS-specific interface test skipped. After adding
+bounded file prefetch and live-harness regressions, the complete macOS Rake task
+passed its 257 examples (20 tshark comparisons are run on Linux), RBS generation
+and Steep, with 92.92% total line coverage. Coverage gates passed; the earlier
+Linux check measured 92.43% total line coverage. The strengthened one-million-case parser fuzz completed without an
 exception. Default state-pressure checks reached exactly 256 MiB accounted
 state without exceeding it and released IP/TCP buffers at EOF. Native RSS
 reached 308 MiB despite retaining only 107 MiB of Ruby heap before finalization;
