@@ -18,6 +18,6 @@ Interface indexes and Linux `any` are supported. Linux loopback duplicates are
 removed. Capture timestamps come from the kernel; captured and original packet
 lengths are recorded separately. pcapng supports multiple interfaces and metadata.
 
-Version 2.0.0.rc1 is a prerelease. The two-week RC evaluation and long capture
+Version 2 is currently a prerelease. The two-week RC evaluation and long capture
 soak gates remain prerequisites for GA; a 1.x maintenance deadline will be
 announced when GA is published.

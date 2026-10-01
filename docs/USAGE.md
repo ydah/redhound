@@ -76,6 +76,10 @@ mapping is unavailable. Other Linux architectures default to sockets; `ring`
 can be selected explicitly. macOS uses BPF, with native timestamp precision
 reported by the device. Linux socket capture cannot recover NIC-stripped VLAN
 tags; choose the ring backend for that metadata.
+Ruby 4.0's `IO::Buffer.map` rejects packet sockets, so `auto` uses socket capture
+and explicit `ring` reports the mapping limitation. Use Ruby 3.3/3.4 for ring
+capture. If using sockets, disable receive VLAN offload on the receiving
+interface when VLAN tags are required (`ethtool -K IF rxvlan off`).
 
 Windows, Wi-Fi monitor mode, packet transmission, TLS decryption, complete
 HTTP/2/QUIC dissection, display-filter syntax and a TUI are outside v2's scope.

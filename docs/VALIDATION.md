@@ -25,6 +25,12 @@ timestamps, drops, RSS and descriptor counts. An insufficient sender rate fails
 the check. Controlled aarch64 runs passed 50,000 pps with simultaneous socket and
 ring capture and 80,000 pps with socket capture for ten seconds. These short
 checks do not replace the hour-long comparison or the x86_64 targets.
+The strengthened live harness checks complete expected wire bytes, every
+timestamp and the entire zero-based sequence. Its mixed TCP/UDP workload and
+capture-only CPU affinity are recorded alongside implementation and harness
+digests. The earlier long-running snapshot uses the original UDP workload and
+verifier; its comparison requires identical complete-frame digests and sampled
+timestamps, and does not establish the new mixed single-core throughput gate.
 
 Final local runtime validation on 2026-10-02 passed all 244 non-live examples on
 Linux, with only the macOS-specific interface test skipped. The complete macOS
@@ -35,6 +41,8 @@ exception. Default state-pressure checks reached exactly 256 MiB accounted
 state without exceeding it and released IP/TCP buffers at EOF. Native RSS
 reached 308 MiB despite retaining only 107 MiB of Ruby heap before finalization;
 this is not reported as a 256 MiB process-RSS guarantee.
+The independent [manual CI and million-case fuzz run](https://github.com/ydah/redhound/actions/runs/36885293639)
+also passed every job on the adversarial runtime fixes.
 
 Ruby 4.0 introduced an additional restriction in
 [`IO::Buffer.map`](https://docs.ruby-lang.org/en/4.0/IO/Buffer.html#method-c-map):

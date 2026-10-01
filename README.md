@@ -14,7 +14,7 @@ for remaining GA evaluation gates.
 gem install redhound --pre
 ```
 
-Or add `gem 'redhound', '~> 2.0.0.rc1'` to your Gemfile.
+Or add `gem 'redhound', '~> 2.0.0.rc2'` to your Gemfile.
 
 ## Usage
 

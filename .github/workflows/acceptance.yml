@@ -56,9 +56,10 @@ jobs:
           ROTATE: ${{ inputs.rotate }}
         run: |
           ruby -e 'abort "duration must be in (0,3600]" unless Float(ENV.fetch("DURATION")).between?(0.001, 3600)'
-          args=(--duration "$DURATION" --rate "$RATE" --backend "$BACKEND" --out "$RUNNER_TEMP/live" --sample 10)
+          cpu=$(awk '/Cpus_allowed_list/ {split($2, ids, /[-,]/); print ids[1]}' /proc/self/status)
+          args=(--duration "$DURATION" --rate "$RATE" --backend "$BACKEND" --out "$RUNNER_TEMP/live" --sample 10 --mixed --cpu "$cpu")
           if [ "$ROTATE" = true ]; then args+=(--rotate --rotation-interval 2); fi
-          if [ "$ROTATE" = false ] && ruby -e 'exit(Float(ENV.fetch("DURATION")) <= 60 ? 0 : 1)'; then args+=(--verify-after); fi
+          if [ "$ROTATE" = false ] && ruby -e 'copies = ENV.fetch("BACKEND") == "compare" ? 2 : 1; exit(Float(ENV.fetch("DURATION")) * Integer(ENV.fetch("RATE")) * 616 * copies <= 4 * 1024**3 ? 0 : 1)'; then args+=(--verify-after); fi
           sudo -E env "PATH=$PATH" ruby --yjit bench/live.rb "${args[@]}"
       - name: Make controlled-traffic evidence readable by the runner
         if: always()

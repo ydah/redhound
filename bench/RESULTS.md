@@ -34,6 +34,21 @@ ruby --yjit -rstackprof -e 'StackProf.run(mode: :wall, out: "tmp/summary.dump") 
 stackprof tmp/summary.dump --text --limit 15
 ```
 
+Owned regular-file reads now prefetch at most 64 KiB. Three alternating runs
+before/after this change on the same native Ruby 4.0.6/YJIT environment measured
+these medians; caller-owned IO, pipes and stdin retain their existing read paths:
+
+| Scenario | Direct reads | Bounded prefetch |
+| --- | ---: | ---: |
+| Summary | 82,948 pps | 93,830 pps |
+| Tree | 45,529 pps | 49,542 pps |
+| Filter VM | 449,888 pps | 894,330 pps |
+| pcap rewrite | 443,508 pps | 863,095 pps |
+| CLI summary with stateful analysis | 47,065 pps | 51,526 pps |
+
+These ARM measurements show the local effect of the change and do not establish
+the separate x86_64 throughput gates.
+
 The design's initial targets apply to x86_64, one core and YJIT: summary 100,000
 pps, tree 30,000 pps, VM 300,000 pps; live ring 200,000 pps and socket 80,000 pps
 with no drops. This arm64 macOS summary measurement does not meet the initial
@@ -63,24 +78,30 @@ reported rather than lowering the targets to classify an unmet gate as passed.
 ## Reproducible live acceptance
 
 On Linux with NET_RAW, NET_ADMIN and SYS_ADMIN, `bench/live.rb` creates its own
-veth pair and network namespace, sends numbered 600-byte UDP frames and checks
+veth pair and network namespace, sends numbered 600-byte frames and checks
 captured bytes, sequence gaps, wire lengths, kernel drops and completion delay:
 
 ```sh
-sudo ruby --yjit bench/live.rb --duration 10 --rate 200000 --backend ring --verify-after --out tmp/ring-200k
-sudo ruby --yjit bench/live.rb --duration 10 --rate 80000 --backend socket --verify-after --out tmp/socket-80k
+sudo ruby --yjit bench/live.rb --duration 10 --rate 200000 --backend ring --mixed --cpu 0 --verify-after --out tmp/ring-200k
+sudo ruby --yjit bench/live.rb --duration 10 --rate 80000 --backend socket --mixed --cpu 0 --verify-after --out tmp/socket-80k
 sudo ruby --yjit bench/live.rb --duration 3600 --rate 50000 --backend compare --out tmp/arm-hour
 sudo ruby --yjit bench/live.rb --duration 259200 --rate 100 --backend ring --rotate --out tmp/rotation-72h
 ```
 
-The comparison also requires identical byte digests and kernel timestamps within
+Use an allowed CPU number from `/proc/self/status` when CPU 0 is unavailable.
+`--mixed` alternates valid TCP and UDP frames with matching IPv4/TCP checksums.
+`--cpu` pins capture processes only; the sender retains its available CPUs.
+Verification checks every saved frame against its complete expected bytes,
+requires the sequence to start at zero and end at the sent count minus one,
+and rejects timestamps outside the capture window. The comparison also requires
+identical byte digests and sampled kernel timestamps within
 1 ms. A sender that cannot produce the requested rate fails acceptance. Capture
 processes write pcap to `/dev/null`, or bounded pcapng rotation with `--rotate`;
 every completed rotated file is checked with capinfos and tshark. JSON results
 and periodic RSS, descriptor and drop samples are retained in the output
 directory. Each run needs a new directory. The manual **Live acceptance** GitHub
 workflow runs the same check on x86_64 and measures file throughput on one CPU.
-For nonrotating runs of at most 60 seconds, it uses `--verify-after`: captured
+For nonrotating workloads requiring at most 4 GiB, it uses `--verify-after`: captured
 pcap records are checked after capture completes, so byte/sequence verification
 does not consume the capture/write throughput budget. This temporarily stores
 about 1.2 GB at 200,000 pps for ten seconds; generated pcap payloads are excluded
@@ -108,6 +129,9 @@ drops, sequence gaps or invalid frames. The last block drained 51 ms after the
 sender deadline (198,979 pps including that drain). The earlier inline-verifying
 run dropped 401,324 frames; its additional byte-checking load is not a
 capture/write-only measurement.
+This earlier run used UDP only, did not pin the capture process, and used the
+older verifier. It establishes a limited capture comparison, not completion of
+the mixed-traffic single-core acceptance gate.
 
 [Run 36882900621](https://github.com/ydah/redhound/actions/runs/36882900621)
 failed the 80,000 pps socket target on Ruby 4.0: 800,000 frames were sent,

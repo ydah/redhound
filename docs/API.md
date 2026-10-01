@@ -26,6 +26,9 @@ provides `next_packet`, `stats`, `interfaces`, `stop`, and `close`; a block alwa
 closes it. `Redhound.capture` yields packets and closes the live source even if
 the block fails. Capture options include `snaplen`, `promiscuous`, `buffer_size`
 (bytes), `direction` (`:in`, `:out`, `:inout`), `backend`, and `filter`.
+On Linux Ruby 4.0, `backend: :auto` uses sockets because `IO::Buffer.map` cannot
+map packet sockets; explicit `:ring` raises `UnsupportedPlatform`. Ruby 3.3/3.4
+retain ring support.
 
 `next_packet(timeout:)` returns nil at its deadline without discarding a partial
 stdin/pipe record. `stop` interrupts a waiting read. `attach_filter(program)`

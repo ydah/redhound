@@ -9,36 +9,54 @@ require 'fileutils'
 require 'open3'
 require 'digest'
 require 'time'
+require_relative 'live_traffic'
 
 def monotonic = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
 if ARGV.first == '--send'
-  _, namespace, port, duration, rate, start, result_path = ARGV
+  _, namespace, port, duration, rate, start, result_path, templates_path, peer = ARGV
   port, rate, start, duration = Integer(port), Integer(rate), Float(start), Float(duration)
   count = 0
   batch = [rate / 1000, 1].max
-  tail = 'RHLOAD'.b + 'x'.b * 544
-  UDPSocket.open do |socket|
-    socket.connect('10.123.0.1', port)
+  templates = templates_path ? RedhoundLiveTraffic.decode_templates(JSON.parse(File.read(templates_path))) : nil
+  socket = if templates
+             protocol = [0x0800].pack('n').unpack1('S')
+             raw = Socket.new(Socket::AF_PACKET, Socket::SOCK_RAW, protocol)
+             address = [Socket::AF_PACKET, 0x0800, templates.fetch('peer_index'), 0, 0, 6,
+                        PacketFactory.mac(templates.fetch('source_mac'))].pack('S n l S C C a8')
+             raw.bind(address)
+             raw
+           else
+             UDPSocket.new
+           end
+  begin
+    socket.connect('10.123.0.1', port) unless templates
     delay = start - monotonic
     sleep(delay) if delay.positive?
     while count < (duration * rate).to_i && monotonic < start + duration
       [batch, (duration * rate).to_i - count].min.times do
-        socket.send([count].pack('Q>') + tail, 0)
+        bytes = templates ? RedhoundLiveTraffic.frame(templates, count) : [count].pack('Q>') + RedhoundLiveTraffic::UDP_TAIL
+        raise 'partial frame send' unless socket.send(bytes, 0) == bytes.bytesize
         count += 1
       end
       delay = start + count.fdiv(rate) - monotonic
       sleep(delay) if delay.positive?
     end
+  ensure
+    socket.close
   end
-  File.write(result_path, JSON.pretty_generate(sent: count, elapsed: monotonic - start, rate: rate))
+  File.write(result_path, JSON.pretty_generate(sent: count, elapsed: monotonic - start, rate: rate,
+                                              workload: templates ? 'mixed_tcp_udp' : 'udp', peer: peer,
+                                              protocol_counts: { udp: templates ? (count + 1) / 2 : count, tcp: templates ? count / 2 : 0 },
+                                              cpu_affinity: File.read('/proc/self/status')[/^Cpus_allowed_list:\s+(.+)/, 1]))
   exit
 end
 
 $LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 require 'redhound'
 options = { duration: 10.0, rate: 1000, backends: %i[socket ring], out: 'tmp/live',
-            rotate: false, rotation_interval: 60.0, sample: 10.0, buffer: 64 << 20 }
+            rotate: false, verify_after: false, mixed: false, cpu: nil,
+            rotation_interval: 60.0, sample: 10.0, buffer: 64 << 20 }
 OptionParser.new do |parser|
   parser.banner = 'Usage: ruby --yjit bench/live.rb [options] (Linux, NET_RAW/NET_ADMIN/SYS_ADMIN)'
   parser.on('--duration SECONDS', Float) { |value| options[:duration] = value }
@@ -47,17 +65,30 @@ OptionParser.new do |parser|
   parser.on('--out DIR') { |value| options[:out] = value }
   parser.on('--rotate', 'Bounded pcapng rotation; otherwise pcap writes go to /dev/null') { options[:rotate] = true }
   parser.on('--verify-after', 'Measure capture/write alone; verify saved pcap after capture ends') { options[:verify_after] = true }
+  parser.on('--cpu CPU', Integer, 'Pin capture processes to this CPU; sender keeps its original affinity') { |value| options[:cpu] = value }
+  parser.on('--mixed', 'Alternate valid 600-byte IPv4 TCP and UDP frames') { options[:mixed] = true }
   parser.on('--rotation-interval SECONDS', Float) { |value| options[:rotation_interval] = value }
   parser.on('--sample SECONDS', Float) { |value| options[:sample] = value }
 end.parse!
 abort 'Linux is required' unless RUBY_PLATFORM.include?('linux')
 abort 'duration, rate and intervals must be finite and positive' unless options.values_at(:duration, :rate, :sample, :rotation_interval).all? { |value| value.positive? && value.finite? }
 abort '--verify-after cannot be combined with rotation' if options[:verify_after] && options[:rotate]
+abort 'CPU must be nonnegative' if options[:cpu] && options[:cpu].negative?
+expected_records = (options[:duration] * options[:rate]).to_i
+abort 'workload must include at least one frame' unless expected_records.positive?
+expected_storage = options[:backends].size * (24 + expected_records * 616)
+abort '--verify-after storage would exceed 4 GiB; reduce rate or duration, or verify inline' if options[:verify_after] && expected_storage > (4 << 30)
+options[:workload] = options[:mixed] ? 'mixed_tcp_udp' : 'udp'
+options[:frame_bytes], options[:expected_records] = 600, expected_records
+options[:expected_storage_bytes] = options[:verify_after] ? expected_storage : 0
+options[:capture_validation_deferred] = options[:verify_after]
 abort 'result directory already exists; use a new --out directory' if File.exist?(File.join(options[:out], 'configuration.json'))
 FileUtils.mkdir_p(options[:out], mode: 0o700)
 capture_files = Dir[File.expand_path('../lib/redhound/{capture,file}/**/*.rb', __dir__)] + %w[capture.rb writer.rb packet.rb].map { |path| File.expand_path("../lib/redhound/#{path}", __dir__) }
 code_sha256 = Digest::SHA256.hexdigest(capture_files.sort.map { |path| File.read(path) }.join)
-File.write(File.join(options[:out], 'configuration.json'), JSON.pretty_generate(options.merge(ruby: RUBY_VERSION, platform: RUBY_PLATFORM, yjit: RubyVM::YJIT.enabled?, started_at: Time.now.utc.iso8601, capture_code_sha256: code_sha256)))
+harness_files = [__FILE__, File.expand_path('live_traffic.rb', __dir__), File.expand_path('../spec/support/packet_factory.rb', __dir__)]
+harness_sha256 = Digest::SHA256.hexdigest(harness_files.map { |path| File.read(path) }.join)
+File.write(File.join(options[:out], 'configuration.json'), JSON.pretty_generate(options.merge(ruby: RUBY_VERSION, platform: RUBY_PLATFORM, yjit: RubyVM::YJIT.enabled?, started_at: Time.now.utc.iso8601, capture_code_sha256: code_sha256, harness_sha256: harness_sha256)))
 namespace, interface, peer = "rh-load-#{Process.pid}", "rh#{Process.pid}", "rp#{Process.pid}"
 created_namespace = created_interface = false
 children = []
@@ -68,6 +99,7 @@ Signal.trap('TERM') { raise Interrupt }
 def ip(*args)
   output, error, status = Open3.capture3('ip', *args)
   raise "ip #{args.join(' ')}: #{output}#{error}" unless status.success?
+  output
 end
 
 def validate_file(path)
@@ -92,6 +124,17 @@ begin
   receiver = UDPSocket.new
   receiver.bind('0.0.0.0', 0)
   port = receiver.addr[1]
+  templates_path = nil
+  templates = nil
+  if options[:mixed]
+    destination = JSON.parse(ip('-j', 'link', 'show', 'dev', interface)).fetch(0)
+    origin = JSON.parse(ip('netns', 'exec', namespace, 'ip', '-j', 'link', 'show', 'dev', peer)).fetch(0)
+    encoded = RedhoundLiveTraffic.templates(source_mac: origin.fetch('address'), destination_mac: destination.fetch('address'),
+                                            port: port, peer_index: origin.fetch('ifindex'))
+    templates_path = File.join(options[:out], 'templates.json')
+    File.open(templates_path, 'wb', 0o600) { |file| file.write(JSON.pretty_generate(encoded)) }
+    templates = RedhoundLiveTraffic.decode_templates(encoded)
+  end
 
   options[:backends].each do |backend|
     control_read, control_write = IO.pipe
@@ -102,8 +145,14 @@ begin
       source = writer = sample_io = sink = nil
       failed = false
       begin
+        if options[:cpu]
+          output, error, status = Open3.capture3('taskset', '-pc', options[:cpu].to_s, Process.pid.to_s)
+          raise "cannot set capture CPU affinity: #{output}#{error}" unless status.success?
+        end
+        cpu_affinity = File.read('/proc/self/status')[/^Cpus_allowed_list:\s+(.+)/, 1]
+        filter = options[:mixed] ? "(tcp or udp) and dst host 10.123.0.1 and dst port #{port}" : "udp dst port #{port}"
         source = Redhound::Capture.open(interface: interface, backend: backend, direction: :in,
-                                       promiscuous: false, buffer_size: options[:buffer], filter: "udp dst port #{port}")
+                                       promiscuous: false, buffer_size: options[:buffer], filter: filter)
         writer = if options[:rotate]
                    Redhound::Writer.open(File.join(options[:out], "#{backend}.pcapng"), max_bytes: 64 << 20,
                                          interval: options[:rotation_interval], file_count: 3)
@@ -115,33 +164,24 @@ begin
                  end
         ready_write.puts(backend)
         ready_write.close
-        start = Float(control_read.gets)
+        timing = JSON.parse(control_read.gets)
+        start = timing.fetch('start')
         control_read.close
         deadline = start + options[:duration] + 1
-        count = gaps = invalid = 0
-        previous = nil
+        count = 0
         last_capture_at = start
-        digest = Digest::SHA256.new
-        timestamps = []
+        verifier = RedhoundLiveTraffic::Verifier.new(start_ns: timing.fetch('realtime_ns'), duration: options[:duration],
+                                                    templates: templates, port: port)
         next_sample = start
         sample_io = File.open(File.join(options[:out], "#{backend}-samples.jsonl"), 'wb', 0o600)
         max_rss = max_fds = 0
-        verify = lambda do |packet|
-          sequence = packet.data.unpack1('Q>', offset: 42)
-          invalid += 1 unless packet.caplen == 600 && packet.original_length == 600 && packet.data.byteslice(50, 6) == 'RHLOAD'
-          gaps += sequence - previous - 1 if previous && sequence > previous + 1
-          invalid += 1 if previous && sequence <= previous
-          previous = sequence
-          digest.update(packet.data)
-          timestamps << [sequence, packet.timestamp_ns] if sequence % 10_000 == 0
-        end
         while monotonic < deadline
           packet = source.next_packet(timeout: 0.1)
           if packet
             old_path = writer.path if options[:rotate]
             writer.write(packet)
             validate_file(old_path) if options[:rotate] && old_path != writer.path
-            verify.call(packet) unless options[:verify_after]
+            verifier.verify(packet) unless options[:verify_after]
             count += 1
             last_capture_at = monotonic
           end
@@ -161,17 +201,19 @@ begin
         writer.close
         writer = nil
         if options[:verify_after]
-          verified = 0
           Redhound.open(File.join(options[:out], "#{backend}.pcap")) do |reader|
-            reader.each { |packet| verify.call(packet); verified += 1 }
+            reader.each { |packet| verifier.verify(packet) }
           end
-          raise 'saved record count differs from captured count' unless verified == count
+          raise 'saved record count differs from captured count' unless verifier.count == count
         end
         Dir.glob(File.join(options[:out], "#{backend}_*.pcapng")).each { |path| validate_file(path) }
         elapsed = last_capture_at - start
-        report = { backend: backend, captured: count, sequence_gaps: gaps, invalid: invalid, sha256: digest.hexdigest,
+        report = verifier.report.merge(backend: backend, captured: count, verification_passed: verifier.complete?(expected_records),
+                   workload: options[:workload], frame_bytes: 600, cpu: options[:cpu], cpu_affinity: cpu_affinity,
+                   verify_after: options[:verify_after], capture_validation_deferred: options[:verify_after],
+                   capture_code_sha256: code_sha256, harness_sha256: harness_sha256,
                    elapsed: elapsed, pps: count / elapsed, finish_lag: [elapsed - options[:duration], 0].max, stats: stats.to_h,
-                   timestamps: timestamps, max_rss: max_rss, max_fds: max_fds }
+                   max_rss: max_rss, max_fds: max_fds)
         File.write(File.join(options[:out], "#{backend}.json"), JSON.pretty_generate(report))
       rescue StandardError, Interrupt => error
         warn error.full_message
@@ -194,24 +236,33 @@ begin
   ready_write.close
   options[:backends].length.times { raise 'capture setup failed' unless ready_read.gets }
   ready_read.close
-  start = monotonic + 0.2
-  controls.each { |control| control.puts(start); control.close }
+  start = monotonic + 0.5
+  realtime_ns = Process.clock_gettime(Process::CLOCK_REALTIME, :nanosecond) + ((start - monotonic) * 1_000_000_000).round
+  controls.each { |control| control.puts(JSON.generate(start: start, realtime_ns: realtime_ns)); control.close }
   sender_path = File.join(options[:out], 'sender.json')
-  sender = Process.spawn('ip', 'netns', 'exec', namespace, RbConfig.ruby, '--yjit', __FILE__, '--send', namespace,
-                         port.to_s, options[:duration].to_s, options[:rate].to_s, start.to_s, sender_path)
+  sender_command = ['ip', 'netns', 'exec', namespace, RbConfig.ruby, '--yjit', __FILE__, '--send', namespace,
+                    port.to_s, options[:duration].to_s, options[:rate].to_s, start.to_s, sender_path]
+  sender_command.concat([templates_path, peer]) if templates_path
+  sender = Process.spawn(*sender_command)
   children << sender
   statuses = children.map { |pid| Process.wait2(pid).last }
   children.clear
   raise 'capture or sender failed; inspect error reports' unless statuses.all?(&:success?)
   sent = JSON.parse(File.read(sender_path)).fetch('sent')
   reports = options[:backends].map { |backend| JSON.parse(File.read(File.join(options[:out], "#{backend}.json"))) }
-  accepted = sent == (options[:duration] * options[:rate]).to_i && reports.all? { |report| report['captured'] == sent && report['sequence_gaps'].zero? && report['invalid'].zero? && report['stats']['dropped'].zero? && report['finish_lag'] <= 0.1 }
+  accepted = sent == expected_records && reports.all? do |report|
+    report['captured'] == sent && report['verification_passed'] && report['stats']['received'] == sent &&
+      report['stats']['dropped'].zero? && report['stats']['if_dropped'].zero? && report['finish_lag'] <= 0.1
+  end
   if reports.size == 2
     accepted &&= reports.map { |report| report['sha256'] }.uniq.size == 1
     stamps = reports.map { |report| report['timestamps'].to_h }
     accepted &&= stamps[0].keys == stamps[1].keys && stamps[0].all? { |sequence, time| (time - stamps[1][sequence]).abs <= 1_000_000 }
   end
   result = { passed: accepted, sent: sent, duration: options[:duration], requested_pps: options[:rate],
+             workload: options[:workload], frame_bytes: 600, expected_records: expected_records, cpu: options[:cpu],
+             verify_after: options[:verify_after], capture_validation_deferred: options[:verify_after],
+             capture_code_sha256: code_sha256, harness_sha256: harness_sha256,
              sender: JSON.parse(File.read(sender_path)), reports: reports.map { |report| report.reject { |key, _value| %w[samples timestamps].include?(key) } } }
   File.write(File.join(options[:out], 'result.json'), JSON.pretty_generate(result))
   puts JSON.pretty_generate(result)
