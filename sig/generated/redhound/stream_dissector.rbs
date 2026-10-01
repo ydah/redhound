@@ -23,14 +23,20 @@ module Redhound
     # @rbs (Integer direction, Integer length) -> Array[Integer]
     def consume_origins: (Integer direction, Integer length) -> Array[Integer]
 
-    # @rbs (String bytes, ?tls_encrypted: bool) -> Layer
-    def parse_pdu: (String bytes, ?tls_encrypted: bool) -> Layer
+    # @rbs (String bytes, ?tls_encrypted: bool, ?head_response: bool) -> Layer
+    def parse_pdu: (String bytes, ?tls_encrypted: bool, ?head_response: bool) -> Layer
 
-    # @rbs (String buffer, ?Integer direction) -> Integer?
-    def pdu_length: (String buffer, ?Integer direction) -> Integer?
+    # @rbs (String buffer, ?Integer direction, ?head_response: bool) -> Integer?
+    def pdu_length: (String buffer, ?Integer direction, ?head_response: bool) -> Integer?
 
-    # @rbs (String buffer) -> Integer?
-    def http_length: (String buffer) -> Integer?
+    # @rbs (String buffer, ?head_response: bool) -> Integer?
+    def http_length: (String buffer, ?head_response: bool) -> Integer?
+
+    # @rbs (untyped stream, Integer direction, String buffer) -> bool
+    def head_response?: (untyped stream, Integer direction, String buffer) -> bool
+
+    # @rbs (untyped stream, Integer direction, Layer layer) -> void
+    def record_http: (untyped stream, Integer direction, Layer layer) -> void
 
     # @rbs (String buffer, Integer direction) -> Integer?
     def tls_length: (String buffer, Integer direction) -> Integer?

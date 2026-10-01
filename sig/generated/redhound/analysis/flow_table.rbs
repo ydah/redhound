@@ -25,6 +25,8 @@ module Redhound
 
       attr_reader keep_alives: untyped
 
+      attr_reader http_methods: untyped
+
       attr_accessor last_ns: untyped
 
       attr_accessor closed_ns: untyped

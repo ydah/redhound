@@ -41,11 +41,20 @@ module Redhound
       # @rbs () -> bool
       def pending?: () -> bool
 
+      # @rbs () -> bool
+      def fin_seen?: () -> bool
+
+      # @rbs () -> void
+      def consume_fin: () -> void
+
       # @rbs () -> Integer
       def next_sequence: () -> Integer
 
       # @rbs () -> void
       def clear_deliveries: () -> void
+
+      # @rbs () -> void
+      def release: () -> void
     end
   end
 end

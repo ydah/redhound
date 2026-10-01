@@ -31,7 +31,7 @@ module Redhound
         start = @expected + Util::Seq.signed_diff(sequence, (base + @expected) % Util::Seq::MOD) + (syn ? 1 : 0)
         @fin_offset = start + data.bytesize if fin
         @diagnostics << :out_of_order if !data.empty? && start >= @expected && start < @highest
-        @diagnostics << :lost_segment if !data.empty? && start > @highest
+        @diagnostics << :lost_segment if (!data.empty? || fin) && start > @highest
         @diagnostics << :retransmission if !data.empty? && start < @expected
         @highest = [@highest, start + data.bytesize + (fin ? 1 : 0)].max
         pieces = [[start, data, frame]]
@@ -70,10 +70,7 @@ module Redhound
           flush_gap(false)
         end
         trim_history
-        if !@fin && @fin_offset && @expected >= @fin_offset
-          @fin = true
-          @expected += 1
-        end
+        consume_fin
         @deliveries.filter_map(&:first)
       end
 
@@ -99,8 +96,9 @@ module Redhound
       # @rbs (?bool clear) -> Array[String]
       def flush_gap(clear = true)
         @deliveries, @gap_lengths = [], [] if clear
-        return [] if @queue.empty?
-        gap = @queue.first[0] - @expected
+        target = @queue.empty? ? @fin_offset : @queue.first[0]
+        return [] unless target
+        gap = target - @expected
         if gap.positive?
           @diagnostics << :reassembly_gap
           @gap_lengths << gap
@@ -110,6 +108,7 @@ module Redhound
           @history_start = @expected
         end
         drain
+        consume_fin
         trim_history
         @deliveries.filter_map(&:first)
       end
@@ -126,11 +125,27 @@ module Redhound
       # @rbs () -> Integer
       def bytesize = @history.bytesize + @queue.sum { |item| item[1].bytesize + 128 }
       # @rbs () -> bool
-      def pending? = !@queue.empty?
+      def pending? = !@queue.empty? || (!@fin && !@fin_offset.nil?)
+      # @rbs () -> bool
+      def fin_seen? = !@fin_offset.nil?
+      # @rbs () -> void
+      def consume_fin
+        if !@fin && @fin_offset && @expected >= @fin_offset
+          @fin = true
+          @expected += 1
+        end
+      end
       # @rbs () -> Integer
       def next_sequence = ((@base_seq || 0) + @expected) % Util::Seq::MOD
       # @rbs () -> void
       def clear_deliveries = @deliveries.clear
+      # @rbs () -> void
+      def release
+        @history.clear
+        @queue.clear
+        @deliveries.clear
+        @gap_lengths.clear
+      end
     end
   end
 end

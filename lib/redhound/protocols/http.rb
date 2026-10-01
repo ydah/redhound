@@ -46,7 +46,7 @@ module Redhound
           if !transfer.empty? && content_length
             return layer.diagnose(:error, :malformed, 'Transfer-Encoding and Content-Length conflict')
           end
-          no_body = response && (status.between?(100, 199) || [204, 304].include?(status))
+          no_body = response && (ctx.packet.meta[:http_head_response] == true || status.between?(100, 199) || [204, 304].include?(status))
           if no_body
             pos = body_start
           elsif transfer.last == 'chunked'

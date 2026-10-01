@@ -1,3 +1,11 @@
+# Statistics reference: analysis_spec disables only tshark's SAP NI dissector
+# for analysis-stats.pcap. Its opaque TCP payloads use source port 40000, which
+# SAP NI also registers (packet-sapni.c, SAP_PROTOCOL_PORT_RANGE). Redhound has
+# no SAP NI dissector and reports Data. This aligns the controlled fixture's
+# interpretation without removing hierarchy rows, protocol counts or bytes.
+# All named supported protocols and Data rows remain checked in full.
+# Source: https://github.com/wireshark/wireshark/blob/wireshark-4.2.0/epan/dissectors/packet-sapni.c
+# Option: https://www.wireshark.org/docs/man-pages/tshark.html
 - {name: eth.src, normalize: string}
 - {name: eth.dst, normalize: string}
 - {name: eth.type, normalize: hex}

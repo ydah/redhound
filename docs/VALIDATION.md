@@ -19,6 +19,8 @@ Reproducible checks:
 - `FUZZ_ITERATIONS=1000000 bundle exec rspec spec/fuzz`: strict parser fuzzing.
 - `sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 bundle exec rspec --tag live`:
   native capture, attached filters, kernel time, snaplen, stop and loopback.
+- `sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 REDHOUND_NETNS=1 bundle exec rspec spec/integration/netns_capture_spec.rb --tag live`:
+  Linux veth socket/ring parity and offloaded VLAN restoration/filtering.
 - `bundle exec yard stats --list-undoc`: documented public API.
 - `actionlint`: test and release workflow validation.
 
@@ -28,14 +30,16 @@ The CI matrix checks Ruby 3.3/3.4/4.0/head, Linux/macOS live capture and tool
 comparisons. Scheduled runs execute one million fuzz cases. Benchmark jobs warn
 on a summary throughput regression over 15% compared with the previous commit.
 
-Local validation on 2026-10-01: Linux aarch64 Ruby 3.4 passed all 165 non-live
+Local validation on 2026-10-01: Linux aarch64 Ruby 3.4 passed all 171 non-live
 examples, including tcpdump/tshark differential checks, and five live capture
 examples using socket and ring backends. Native macOS Ruby 4.0 passed unit,
 golden and filter checks; BPF ioctl constants match the installed SDK. Native
-BPF loopback capture, attached filters, timestamps, truncation, termination and
-privilege dropping passed the macOS CI job. Ruby 3.3/3.4/4.0/head all passed
-the CI type, signature and coverage gates. Whole-library line coverage measured 90.71%; isolated
-protocol line coverage measured 99.90%. See [benchmarks](../bench/RESULTS.md)
+BPF loopback and en0 Ethernet capture, attached filters, timestamps, truncation,
+termination, privilege dropping and pcapng metadata passed the macOS CI job.
+The Linux namespace test passed socket/ring parity and offloaded VLAN checks.
+Ruby 3.3/3.4/4.0/head all passed the CI type, signature and coverage gates.
+Whole-library line coverage measured 90.92%; isolated protocol line coverage
+measured 99.90%. See [benchmarks](../bench/RESULTS.md)
 for throughput figures and measurement limits.
 
 ## Remaining GA acceptance gates
@@ -44,8 +48,6 @@ for throughput figures and measurement limits.
 - Run a 72-hour rotation soak and record RSS, descriptor counts and drop rates.
 - Run an hour of high-load aarch64 socket/ring comparison before changing its
   automatic backend default.
-- Verify physical macOS Ethernet capture/filter/pcapng output, in addition to
-  the loopback CI run.
 - Confirm x86_64 single-core throughput and live drop targets on the specified
   workload; file benchmarks alone cannot establish loss-free live throughput.
 - Keep rc1 available for two weeks, classify reports, and fix critical/high

@@ -31,6 +31,7 @@
 - List interfaces without duplicates and accept interface indexes.
 - Protect read inputs and their aliases from rotated-output overwrites, validate filters on empty captures, and stop stdin reads cleanly on termination.
 - Decode foreign-endian loopback capture headers correctly and preserve original wire lengths for truncated VLAN packets.
+- Handle HEAD responses and pipelined HTTP correctly, reassemble HTTP on nonstandard ports, and report missing or incomplete TCP data at FIN and EOF.
 
 ## 1.0.1 - 2025-01-17
 

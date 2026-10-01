@@ -18,6 +18,10 @@ module Redhound
         application = flow.applications[direction]
         if !application && @protocol_streams
           klass = @registry.by_port('tcp.port', layer[:srcport], layer[:dstport])
+          unless klass
+            recognized = packet.layers.find { |item| (candidate = @registry.protocols[item.protocol]) && candidate <= StreamDissector }
+            klass = recognized ? @registry.protocols[recognized.protocol] : flow.applications[1 - direction]&.class
+          end
           flow.applications[direction] = klass.new(registry: @registry, max_bytes: @stream_bytes) if klass && klass <= StreamDissector
           application = flow.applications[direction]
         end
@@ -40,16 +44,24 @@ module Redhound
         deliver(flow, direction, stream, application, packet)
         if flags & 4 != 0
           finish_flow(flow, packet)
+        elsif flow.streams.compact.size == 2 && flow.streams.compact.all?(&:fin_seen?)
+          finish_flow(flow, packet)
         elsif stream.fin
           attach(packet, application.on_close(flow, direction)) if application
           flow.closed_ns ||= packet.timestamp_ns if flow.streams.compact.size == 2 && flow.streams.compact.all?(&:fin)
         end
       end
-      # @rbs (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> void
+      # @rbs (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> Array[Layer]
       def deliver(flow, direction, stream, application, packet)
+        completed = [] #: Array[Layer]
         stream.deliveries.each do |data, origin|
           unless data
-            application&.on_gap(flow, direction, origin)
+            gap = Layer.new(:tcp, 0, 0, 0).diagnose(:warning, :reassembly_gap, "#{origin} TCP bytes missing")
+            packet&.[](:tcp)&.diagnose(:warning, :reassembly_gap, gap.diagnostics.first.message)
+            completed << gap unless packet
+            layers = application ? application.on_gap(flow, direction, origin) : Array.new #: Array[Layer]
+            completed.concat(layers)
+            attach(packet, layers) if packet
             next
           end
           @follow&.write(flow, direction, data)
@@ -65,7 +77,9 @@ module Redhound
                      Array.new
                    end #: Array[Layer]
           attach(packet, layers) if packet
+          completed.concat(layers)
         end
+        completed
       ensure
         stream.clear_deliveries
       end
@@ -76,19 +90,26 @@ module Redhound
           packet.layers << layer
         end
       end
-      # @rbs (Flow flow, ?Packet? packet) -> void
+      # @rbs (Flow flow, ?Packet? packet) -> Array[Layer]
       def finish_flow(flow, packet = nil)
+        completed = [] #: Array[Layer]
         flow.streams.each_with_index do |stream, direction|
           next unless stream
           application = flow.applications[direction]
           while stream.pending?
             stream.flush_gap
-            packet&.[](:tcp)&.diagnose(:warning, :reassembly_gap) unless stream.gap_lengths.empty?
-            deliver(flow, direction, stream, application, packet)
+            completed.concat(deliver(flow, direction, stream, application, packet))
           end
-          attach(packet, application.on_close(flow, direction)) if application && packet
+          if application
+            layers = application.on_close(flow, direction)
+            attach(packet, layers) if packet
+            completed.concat(layers)
+          end
+          stream.release
         end
+        flow.http_methods.each(&:clear)
         flow.closed_ns ||= packet ? packet.timestamp_ns : flow.last_ns
+        completed
       end
       # @rbs (FlowTable flows, Packet packet) -> void
       def enforce_limit(flows, packet)

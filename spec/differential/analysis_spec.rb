@@ -127,8 +127,10 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
   end
 
   it 'matches interval and protocol hierarchy packet and byte counts' do
-    # Compare packet hierarchy, not version-dependent TCP segment buffering.
-    reference = tshark(:stats, '-o', 'tcp.desegment_tcp_streams:FALSE', '-q', '-z', 'io,stat,1', '-z', 'io,phs')
+    # The fixture's opaque TCP data uses source port 40000, also registered by
+    # tshark's unsupported SAP NI dissector. Disable only SAP NI so every
+    # hierarchy row, including Data, remains comparable across tshark versions.
+    reference = tshark(:stats, '--disable-protocol', 'sapni', '-o', 'tcp.desegment_tcp_streams:FALSE', '-q', '-z', 'io,stat,1', '-z', 'io,phs')
     intervals = reference.lines.filter_map do |line|
       match = /\|\s*(\d+)\s*<>\s*(?:Dur|\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|/.match(line)
       [match[1].to_i, [match[2].to_i, match[3].to_i]] if match

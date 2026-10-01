@@ -109,7 +109,15 @@ module Redhound
       # @rbs (untyped out, untyped err) -> void
       def finish(out, err)
         return if @finished
-        @flows.values.each { |flow| @tcp_reassembler.finish_flow(flow) }
+        @flows.values.each do |flow|
+          @tcp_reassembler.finish_flow(flow).each do |layer|
+            layer.diagnostics.each do |diagnostic|
+              message = diagnostic.message.b.gsub(/[^\x20-\x7e]/n) { |byte| format('\\x%02x', byte.getbyte(0)) }
+              err.puts("stream #{flow.id} #{layer.protocol}: #{diagnostic.code}: #{message}")
+            end
+          end
+          @flows.account(flow)
+        end
         @follow&.format(out)
         snapshot(err)
       ensure

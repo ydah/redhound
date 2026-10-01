@@ -25,9 +25,11 @@ module Redhound
       layers = [] #: Array[Layer]
       loop do
         buffer = @buffers[direction]
-        length = pdu_length(buffer, direction)
+        head_response = head_response?(stream, direction, buffer)
+        length = pdu_length(buffer, direction, head_response: head_response)
         break unless length && length.positive?
-        layer = parse_pdu(buffer.byteslice(0, length), tls_encrypted: @tls_encrypted[direction])
+        layer = parse_pdu(buffer.byteslice(0, length), tls_encrypted: @tls_encrypted[direction], head_response: head_response)
+        record_http(stream, direction, layer)
         @tls_encrypted[direction] = true if self.class.protocol_id == :tls && layer.field_values('tls.record.content_type').include?(20)
         layer.add(:reassembled_from, 'tcp.reassembled_from', consume_origins(direction, length))
         layers << layer
@@ -38,16 +40,18 @@ module Redhound
 
     # @rbs (untyped stream, Integer direction, Integer length) -> Array[Layer]
     def on_gap(stream, direction, length)
-      @buffers[direction].clear
-      @origins[direction].clear
-      []
+      layers = on_close(stream, direction)
+      layers.each { |layer| layer.diagnose(:warning, :reassembly_gap, "#{length} TCP bytes missing") }
+      stream.http_methods.each(&:clear) if self.class.protocol_id == :http
+      layers
     end
 
     # @rbs (untyped stream, Integer direction) -> Array[Layer]
     def on_close(stream, direction)
       buffer = @buffers[direction]
       return [] if buffer.empty?
-      layer = parse_pdu(buffer, tls_encrypted: @tls_encrypted[direction])
+      layer = parse_pdu(buffer, tls_encrypted: @tls_encrypted[direction], head_response: head_response?(stream, direction, buffer))
+      record_http(stream, direction, layer)
       layer.add(:reassembled_from, 'tcp.reassembled_from', consume_origins(direction, buffer.bytesize))
       @buffers[direction] = ''.b
       [layer]
@@ -73,29 +77,29 @@ module Redhound
       frames.uniq.sort
     end
 
-    # @rbs (String bytes, ?tls_encrypted: bool) -> Layer
-    def parse_pdu(bytes, tls_encrypted: false)
-      packet = Packet.new(bytes, meta: { tls_encrypted: tls_encrypted })
+    # @rbs (String bytes, ?tls_encrypted: bool, ?head_response: bool) -> Layer
+    def parse_pdu(bytes, tls_encrypted: false, head_response: false)
+      packet = Packet.new(bytes, meta: { tls_encrypted: tls_encrypted, http_head_response: head_response })
       ctx = Context.new(packet, registry: @registry)
       ctx.layers << Layer.new(:tcp, 0, 0, bytes.bytesize)
       Engine.new(registry: @registry).safely(self.class, ctx, ctx.cursor)
     end
 
-    # @rbs (String buffer, ?Integer direction) -> Integer?
-    def pdu_length(buffer, direction = 0)
+    # @rbs (String buffer, ?Integer direction, ?head_response: bool) -> Integer?
+    def pdu_length(buffer, direction = 0, head_response: false)
       case self.class.protocol_id
       when :dns
         return nil if buffer.bytesize < 2
         length = buffer.unpack1('n') #: Integer
         buffer.bytesize >= length + 2 ? length + 2 : nil
-      when :http then http_length(buffer)
+      when :http then http_length(buffer, head_response: head_response)
       when :tls then tls_length(buffer, direction)
       else buffer.empty? ? nil : buffer.bytesize
       end
     end
 
-    # @rbs (String buffer) -> Integer?
-    def http_length(buffer)
+    # @rbs (String buffer, ?head_response: bool) -> Integer?
+    def http_length(buffer, head_response: false)
       ending = buffer.index("\r\n\r\n")
       return buffer.bytesize if !ending && buffer.bytesize > 65_536
       return nil unless ending
@@ -103,7 +107,7 @@ module Redhound
       header = buffer.byteslice(0, ending) #: String
       response = header.start_with?('HTTP/')
       status = response ? header.split(' ', 3)[1].to_i : 0
-      return head_end if response && (status.between?(100, 199) || [204, 304].include?(status))
+      return head_end if response && (head_response || status.between?(100, 199) || [204, 304].include?(status))
       lengths = header.scan(/\r\ncontent-length:[ \t]*([^\r\n]*)/in).flatten.flat_map { |value| value.split(',').map(&:strip) }
       transfer = header.scan(/\r\ntransfer-encoding:[ \t]*([^\r\n]*)/in).flatten.join(',').downcase.split(',').map(&:strip)
       if (!lengths.empty? && !transfer.empty?) || lengths.uniq.size > 1 || lengths.any? { |value| !value.match?(/\A[0-9]+\z/n) }
@@ -122,6 +126,27 @@ module Redhound
         return length <= buffer.bytesize ? length : nil
       end
       response ? nil : head_end
+    end
+
+    # @rbs (untyped stream, Integer direction, String buffer) -> bool
+    def head_response?(stream, direction, buffer)
+      self.class.protocol_id == :http && buffer.start_with?('HTTP/') && stream.http_methods[1 - direction].first == true
+    end
+
+    # @rbs (untyped stream, Integer direction, Layer layer) -> void
+    def record_http(stream, direction, layer)
+      return unless self.class.protocol_id == :http
+      method = layer.field_value('http.request.method')
+      if method && !layer.error?
+        methods = stream.http_methods[direction]
+        if methods.size >= [@max_bytes / 16, 1].max
+          methods.clear
+          layer.diagnose(:warning, :reassembly_gap, 'HTTP request context memory limit exceeded')
+        end
+        methods << (method == 'HEAD')
+      elsif (status = layer.field_value('http.response.code')) && (status >= 200 || status == 101)
+        stream.http_methods[1 - direction].shift
+      end
     end
 
     # @rbs (String buffer, Integer direction) -> Integer?

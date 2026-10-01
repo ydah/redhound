@@ -291,4 +291,103 @@ RSpec.describe 'stateful analysis' do
     expect(encrypted['tls.handshake.type']).to be_nil
     session.finish(StringIO.new, StringIO.new)
   end
+
+  it 'frames HEAD responses without a body and preserves pipelined GET framing' do
+    session = Redhound::Analysis::Session.new
+    requests = "HEAD / HTTP/1.1\r\nHost: example.test\r\n\r\nGET /next HTTP/1.1\r\nHost: example.test\r\n\r\n"
+    session.update(packet(requests))
+    informational = "HTTP/1.1 100 Continue\r\n\r\n"
+    session.update(packet(informational, seq: 500, reverse: true, number: 2))
+    responses = "HTTP/1.1 200 OK\r\nContent-Length: 100\r\n\r\nHTTP/1.1 200 OK\r\nContent-Length: 4\r\n\r\nbody"
+    response = packet(responses, seq: 500 + informational.bytesize, reverse: true, number: 3)
+    session.update(response)
+    expect(response.layers_of(:http).map { |layer| layer.field_value('http.response.code') }).to eq([200, 200])
+    expect(response.layers_of(:http).map { |layer| layer.field_value('http.file_data') }).to eq([nil, 'body'])
+    expect(response.layers_of(:http).flat_map { |layer| layer.diagnostics.map(&:code) }).not_to include(:truncated)
+    session.finish(StringIO.new, StringIO.new)
+  end
+
+  it 'tracks FIN holes, preserves later earlier data, and closes after both FINs' do
+    session = Redhound::Analysis::Session.new(follow: 'tcp,raw,0')
+    session.update(packet(seq: 99, flags: 2))
+    pending = packet(seq: 150, flags: 0x11, number: 2)
+    session.update(pending)
+    expect(pending['tcp.analysis.lost_segment']).to eq(true)
+    expect(session.flows.values.first.streams.first.pending?).to eq(true)
+    session.update(packet('a' * 50, seq: 100, number: 3))
+    peer = packet(seq: 500, flags: 0x11, reverse: true, number: 4)
+    session.update(peer)
+    expect(session.flows.values.first.closed?).to eq(true)
+    output = StringIO.new(''.b)
+    session.finish(output, StringIO.new)
+    expect(output.string).to eq('a' * 50)
+
+    session = Redhound::Analysis::Session.new
+    session.update(packet(seq: 99, flags: 2))
+    session.update(packet(seq: 150, flags: 0x11, number: 2))
+    peer = packet(seq: 500, flags: 0x11, reverse: true, number: 3)
+    session.update(peer)
+    expect(session.flows.values.first.closed?).to eq(true)
+    expect(peer[:tcp].diagnostics.map(&:code)).to include(:reassembly_gap)
+    expect(peer[:tcp].diagnostics.find { |diagnostic| diagnostic.code == :reassembly_gap }.message).to include('50')
+    session.finish(StringIO.new, StringIO.new)
+  end
+
+  it 'reassembles heuristic HTTP on a nonstandard TCP port' do
+    session = Redhound::Analysis::Session.new
+    session.update(packet(seq: 99, flags: 2, port: 9999))
+    first = "GET / HTTP/1.1\r\nHost: "
+    session.update(packet(first, port: 9999, number: 2))
+    completing = packet("example.test\r\n\r\n", seq: 100 + first.bytesize, port: 9999, number: 3)
+    session.update(completing)
+    expect(completing['http.host']).to eq('example.test')
+    expect(completing[:http].field_value('tcp.reassembled_from')).to eq([2, 3])
+    session.finish(StringIO.new, StringIO.new)
+  end
+
+  it 'reports incomplete EOF PDUs and FIN gaps while releasing all buffered application and TCP bytes' do
+    [false, true].each do |fin|
+      session = Redhound::Analysis::Session.new
+      session.update(packet(seq: 99, flags: 2))
+      session.update(packet("GET / HTTP/1.1\r\nHost: unfinished", number: 2))
+      session.update(packet(seq: 150, flags: 0x11, number: 3)) if fin
+      flow = session.flows.values.first
+      expect(flow.applications.compact.sum(&:bytesize)).to be > 0
+      error = StringIO.new
+      session.finish(StringIO.new, error)
+      expect(error.string.include?('reassembly_gap')).to eq(fin)
+      expect(error.string).to match(/stream 0.*truncated/)
+      expect(flow.applications.compact.sum(&:bytesize)).to eq(0)
+      expect(flow.streams.compact.sum(&:bytesize)).to eq(0)
+      expect(session.bytesize).to eq(Redhound::Analysis::Flow::BASE_BYTES)
+    end
+  end
+
+  it 'finalizes valid close-delimited HTTP at EOF without incomplete diagnostics' do
+    session = Redhound::Analysis::Session.new
+    session.update(packet("HTTP/1.1 200 OK\r\n\r\nbody", seq: 500, reverse: true))
+    flow = session.flows.values.first
+    layers = session.tcp_reassembler.finish_flow(flow)
+    expect(layers.last.field_value('http.file_data')).to eq('body')
+    expect(layers.flat_map { |layer| layer.diagnostics.map(&:code) }).to eq([])
+    error = StringIO.new
+    session.finish(StringIO.new, error)
+    expect(error.string).to eq('')
+    expect(flow.applications.compact.sum(&:bytesize)).to eq(0)
+  end
+
+  it 'bounds outstanding HTTP request methods and clears them at EOF' do
+    session = Redhound::Analysis::Session.new(stream_bytes: 256)
+    request = "HEAD / HTTP/1.1\r\n\r\n"
+    100.times do |index|
+      frame = packet(request, seq: 100 + index * request.bytesize, number: index + 1)
+      session.update(frame)
+      flow = session.flows.values.first
+      expect(flow.http_methods.flatten.size).to be <= 16
+      expect(frame[:http].diagnostics.map(&:code)).to include(:reassembly_gap) if index == 16
+    end
+    flow = session.flows.values.first
+    session.finish(StringIO.new, StringIO.new)
+    expect(flow.http_methods.flatten).to eq([])
+  end
 end

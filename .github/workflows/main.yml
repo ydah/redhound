@@ -41,6 +41,9 @@ jobs:
           ruby-version: '3.4'
           bundler-cache: true
       - run: sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 bundle exec rspec --tag live
+      - name: Compare veth and offloaded VLAN capture
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 REDHOUND_NETNS=1 bundle exec rspec spec/integration/netns_capture_spec.rb --tag live
   differential:
     runs-on: ubuntu-latest
     timeout-minutes: 15

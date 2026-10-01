@@ -7,20 +7,21 @@ module Redhound
     # @api private
     class Flow
       BASE_BYTES = 4096
-      attr_reader :key, :id, :first_ns, :packets, :bytes, :streams, :applications, :acks, :keep_alives
+      attr_reader :key, :id, :first_ns, :packets, :bytes, :streams, :applications, :acks, :keep_alives, :http_methods
       attr_accessor :last_ns, :closed_ns, :syn_ns, :syn_direction, :synack_ns, :synack_seq, :initial_rtt, :accounted_bytes
       # @rbs (untyped key, Integer id, Integer timestamp_ns) -> void
       def initialize(key, id, timestamp_ns)
         @key, @id, @first_ns, @last_ns = key, id, timestamp_ns, timestamp_ns
         @packets, @bytes, @streams, @applications, @acks = [0, 0], [0, 0], [nil, nil], [nil, nil], [nil, nil]
         @keep_alives = [false, false]
+        @http_methods = [Array.new, Array.new] #: Array[untyped]
         @closed_ns = @syn_ns = @syn_direction = @synack_ns = @synack_seq = @initial_rtt = nil # @rbs untyped
         @accounted_bytes = BASE_BYTES
       end
       # @rbs () -> bool
       def closed? = !@closed_ns.nil?
       # @rbs () -> Integer
-      def bytesize = BASE_BYTES + @streams.compact.sum(&:bytesize) + @applications.compact.sum(&:bytesize)
+      def bytesize = BASE_BYTES + @streams.compact.sum(&:bytesize) + @applications.compact.sum(&:bytesize) + @http_methods.sum { |methods| methods.size * 16 }
     end
 
     # @api private

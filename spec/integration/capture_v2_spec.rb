@@ -2,6 +2,7 @@
 
 require 'spec_helper'
 require 'open3'
+require 'stringio'
 
 RSpec.describe 'v2 live capture', :live do
   let(:loopback) { RUBY_PLATFORM.include?('darwin') ? 'lo0' : 'lo' }
