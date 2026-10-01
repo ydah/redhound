@@ -1,4 +1,5 @@
 /.bundle/
+/.idea/
 /.yardoc
 /.gem_rbs_collection/
 /_yardoc/
@@ -10,3 +11,4 @@
 /spec/reports/
 /tmp/
 Gemfile.lock
+*.gem
