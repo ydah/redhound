@@ -187,9 +187,7 @@ begin
         while monotonic < deadline
           packet = source.next_packet(timeout: 0.1)
           if packet
-            old_path = writer.path if options[:rotate]
             writer.write(packet)
-            validate_file(old_path) if options[:rotate] && old_path != writer.path
             verifier.verify(packet) unless options[:verify_after]
             count += 1
             last_capture_at = monotonic
@@ -215,6 +213,7 @@ begin
           end
           raise 'saved record count differs from captured count' unless verifier.count == count
         end
+        # External inspection must not pause capture while the ring continues filling.
         Dir.glob(File.join(options[:out], "#{backend}_*.pcapng")).each { |path| validate_file(path) }
         elapsed = last_capture_at - start
         report = verifier.report.merge(backend: backend, captured: count, verification_passed: verifier.complete?(expected_records),

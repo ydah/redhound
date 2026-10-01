@@ -101,7 +101,7 @@ and rejects timestamps outside the capture window. The comparison also requires
 identical byte digests and sampled kernel timestamps within
 1 ms. A sender that cannot produce the requested rate fails acceptance. Capture
 processes write pcap to `/dev/null`, or bounded pcapng rotation with `--rotate`;
-every completed rotated file is checked with capinfos and tshark. JSON results
+the three retained rotated files are checked with capinfos and tshark after capture closes. JSON results
 and periodic RSS, descriptor and drop samples are retained in the output
 directory. Each run needs a new directory. The manual **Live acceptance** GitHub
 workflow runs the same check on x86_64 and measures file throughput on one CPU.

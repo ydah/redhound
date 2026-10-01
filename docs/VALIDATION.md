@@ -45,6 +45,13 @@ this is not reported as a 256 MiB process-RSS guarantee.
 The independent [manual CI and million-case fuzz run](https://github.com/ydah/redhound/actions/runs/36885293639)
 also passed every job on the adversarial runtime fixes.
 
+The GitHub maintenance configuration now includes weekly Bundler/Actions
+dependency updates, actionlint, codespell, strict yamllint, zizmor and Ruby/Actions
+CodeQL analysis. Action revisions are pinned and checkout credentials are not
+retained. All four lint workflows passed on main. HTTP header trimming uses
+bounded byte ranges while preserving SP/HTAB-only whitespace semantics; controls
+remain visible to malformed-header diagnostics.
+
 Ruby 4.0 introduced an additional restriction in
 [`IO::Buffer.map`](https://docs.ruby-lang.org/en/4.0/IO/Buffer.html#method-c-map):
 it rejects files with zero size even when a mapping size is supplied. Linux
@@ -67,6 +74,16 @@ Completion requires the final `result.json` to pass, inspection of the periodic
 resource samples, and successful external validation of rotated files. The
 controlled veth soak does not establish the separate busy physical-interface
 24-hour gate. Results and unfulfilled conditions are recorded explicitly below.
+
+The frozen rotation run first reported 1,178 kernel drops and three ring freezes
+at the 4,200-second sample, after zero drops at 3,600 seconds. The macOS power log
+records hibernation/wake in that interval with a 10.614-second recovery delay.
+This correlation does not isolate the cause, and the run is not loss-free
+acceptance evidence. Its periodic resource observations are retained. External
+capinfos/tshark inspection now runs after capture closes, validating the three
+retained rotation files rather than blocking packet reads at every rotation.
+A four-second rotation smoke captured and verified all 4,000 frames without
+drops, gaps or malformed records and passed both external tools.
 
 The one-hour aarch64 comparison completed successfully: each backend captured
 all 180,000,000 frames with zero drops/gaps and the same complete-byte digest.
