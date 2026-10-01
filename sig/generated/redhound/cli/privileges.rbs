@@ -1,0 +1,12 @@
+# Generated from lib/redhound/cli/privileges.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module CLI
+    # @api private
+    module Privileges
+      # @rbs (String user) -> void
+      def self.drop: (String user) -> void
+    end
+  end
+end

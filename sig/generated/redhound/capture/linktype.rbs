@@ -1,0 +1,20 @@
+# Generated from lib/redhound/capture/linktype.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linktype
+      VALUES: untyped
+
+      # @rbs (Integer | Symbol | String value) -> Integer
+      def self.resolve: (Integer | Symbol | String value) -> Integer
+
+      # @rbs (Integer value) -> String
+      def self.name: (Integer value) -> String
+
+      # @rbs (Integer hardware_type) -> Integer
+      def self.for_hardware: (Integer hardware_type) -> Integer
+    end
+  end
+end

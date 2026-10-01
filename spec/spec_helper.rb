@@ -3,6 +3,14 @@
 require 'simplecov'
 SimpleCov.start do
   add_filter '/spec/'
+  add_group 'Protocols', 'lib/redhound/protocols'
+  minimum_coverage 90 if ENV['REDHOUND_COVERAGE_GATE'] == '1'
+end
+SimpleCov.at_exit do
+  SimpleCov.result.format!
+  if ENV['REDHOUND_COVERAGE_GATE'] == '1' && SimpleCov.result.groups.fetch('Protocols').covered_percent < 95
+    abort 'Protocol line coverage is below 95%'
+  end
 end
 
 require 'redhound'

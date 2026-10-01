@@ -1,0 +1,38 @@
+# Generated from lib/redhound/file/pcap_writer.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    class PcapWriter
+      attr_reader bytes_written: untyped
+
+      attr_reader path: untyped
+
+      # @rbs (untyped output, ?linktype: Integer | Symbol | String, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, **untyped) -> void
+      def initialize: (untyped output, ?linktype: Integer | Symbol | String, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, **untyped) -> void
+
+      # @rbs (Packet packet) -> self
+      def write: (Packet packet) -> self
+
+      alias << write
+
+      # @rbs (Packet packet) -> Integer
+      def record_size: (Packet packet) -> Integer
+
+      # @rbs (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+      def write_stats: (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+
+      # @rbs () -> void
+      def flush: () -> void
+
+      # @rbs () -> void
+      def close: () -> void
+
+      private
+
+      # @rbs (String bytes) -> void
+      def write_bytes: (String bytes) -> void
+    end
+  end
+end

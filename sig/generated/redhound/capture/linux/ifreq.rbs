@@ -1,0 +1,18 @@
+# Generated from lib/redhound/capture/linux/ifreq.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      module Ifreq
+        # @rbs (String name, Integer command) -> String
+        def self.query: (String name, Integer command) -> String
+
+        # @rbs (String name, ?index: Integer) -> Interface
+        def self.interface: (String name, ?index: Integer) -> Interface
+      end
+    end
+  end
+end

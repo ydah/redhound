@@ -1,0 +1,34 @@
+# Generated from lib/redhound/capture/file_source.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    class FileSource < Source
+      attr_reader reader: untyped
+
+      # @rbs (untyped input, ?filter: String?) -> void
+      def initialize: (untyped input, ?filter: String?) -> void
+
+      # @rbs (untyped input, ?filter: String?) -> FileSource
+      # @rbs [T] (untyped input, ?filter: String?) { (FileSource) -> T } -> T
+      def self.open: (untyped input, ?filter: String?) -> FileSource
+                   | [T] (untyped input, ?filter: String?) { (FileSource) -> T } -> T
+
+      # @rbs (?timeout: Numeric?) -> Packet?
+      def next_packet: (?timeout: Numeric?) -> Packet?
+
+      # @rbs () -> Integer
+      def linktype: () -> Integer
+
+      # @rbs () -> Array[Interface]
+      def interfaces: () -> Array[Interface]
+
+      # @rbs () -> Stats
+      def stats: () -> Stats
+
+      # @rbs () -> void
+      def close: () -> void
+    end
+  end
+end

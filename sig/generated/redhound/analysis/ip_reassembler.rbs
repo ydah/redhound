@@ -1,0 +1,40 @@
+# Generated from lib/redhound/analysis/ip_reassembler.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    class IpReassembler
+      attr_reader evicted: untyped
+
+      attr_reader expired: untyped
+
+      # @rbs (?max_bytes: Integer, ?timeout_ns: Integer) -> void
+      def initialize: (?max_bytes: Integer, ?timeout_ns: Integer) -> void
+
+      # @rbs (Packet packet) -> untyped
+      def descriptor: (Packet packet) -> untyped
+
+      # @rbs (Packet packet) -> Packet?
+      def update: (Packet packet) -> Packet?
+
+      # @rbs (untyped state) -> bool
+      def complete?: (untyped state) -> bool
+
+      # @rbs (Packet packet, untyped state, Integer version) -> Packet?
+      def virtual_packet: (Packet packet, untyped state, Integer version) -> Packet?
+
+      # @rbs (Integer now_ns) -> void
+      def advance: (Integer now_ns) -> void
+
+      # @rbs (Integer now_ns) -> void
+      def expire: (Integer now_ns) -> void
+
+      # @rbs () -> Integer
+      def bytesize: () -> Integer
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+    end
+  end
+end

@@ -1,0 +1,15 @@
+# Generated from lib/redhound/analysis/tcp_analysis.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    module TcpAnalysis
+      # @rbs (Flow flow, Integer direction, TcpStream stream, Layer layer, Integer timestamp_ns) -> void
+      def self.update: (Flow flow, Integer direction, TcpStream stream, Layer layer, Integer timestamp_ns) -> void
+
+      # @rbs (Layer layer, Symbol name) -> void
+      def self.flag: (Layer layer, Symbol name) -> void
+    end
+  end
+end

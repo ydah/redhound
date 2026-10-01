@@ -1,0 +1,38 @@
+# Generated from lib/redhound/stream_dissector.rb with RBS::Inline
+
+module Redhound
+  # A stateful TCP dissector. Instances belong to one bidirectional flow.
+  # Override on_data/on_gap for custom stream protocols; built-in framing is
+  # shared with the packet dissectors so validation has one implementation.
+  class StreamDissector < Dissector
+    # @rbs (?registry: Registry, ?max_bytes: Integer) -> void
+    def initialize: (?registry: Registry, ?max_bytes: Integer) -> void
+
+    # @rbs (untyped stream, Integer direction, String data, Integer frame) -> Array[Layer]
+    def on_data: (untyped stream, Integer direction, String data, Integer frame) -> Array[Layer]
+
+    # @rbs (untyped stream, Integer direction, Integer length) -> Array[Layer]
+    def on_gap: (untyped stream, Integer direction, Integer length) -> Array[Layer]
+
+    # @rbs (untyped stream, Integer direction) -> Array[Layer]
+    def on_close: (untyped stream, Integer direction) -> Array[Layer]
+
+    # @rbs () -> Integer
+    def bytesize: () -> Integer
+
+    # @rbs (Integer direction, Integer length) -> Array[Integer]
+    def consume_origins: (Integer direction, Integer length) -> Array[Integer]
+
+    # @rbs (String bytes, ?tls_encrypted: bool) -> Layer
+    def parse_pdu: (String bytes, ?tls_encrypted: bool) -> Layer
+
+    # @rbs (String buffer, ?Integer direction) -> Integer?
+    def pdu_length: (String buffer, ?Integer direction) -> Integer?
+
+    # @rbs (String buffer) -> Integer?
+    def http_length: (String buffer) -> Integer?
+
+    # @rbs (String buffer, Integer direction) -> Integer?
+    def tls_length: (String buffer, Integer direction) -> Integer?
+  end
+end

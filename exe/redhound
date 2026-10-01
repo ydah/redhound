@@ -4,4 +4,5 @@
 $LOAD_PATH << File.join(__dir__, '../lib')
 require 'redhound'
 
-Redhound::Command.new.run(ARGV.dup)
+RubyVM::YJIT.enable if defined?(RubyVM::YJIT) && RubyVM::YJIT.respond_to?(:enable) && !ARGV.include?('--no-yjit')
+exit Redhound::CLI::Command.new.run(ARGV.dup)

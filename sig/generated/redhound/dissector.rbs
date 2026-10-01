@@ -1,0 +1,113 @@
+# Generated from lib/redhound/dissector.rb with RBS::Inline
+
+module Redhound
+  # Base class and declarative fixed-header DSL for custom protocols.
+  class Dissector
+    # Unpack formats and byte lengths supported by the header DSL.
+    TYPES: untyped
+
+    # Build a single unpack template and its field descriptions.
+    class Header
+      # Compiled unpack template, header byte length and field definitions.
+      attr_reader template: untyped
+
+      # Compiled unpack template, header byte length and field definitions.
+      attr_reader length: untyped
+
+      # Compiled unpack template, header byte length and field definitions.
+      attr_reader definitions: untyped
+
+      # @rbs () -> void
+      # Start an empty fixed-header definition.
+      def initialize: () -> void
+
+      # @rbs (Symbol type, Symbol key, String name, **untyped opts) -> void
+      # Append a typed fixed-width field with optional format/enum metadata.
+      def field: (Symbol type, Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append an unsigned 8-bit field.
+      def uint8: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a network-order unsigned 16-bit field.
+      def uint16: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a network-order unsigned 32-bit field.
+      def uint32: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a network-order unsigned 64-bit field.
+      def uint64: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a six-byte MAC address.
+      def mac: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a four-byte IPv4 address.
+      def ipv4: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a sixteen-byte IPv6 address.
+      def ipv6: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Integer width) { (Header) [self: Header] -> void } -> void
+      # Define bit fields filling an 8/16/32/64-bit network-order word.
+      def bits: (Integer width) { (Header) [self: Header] -> void } -> void
+
+      # @rbs (Symbol key, String name, Integer width, **untyped opts) -> void
+      # Append a bit field inside bits, optionally scaled/formatted.
+      def bit: (Symbol key, String name, Integer width, **untyped opts) -> void
+    end
+
+    # @rbs () -> Symbol
+    # Registered protocol symbol.
+    def self.protocol_id: () -> Symbol
+
+    # @rbs () -> String
+    # Human-readable protocol name.
+    def self.protocol_name: () -> String
+
+    # @rbs () -> String
+    # Short output label.
+    def self.short_name: () -> String
+
+    # @rbs () -> untyped
+    # Compiled header definition, if one was declared.
+    def self.compiled_header: () -> untyped
+
+    # @rbs (Symbol id, name: String, short: String) -> void
+    # Declare protocol identity and register the dissector.
+    def self.protocol: (Symbol id, name: String, short: String) -> void
+
+    # @rbs (String key, *Integer values) -> void
+    # Register this protocol under one or more dispatch values.
+    def self.dissects_on: (String key, *Integer values) -> void
+
+    # @rbs () { (Header) [self: Header] -> void } -> void
+    # Compile a fixed header from the DSL block.
+    def self.header: () { (Header) [self: Header] -> void } -> void
+
+    # @rbs () -> String
+    # Compiled unpack template, or an empty template.
+    def self.header_template: () -> String
+
+    # @rbs (Context ctx, Cursor cursor) -> Layer
+    # Decode fixed fields then invoke the variable-header hook.
+    def parse: (Context ctx, Cursor cursor) -> Layer
+
+    # @rbs (Context ctx, Layer layer) -> void
+    # Override to parse variable fields using the bounded Context cursor.
+    def dissect: (Context ctx, Layer layer) -> void
+
+    # @rbs (Context ctx, Layer layer) -> untyped
+    # Override to return the next protocol class or nil.
+    def next_dissector: (Context ctx, Layer layer) -> untyped
+
+    # @rbs (Layer layer) -> String
+    # Override to format the layer summary.
+    def summary: (Layer layer) -> String
+  end
+end

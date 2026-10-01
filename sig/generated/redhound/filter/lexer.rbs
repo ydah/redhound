@@ -1,0 +1,15 @@
+# Generated from lib/redhound/filter/lexer.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    class Lexer
+      # @rbs (String expression) -> void
+      def initialize: (String expression) -> void
+
+      # @rbs () -> Array[[String, Integer]]
+      def tokens: () -> Array[[ String, Integer ]]
+    end
+  end
+end

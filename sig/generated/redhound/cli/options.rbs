@@ -1,0 +1,25 @@
+# Generated from lib/redhound/cli/options.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module CLI
+    # @api private
+    class Options
+      attr_reader values: untyped
+
+      attr_reader parser: untyped
+
+      # @rbs (Array[String] argv) -> void
+      def initialize: (Array[String] argv) -> void
+
+      # @rbs (Array[String] args) -> Array[String]
+      def normalize: (Array[String] args) -> Array[String]
+
+      # @rbs () -> OptionParser
+      def build_parser: () -> OptionParser
+
+      # @rbs () -> void
+      def validate: () -> void
+    end
+  end
+end

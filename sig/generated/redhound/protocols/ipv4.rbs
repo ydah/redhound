@@ -1,0 +1,15 @@
+# Generated from lib/redhound/protocols/ipv4.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Ipv4 < Dissector
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+  end
+end

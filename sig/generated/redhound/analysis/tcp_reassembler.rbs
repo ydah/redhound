@@ -1,0 +1,27 @@
+# Generated from lib/redhound/analysis/tcp_reassembler.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    class TcpReassembler
+      # @rbs (?registry: Registry, ?max_bytes: Integer, ?stream_bytes: Integer, ?protocol_streams: bool, ?follow: untyped) -> void
+      def initialize: (?registry: Registry, ?max_bytes: Integer, ?stream_bytes: Integer, ?protocol_streams: bool, ?follow: untyped) -> void
+
+      # @rbs (Packet packet, Flow flow, Integer direction) -> void
+      def update: (Packet packet, Flow flow, Integer direction) -> void
+
+      # @rbs (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> void
+      def deliver: (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> void
+
+      # @rbs (Packet packet, Array[Layer] layers) -> void
+      def attach: (Packet packet, Array[Layer] layers) -> void
+
+      # @rbs (Flow flow, ?Packet? packet) -> void
+      def finish_flow: (Flow flow, ?Packet? packet) -> void
+
+      # @rbs (FlowTable flows, Packet packet) -> void
+      def enforce_limit: (FlowTable flows, Packet packet) -> void
+    end
+  end
+end

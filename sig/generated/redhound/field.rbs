@@ -1,0 +1,74 @@
+# Generated from lib/redhound/field.rb with RBS::Inline
+
+module Redhound
+  # Immutable description of a field location, type and display metadata.
+  class FieldDefinition < Data
+    attr_reader key(): untyped
+
+    attr_reader name(): untyped
+
+    attr_reader type(): untyped
+
+    attr_reader offset(): untyped
+
+    attr_reader length(): untyped
+
+    attr_reader index(): untyped
+
+    attr_reader shift(): untyped
+
+    attr_reader mask(): untyped
+
+    attr_reader scale(): untyped
+
+    attr_reader format(): untyped
+
+    attr_reader enum(): untyped
+
+    def self.new: (untyped key, untyped name, untyped type, untyped offset, untyped length, untyped index, untyped shift, untyped mask, untyped scale, untyped format, untyped enum) -> instance
+                | (key: untyped, name: untyped, type: untyped, offset: untyped, length: untyped, index: untyped, shift: untyped, mask: untyped, scale: untyped, format: untyped, enum: untyped) -> instance
+
+    def self.members: () -> [ :key, :name, :type, :offset, :length, :index, :shift, :mask, :scale, :format, :enum ]
+
+    def members: () -> [ :key, :name, :type, :offset, :length, :index, :shift, :mask, :scale, :format, :enum ]
+  end
+
+  # A decoded field with its definition, raw value and absolute location.
+  class Field
+    # Definition, raw decoded value and capture location.
+    attr_reader definition: untyped
+
+    # Definition, raw decoded value and capture location.
+    attr_reader raw_value: untyped
+
+    # Definition, raw decoded value and capture location.
+    attr_reader offset: untyped
+
+    # Definition, raw decoded value and capture location.
+    attr_reader length: untyped
+
+    # @rbs (untyped definition, untyped value, Integer base) -> void
+    # Bind a field definition to its value and layer base offset.
+    def initialize: (untyped definition, untyped value, Integer base) -> void
+
+    # @rbs () -> String
+    # Stable dotted field name.
+    def name: () -> String
+
+    # @rbs () -> Symbol
+    # Declared field representation.
+    def type: () -> Symbol
+
+    # @rbs () -> untyped
+    # Decoded value; addresses are returned in human-readable text.
+    def value: () -> untyped
+
+    # @rbs () -> untyped
+    # JSON-safe value; opaque bytes and invalid text are encoded in hexadecimal.
+    def json_value: () -> untyped
+
+    # @rbs () -> String
+    # Terminal-safe field text with escaped control and non-ASCII bytes.
+    def display: () -> String
+  end
+end

@@ -1,0 +1,18 @@
+# Generated from lib/redhound/output/json.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Json
+      # @rbs (?ndjson: bool) -> void
+      def initialize: (?ndjson: bool) -> void
+
+      # @rbs (Packet packet, untyped io) -> void
+      def format: (Packet packet, untyped io) -> void
+
+      # @rbs (untyped io) -> void
+      def finish: (untyped io) -> void
+    end
+  end
+end

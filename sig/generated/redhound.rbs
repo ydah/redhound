@@ -1,0 +1,18 @@
+# Generated from lib/redhound.rb with RBS::Inline
+
+# Capture, inspect and save network packets using Ruby standard libraries.
+module Redhound
+  # @rbs (String bytes, ?linktype: (Integer | Symbol), **untyped metadata) -> Packet
+  # Create a packet with lazy, bounded protocol dissection. See docs/API.md.
+  def self.dissect: (String bytes, ?linktype: Integer | Symbol, **untyped metadata) -> Packet
+
+  # @rbs (untyped input, ?filter: String?) -> Reader
+  # @rbs [T] (untyped input, ?filter: String?) { (Reader) -> T } -> T
+  # Read a pcap/pcapng path or binary IO; a block closes the reader automatically.
+  def self.open: (untyped input, ?filter: String?) -> Reader
+               | [T] (untyped input, ?filter: String?) { (Reader) -> T } -> T
+
+  # @rbs (interface: String | Integer, ?count: Integer?, **untyped options) { (Packet) -> void } -> void
+  # Yield live packets until count is reached or capture stops; always close the source.
+  def self.capture: (interface: String | Integer, ?count: Integer?, **untyped options) { (Packet) -> void } -> void
+end

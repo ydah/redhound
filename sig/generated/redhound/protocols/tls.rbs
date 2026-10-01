@@ -1,0 +1,51 @@
+# Generated from lib/redhound/protocols/tls.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Tls < StreamDissector
+      # @type ivar @ranges: Array[untyped]
+      # @api private
+      class BadLength < StandardError
+      end
+
+      CONTENT_TYPES: untyped
+
+      HANDSHAKES: untyped
+
+      # @rbs (Context ctx, Cursor cursor) -> bool
+      def self.heuristic?: (Context ctx, Cursor cursor) -> bool
+
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Layer layer, Cursor cursor) -> void
+      def handshakes: (Layer layer, Cursor cursor) -> void
+
+      # @rbs (Layer layer, Cursor cursor, Integer type) -> void
+      def hello: (Layer layer, Cursor cursor, Integer type) -> void
+
+      # @rbs (Layer layer, Cursor cursor, Integer pos, bool client) -> void
+      def extensions: (Layer layer, Cursor cursor, Integer pos, bool client) -> void
+
+      # @rbs (Layer layer, Cursor cursor) -> void
+      def server_names: (Layer layer, Cursor cursor) -> void
+
+      # @rbs (Layer layer, Cursor cursor) -> void
+      def alpn: (Layer layer, Cursor cursor) -> void
+
+      # @rbs (Layer layer, Cursor cursor, bool client) -> void
+      def versions: (Layer layer, Cursor cursor, bool client) -> void
+
+      # @rbs (Integer logical) -> Integer
+      def wire_offset: (Integer logical) -> Integer
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length, ?bool handshake) -> void
+      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length, ?bool handshake) -> void
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

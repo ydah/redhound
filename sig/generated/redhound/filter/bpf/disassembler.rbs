@@ -1,0 +1,18 @@
+# Generated from lib/redhound/filter/bpf/disassembler.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    module BPF
+      # @api private
+      module Disassembler
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions, ?format: Symbol) -> String
+        def self.disassemble: (Array[[ Integer, Integer, Integer, Integer ]] instructions, ?format: Symbol) -> String
+
+        # @rbs (Integer code, Integer k) -> String
+        def self.instruction: (Integer code, Integer k) -> String
+      end
+    end
+  end
+end

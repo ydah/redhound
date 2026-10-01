@@ -1,0 +1,53 @@
+# Generated from lib/redhound/capture/interface.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    class Interface
+      attr_reader name: untyped
+
+      attr_reader index: untyped
+
+      attr_reader linktype: untyped
+
+      attr_reader snaplen: untyped
+
+      attr_reader flags: untyped
+
+      attr_reader mtu: untyped
+
+      attr_reader mac: untyped
+
+      attr_reader description: untyped
+
+      attr_reader filter: untyped
+
+      attr_reader meta: untyped
+
+      # @rbs (name: String, ?index: Integer, ?linktype: Integer, ?snaplen: Integer, ?flags: Integer, ?mtu: Integer?, ?mac: String?, ?description: String?, ?filter: String?, ?meta: Hash[Symbol, untyped]) -> void
+      def initialize: (name: String, ?index: Integer, ?linktype: Integer, ?snaplen: Integer, ?flags: Integer, ?mtu: Integer?, ?mac: String?, ?description: String?, ?filter: String?, ?meta: Hash[Symbol, untyped]) -> void
+
+      # @rbs () -> Integer
+      def ifindex: () -> Integer
+
+      # @rbs () -> bool
+      def up?: () -> bool
+
+      # @rbs () -> bool
+      def loopback?: () -> bool
+
+      # @rbs () -> bool
+      def running?: () -> bool
+
+      # @rbs () -> String
+      def to_s: () -> String
+
+      # @rbs () -> Array[Interface]
+      def self.all: () -> Array[Interface]
+
+      # @rbs (String | Integer value) -> Interface
+      def self.find: (String | Integer value) -> Interface
+    end
+  end
+end

@@ -1,0 +1,27 @@
+# Generated from lib/redhound/context.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  class Context
+    attr_reader packet: untyped
+
+    attr_reader registry: untyped
+
+    attr_reader layers: untyped
+
+    attr_accessor cursor: untyped
+
+    attr_accessor embedded: untyped
+
+    attr_accessor extension_count: untyped
+
+    # @rbs (Packet packet, registry: Registry, ?verify_checksums: bool) -> void
+    def initialize: (Packet packet, registry: Registry, ?verify_checksums: bool) -> void
+
+    # @rbs () -> bool
+    def verify_checksums?: () -> bool
+
+    # @rbs () -> Layer?
+    def network: () -> Layer?
+  end
+end

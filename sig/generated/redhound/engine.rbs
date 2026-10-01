@@ -1,0 +1,23 @@
+# Generated from lib/redhound/engine.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  class Engine
+    MAX_DEPTH: ::Integer
+
+    # @rbs () -> Engine
+    def self.default: () -> Engine
+
+    # @rbs (?registry: Registry, ?verify_checksums: bool) -> void
+    def initialize: (?registry: Registry, ?verify_checksums: bool) -> void
+
+    # @rbs (Packet packet) -> Array[Layer]
+    def dissect: (Packet packet) -> Array[Layer]
+
+    # @rbs (untyped klass, Context ctx, Layer layer) -> untyped
+    def next_dissector: (untyped klass, Context ctx, Layer layer) -> untyped
+
+    # @rbs (untyped klass, Context ctx, Cursor cursor) -> Layer
+    def safely: (untyped klass, Context ctx, Cursor cursor) -> Layer
+  end
+end

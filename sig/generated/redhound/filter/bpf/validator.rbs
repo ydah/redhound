@@ -1,0 +1,30 @@
+# Generated from lib/redhound/filter/bpf/validator.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    module BPF
+      # Validates the portable cBPF ISA and Linux VLAN ancillary loads.
+      # @api private
+      module Validator
+        LOADS: untyped
+
+        ALU: untyped
+
+        JUMPS: untyped
+
+        OPCODES: untyped
+
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> bool
+        def self.validate!: (Array[[ Integer, Integer, Integer, Integer ]] instructions) -> bool
+
+        # @rbs (Integer code, Integer jt, Integer jf, Integer k, Integer index) -> Array[Integer]
+        def self.successors: (Integer code, Integer jt, Integer jf, Integer k, Integer index) -> Array[Integer]
+
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> void
+        def self.validate_memory!: (Array[[ Integer, Integer, Integer, Integer ]] instructions) -> void
+      end
+    end
+  end
+end

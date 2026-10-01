@@ -1,0 +1,45 @@
+# Generated from lib/redhound/registry.rb with RBS::Inline
+
+module Redhound
+  # Protocol dispatch and per-session decode-as rules.
+  class Registry
+    # @rbs () -> Registry
+    # Shared registry populated by built-in and custom dissectors.
+    def self.default: () -> Registry
+
+    # Registered protocol identities and dispatch tables.
+    attr_reader protocols: untyped
+
+    # @rbs () -> void
+    # Create empty protocol dispatch tables.
+    def initialize: () -> void
+
+    # @rbs (String key, Integer value, untyped klass) -> void
+    # Register a class under a dispatch key and value.
+    def register: (String key, Integer value, untyped klass) -> void
+
+    # @rbs (untyped klass) -> void
+    # Register a protocol class by its declared identity.
+    def register_protocol: (untyped klass) -> void
+
+    # @rbs (String key, Integer value) -> untyped
+    # Look up a protocol class for a dispatch key and value.
+    def lookup: (String key, Integer value) -> untyped
+
+    # @rbs (String key, Integer src, Integer dst) -> untyped
+    # Resolve decode-as rules before registered low/high port dispatch.
+    def by_port: (String key, Integer src, Integer dst) -> untyped
+
+    # @rbs (Symbol parent, Context ctx, Cursor cursor) -> untyped
+    # Run registered transport heuristics on the bounded payload.
+    def heuristic: (Symbol parent, Context ctx, Cursor cursor) -> untyped
+
+    # @rbs (String rule) -> void
+    # Apply a transport-port override such as udp.port==8443,dns.
+    def decode_as: (String rule) -> void
+
+    # @rbs () -> Registry
+    # Copy tables and overrides for an independent analysis session.
+    def copy: () -> Registry
+  end
+end

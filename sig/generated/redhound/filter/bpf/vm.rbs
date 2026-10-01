@@ -1,0 +1,26 @@
+# Generated from lib/redhound/filter/bpf/vm.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    module BPF
+      # @api private
+      class VM
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> void
+        def initialize: (Array[[ Integer, Integer, Integer, Integer ]] instructions) -> void
+
+        # @rbs (untyped packet) -> Integer
+        def evaluate: (untyped packet) -> Integer
+
+        private
+
+        # @rbs (Integer operation, Integer a, Integer operand) -> Integer
+        def arithmetic: (Integer operation, Integer a, Integer operand) -> Integer
+
+        # @rbs (Integer offset, untyped meta) -> Integer
+        def ancillary: (Integer offset, untyped meta) -> Integer
+      end
+    end
+  end
+end

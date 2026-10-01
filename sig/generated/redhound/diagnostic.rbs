@@ -1,0 +1,21 @@
+# Generated from lib/redhound/diagnostic.rb with RBS::Inline
+
+module Redhound
+  # Structured protocol diagnostic with severity, stable code, message and optional field.
+  class Diagnostic < Data
+    attr_reader severity(): untyped
+
+    attr_reader code(): untyped
+
+    attr_reader message(): untyped
+
+    attr_reader field(): untyped
+
+    def self.new: (untyped severity, untyped code, untyped message, untyped field) -> instance
+                | (severity: untyped, code: untyped, message: untyped, field: untyped) -> instance
+
+    def self.members: () -> [ :severity, :code, :message, :field ]
+
+    def members: () -> [ :severity, :code, :message, :field ]
+  end
+end

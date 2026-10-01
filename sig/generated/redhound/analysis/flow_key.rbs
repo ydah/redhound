@@ -1,0 +1,15 @@
+# Generated from lib/redhound/analysis/flow_key.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    module FlowKey
+      # @rbs (Packet packet, ?Symbol? type) -> untyped
+      def self.from: (Packet packet, ?Symbol? type) -> untyped
+
+      # @rbs (Symbol proto, untyped src, untyped dst) -> untyped
+      def self.normalize: (Symbol proto, untyped src, untyped dst) -> untyped
+    end
+  end
+end

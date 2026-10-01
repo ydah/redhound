@@ -1,0 +1,12 @@
+# Generated from lib/redhound/cli/command.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module CLI
+    # @api private
+    class Command
+      # @rbs (Array[String] argv, ?out: untyped, ?err: untyped) -> Integer
+      def run: (Array[String] argv, ?out: untyped, ?err: untyped) -> Integer
+    end
+  end
+end

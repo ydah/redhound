@@ -1,0 +1,42 @@
+# Generated from lib/redhound/filter/analyzer.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    class Analyzer
+      PROTOCOL_NUMBERS: untyped
+
+      ETHER_TYPES: untyped
+
+      # @rbs (String expression) -> void
+      def initialize: (String expression) -> void
+
+      # @rbs (untyped node) -> untyped
+      def analyze: (untyped node) -> untyped
+
+      private
+
+      # @rbs (untyped node) -> untyped
+      def primitive: (untyped node) -> untyped
+
+      # @rbs (untyped node) -> untyped
+      def arithmetic: (untyped node) -> untyped
+
+      # @rbs (String value, String? proto, Symbol type, Integer position) -> untyped
+      def ports: (String value, String? proto, Symbol type, Integer position) -> untyped
+
+      # @rbs (String value, Symbol type, Integer position) -> untyped
+      def addresses: (String value, Symbol type, Integer position) -> untyped
+
+      # @rbs (String value, Hash[String, Integer] names, Integer position) -> Integer
+      def integer_or_name: (String value, Hash[String, Integer] names, Integer position) -> Integer
+
+      # @rbs () -> Hash[String, Integer]
+      def protocol_numbers: () -> Hash[String, Integer]
+
+      # @rbs (String message, Integer position) -> bot
+      def error: (String message, Integer position) -> bot
+    end
+  end
+end

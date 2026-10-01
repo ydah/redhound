@@ -1,0 +1,35 @@
+# Generated from lib/redhound/capture/linux/tpacket_v3.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      class TPacketV3 < PacketSocket
+        # @rbs (?timeout: Numeric?) -> Packet?
+        def next_packet: (?timeout: Numeric?) -> Packet?
+
+        # @rbs () -> void
+        def close_resources: () -> void
+
+        # @rbs () -> Integer
+        def receive_snaplen: () -> Integer
+
+        # @rbs (Integer? buffer_size) -> void
+        def setup_receive_buffer: (Integer? buffer_size) -> void
+
+        private
+
+        # @rbs (Integer offset) -> Integer
+        def u32: (Integer offset) -> Integer
+
+        # @rbs (Integer offset, Integer length) -> void
+        def check_ring_bounds: (Integer offset, Integer length) -> void
+
+        # @rbs () -> void
+        def release_block: () -> void
+      end
+    end
+  end
+end

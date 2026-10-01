@@ -1,0 +1,101 @@
+# Generated from lib/redhound/filter/codegen.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    class CodeGen
+      LINKTYPES: untyped
+
+      LAYOUTS: untyped
+
+      ALU: untyped
+
+      # @rbs (Integer linktype, Integer snaplen, bool live, String expression) -> void
+      def initialize: (Integer linktype, Integer snaplen, bool live, String expression) -> void
+
+      # @rbs (untyped ast) -> Program
+      def compile: (untyped ast) -> Program
+
+      private
+
+      # @rbs (untyped ast) -> bool
+      def includes_vlan?: (untyped ast) -> bool
+
+      # @rbs (untyped node, Symbol yes, Symbol no) -> void
+      def emit: (untyped node, Symbol yes, Symbol no) -> void
+
+      # @rbs (untyped node) -> untyped
+      def primitive: (untyped node) -> untyped
+
+      # @rbs (String name) -> untyped
+      def family: (String name) -> untyped
+
+      # @rbs (Integer number, Array[Integer] versions) -> untyped
+      def protocol: (Integer number, Array[Integer] versions) -> untyped
+
+      # @rbs (Integer version, Integer number) -> untyped
+      def next_protocol: (Integer version, Integer number) -> untyped
+
+      # @rbs () -> untyped
+      def fragment_guard: () -> untyped
+
+      # @rbs () -> Integer
+      def network: () -> Integer
+
+      # @rbs (Integer offset, Integer size, Symbol operation, Integer value, ?Symbol? mode) -> untyped
+      def test: (Integer offset, Integer size, Symbol operation, Integer value, ?Symbol? mode) -> untyped
+
+      # @rbs (*untyped nodes) -> untyped
+      def conjunction: (*untyped nodes) -> untyped
+
+      # @rbs (*untyped nodes) -> untyped
+      def disjunction: (*untyped nodes) -> untyped
+
+      # @rbs (Symbol direction, untyped src, untyped dst) -> untyped
+      def directional: (Symbol direction, untyped src, untyped dst) -> untyped
+
+      # @rbs (untyped values, String? proto, Symbol direction) -> untyped
+      def addresses: (untyped values, String? proto, Symbol direction) -> untyped
+
+      # @rbs (Integer offset, Integer version, Integer address, Integer mask) -> untyped
+      def address_test: (Integer offset, Integer version, Integer address, Integer mask) -> untyped
+
+      # @rbs (String mac, Symbol direction, Integer position) -> untyped
+      def ethernet_host: (String mac, Symbol direction, Integer position) -> untyped
+
+      # @rbs (untyped ranges, Symbol direction) -> untyped
+      def ports: (untyped ranges, Symbol direction) -> untyped
+
+      # @rbs (Integer version, Integer offset, [Integer, Integer] limits) -> untyped
+      def port_test: (Integer version, Integer offset, [ Integer, Integer ] limits) -> untyped
+
+      # @rbs (String? proto, Symbol type, Integer position) -> untyped
+      def broadcast: (String? proto, Symbol type, Integer position) -> untyped
+
+      # @rbs (Integer? id, Symbol yes, Symbol no) -> void
+      def vlan: (Integer? id, Symbol yes, Symbol no) -> void
+
+      # @rbs (Integer offset, Integer size, Symbol? mode) -> void
+      def load: (Integer offset, Integer size, Symbol? mode) -> void
+
+      # @rbs () -> void
+      def transport_index: () -> void
+
+      # @rbs (untyped operation, Integer value, Symbol yes, Symbol no, ?bool from_x) -> void
+      def compare: (untyped operation, Integer value, Symbol yes, Symbol no, ?bool from_x) -> void
+
+      # @rbs (untyped node) -> Array[String]
+      def access_protocols: (untyped node) -> Array[String]
+
+      # @rbs (untyped node, Integer depth) -> void
+      def arithmetic: (untyped node, Integer depth) -> void
+
+      # @rbs (untyped node, Integer depth) -> void
+      def accessor: (untyped node, Integer depth) -> void
+
+      # @rbs (String message, Integer position) -> bot
+      def error: (String message, Integer position) -> bot
+    end
+  end
+end

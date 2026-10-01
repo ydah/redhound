@@ -1,0 +1,65 @@
+# Generated from lib/redhound/filter/parser.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # ASTs stay private; primitive operands are resolved before code generation.
+    # @api private
+    class Parser
+      PROTOCOLS: untyped
+
+      TYPES: untyped
+
+      COMPARISONS: untyped
+
+      PRECEDENCE: untyped
+
+      CONSTANTS: untyped
+
+      # @rbs (String expression) -> void
+      def initialize: (String expression) -> void
+
+      # @rbs () -> untyped
+      def parse: () -> untyped
+
+      private
+
+      # libpcap gives AND and OR the same precedence, left associative.
+      # @rbs () -> untyped
+      def expression: () -> untyped
+
+      # @rbs () -> untyped
+      def unary: () -> untyped
+
+      # @rbs () -> untyped
+      def primitive: () -> untyped
+
+      # @rbs () -> untyped
+      def relation: () -> untyped
+
+      # @rbs (?Integer minimum) -> untyped
+      def arithmetic: (?Integer minimum) -> untyped
+
+      # @rbs (String value) -> bool
+      def numeric?: (String value) -> bool
+
+      # @rbs (String value) -> Integer
+      def integer: (String value) -> Integer
+
+      # @rbs () -> Integer
+      def number: () -> Integer
+
+      # @rbs () -> String
+      def peek: () -> String
+
+      # @rbs () -> String
+      def take: () -> String
+
+      # @rbs (String value) -> void
+      def expect: (String value) -> void
+
+      # @rbs (String message, ?Integer? position) -> bot
+      def error: (String message, ?Integer? position) -> bot
+    end
+  end
+end

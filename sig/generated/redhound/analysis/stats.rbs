@@ -1,0 +1,77 @@
+# Generated from lib/redhound/analysis/stats.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    module Stats
+      # @api private
+      class Table
+        attr_reader evicted: untyped
+
+        # @rbs (?max_rows: Integer) -> void
+        def initialize: (?max_rows: Integer) -> void
+
+        # @rbs (untyped key) { () -> untyped } -> untyped
+        def row: (untyped key) { () -> untyped } -> untyped
+
+        # @rbs () -> Integer
+        def bytesize: () -> Integer
+
+        # @rbs () -> void
+        def evict: () -> void
+
+        # @rbs (untyped io) -> void
+        def format: (untyped io) -> void
+
+        # @rbs () -> Hash[Symbol, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      # @api private
+      class Io < Table
+        # @rbs ((Integer | Float) seconds, ?max_rows: Integer) -> void
+        def initialize: (Integer | Float seconds, ?max_rows: Integer) -> void
+
+        # @rbs (Packet packet) -> void
+        def update: (Packet packet) -> void
+
+        # @rbs () -> Hash[Symbol, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      # @api private
+      class Conversations < Table
+        # @rbs (Symbol type, ?max_rows: Integer) -> void
+        def initialize: (Symbol type, ?max_rows: Integer) -> void
+
+        # @rbs (Packet packet) -> void
+        def update: (Packet packet) -> void
+
+        # @rbs () -> Hash[Symbol, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      # @api private
+      class Endpoints < Table
+        # @rbs (Symbol type, ?max_rows: Integer) -> void
+        def initialize: (Symbol type, ?max_rows: Integer) -> void
+
+        # @rbs (Packet packet) -> void
+        def update: (Packet packet) -> void
+
+        # @rbs () -> Hash[Symbol, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+
+      # @api private
+      class Hierarchy < Table
+        # @rbs (Packet packet) -> void
+        def update: (Packet packet) -> void
+
+        # @rbs () -> Hash[Symbol, untyped]
+        def to_h: () -> Hash[Symbol, untyped]
+      end
+    end
+  end
+end

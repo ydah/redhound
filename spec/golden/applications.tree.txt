@@ -1,0 +1,554 @@
+Frame 1: 315 bytes on wire, 315 captured, 2023-11-14 22:13:20.000000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 301
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb5bb
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40000
+         udp.dstport: 53
+         udp.length: 281
+         udp.checksum: 0x0
+         └─ Domain Name System
+            dns.id: 4660
+            dns.flags: 33152
+            dns.flags.response: true
+            dns.flags.opcode: 0
+            dns.flags.authoritative: false
+            dns.flags.truncated: false
+            dns.flags.recdesired: true
+            dns.flags.recavail: true
+            dns.flags.authenticated: false
+            dns.flags.checkdisable: false
+            dns.flags.rcode: 0
+            dns.count.queries: 1
+            dns.count.answers: 7
+            dns.count.auth_rr: 0
+            dns.count.additional_rr: 0
+            dns.qry.name: example.test
+            dns.qry.type: 1
+            dns.qry.class: 1
+            dns.resp.name: example.test
+            dns.resp.type: 1
+            dns.resp.len: 4
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.a: 192.0.2.10
+            dns.resp.name: example.test
+            dns.resp.type: 28
+            dns.resp.len: 16
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.aaaa: 2001:db8::10
+            dns.resp.name: example.test
+            dns.resp.type: 5
+            dns.resp.len: 20
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.cname: alias.example.test
+            dns.resp.name: example.test
+            dns.resp.type: 15
+            dns.resp.len: 21
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.mx.preference: 10
+            dns.mx.mail_exchange: mail.example.test
+            dns.resp.name: example.test
+            dns.resp.type: 16
+            dns.resp.len: 8
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.txt: abc
+            dns.txt: def
+            dns.resp.name: example.test
+            dns.resp.type: 6
+            dns.resp.len: 62
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.soa.mname: ns.example.test
+            dns.soa.rname: hostmaster.example.test
+            dns.soa.serial_number: 42
+            dns.soa.refresh_interval: 60
+            dns.soa.retry_interval: 30
+            dns.soa.expire_limit: 3600
+            dns.soa.minimum_ttl: 300
+            dns.srv.service: example
+            dns.srv.proto: test
+            dns.resp.type: 33
+            dns.resp.len: 28
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.srv.priority: 1
+            dns.srv.weight: 2
+            dns.srv.port: 443
+            dns.srv.target: service.example.test
+Frame 2: 128 bytes on wire, 128 captured, 2023-11-14 22:13:20.001000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 114
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb676
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40001
+         udp.dstport: 53
+         udp.length: 94
+         udp.checksum: 0x0
+         └─ Domain Name System
+            dns.id: 4660
+            dns.flags: 33152
+            dns.flags.response: true
+            dns.flags.opcode: 0
+            dns.flags.authoritative: false
+            dns.flags.truncated: false
+            dns.flags.recdesired: true
+            dns.flags.recavail: true
+            dns.flags.authenticated: false
+            dns.flags.checkdisable: false
+            dns.flags.rcode: 0
+            dns.count.queries: 1
+            dns.count.answers: 1
+            dns.count.auth_rr: 0
+            dns.count.additional_rr: 1
+            dns.qry.name: example.test
+            dns.qry.type: 1
+            dns.qry.class: 1
+            dns.resp.name: example.test
+            dns.resp.type: 65
+            dns.resp.len: 33
+            dns.resp.class: 1
+            dns.resp.ttl: 60
+            dns.svcb.svcpriority: 1
+            dns.svcb.targetname: svc.example.test
+            dns.svcb.svcparam.key: 1
+            dns.svcb.svcparam.value.length: 3
+            dns.svcb.svcparam.alpn: h2
+            dns.svcb.svcparam.key: 3
+            dns.svcb.svcparam.value.length: 2
+            dns.svcb.svcparam.port: 443
+            dns.resp.name: <Root>
+            dns.resp.type: 41
+            dns.resp.len: 0
+            dns.rr.udp_payload_size: 1232
+            dns.resp.ext_rcode: 0
+            dns.resp.edns0_version: 0
+            dns.resp.z: 32768
+            dns.resp.z.do: true
+Frame 3: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.002000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 58
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb6ae
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40002
+         udp.dstport: 5353
+         udp.length: 38
+         udp.checksum: 0x0
+         └─ Domain Name System
+            dns.id: 4660
+            dns.flags: 0
+            dns.flags.response: false
+            dns.flags.opcode: 0
+            dns.flags.authoritative: false
+            dns.flags.truncated: false
+            dns.flags.recdesired: false
+            dns.flags.recavail: false
+            dns.flags.authenticated: false
+            dns.flags.checkdisable: false
+            dns.count.queries: 1
+            dns.count.answers: 0
+            dns.count.auth_rr: 0
+            dns.count.additional_rr: 0
+            dns.qry.name: example.test
+            dns.qry.type: 1
+            dns.qry.class: 1
+            dns.qry.qu: false
+Frame 4: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.003000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 58
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb6ae
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40003
+         udp.dstport: 5355
+         udp.length: 38
+         udp.checksum: 0x0
+         └─ Domain Name System
+            dns.id: 4660
+            dns.flags: 0
+            dns.flags.response: false
+            dns.flags.opcode: 0
+            dns.flags.truncated: false
+            dns.flags.conflict: false
+            dns.flags.tentative: false
+            dns.count.queries: 1
+            dns.count.answers: 0
+            dns.count.auth_rr: 0
+            dns.count.additional_rr: 0
+            dns.qry.name: example.test
+            dns.qry.type: 1
+            dns.qry.class: 1
+Frame 5: 292 bytes on wire, 292 captured, 2023-11-14 22:13:20.004000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 278
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb5d2
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40004
+         udp.dstport: 67
+         udp.length: 258
+         udp.checksum: 0x0
+         └─ Dynamic Host Configuration Protocol
+            dhcp.type: 1
+            dhcp.hw.type: 1
+            dhcp.hw.len: 6
+            dhcp.hops: 0
+            dhcp.id: 0x12345678
+            dhcp.secs: 0
+            dhcp.flags: 0x8000
+            dhcp.ip.client: 0.0.0.0
+            dhcp.ip.your: 192.0.2.10
+            dhcp.ip.server: 0.0.0.0
+            dhcp.ip.relay: 0.0.0.0
+            dhcp.hw.mac_addr: 02:00:00:00:00:01
+            dhcp.server: 
+            dhcp.file: 
+            dhcp.cookie: 1669485411
+            dhcp.option.type: 53
+            dhcp.option.length: 1
+            dhcp.option.value: 01
+            dhcp.option.type: 12
+            dhcp.option.length: 4
+            dhcp.option.value: 686f7374
+            dhcp.option.dhcp: 1
+            dhcp.option.hostname: host
+Frame 6: 90 bytes on wire, 90 captured, 2023-11-14 22:13:20.005000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 76
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 17
+      ip.checksum: 0xb69c
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ User Datagram Protocol
+         udp.srcport: 40005
+         udp.dstport: 123
+         udp.length: 56
+         udp.checksum: 0x0
+         └─ Network Time Protocol
+            ntp.flags.li: 0
+            ntp.flags.vn: 4
+            ntp.flags.mode: server (4)
+            ntp.stratum: 2
+            ntp.ppoll: 6
+            ntp.precision: -6
+            ntp.rootdelay: 0
+            ntp.rootdispersion: 0
+            ntp.refid: 0
+            ntp.reftime: 0
+            ntp.org: 0
+            ntp.rec: 0
+            ntp.xmt: 16750372456547483648
+Frame 7: 96 bytes on wire, 96 captured, 2023-11-14 22:13:20.006000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 82
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 6
+      ip.checksum: 0xb6a1
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ Transmission Control Protocol
+         tcp.srcport: 40006
+         tcp.dstport: 80
+         tcp.seq: 1
+         tcp.ack: 0
+         tcp.hdr_len: 20
+         tcp.reserved: 0
+         tcp.flags: 0x18
+         tcp.window_size_value: 64240
+         tcp.checksum: 0x0
+         tcp.urgent_pointer: 0
+         tcp.flags.fin: false
+         tcp.flags.syn: false
+         tcp.flags.reset: false
+         tcp.flags.push: true
+         tcp.flags.ack: true
+         tcp.flags.urg: false
+         tcp.flags.ecn: false
+         tcp.flags.cwr: false
+         tcp.len: 42
+         └─ Hypertext Transfer Protocol
+            http.request.method: GET
+            http.request.uri: /test
+            http.request.version: HTTP/1.1
+            http.host: example.test
+Frame 8: 95 bytes on wire, 95 captured, 2023-11-14 22:13:20.007000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 81
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 6
+      ip.checksum: 0xb6a2
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ Transmission Control Protocol
+         tcp.srcport: 40007
+         tcp.dstport: 80
+         tcp.seq: 1
+         tcp.ack: 0
+         tcp.hdr_len: 20
+         tcp.reserved: 0
+         tcp.flags: 0x18
+         tcp.window_size_value: 64240
+         tcp.checksum: 0x0
+         tcp.urgent_pointer: 0
+         tcp.flags.fin: false
+         tcp.flags.syn: false
+         tcp.flags.reset: false
+         tcp.flags.push: true
+         tcp.flags.ack: true
+         tcp.flags.urg: false
+         tcp.flags.ecn: false
+         tcp.flags.cwr: false
+         tcp.len: 41
+         └─ Hypertext Transfer Protocol
+            http.response.version: HTTP/1.1
+            http.response.code: 200
+            http.response.phrase: OK
+            http.content_length: 3
+            http.file_data: 616263
+Frame 9: 145 bytes on wire, 145 captured, 2023-11-14 22:13:20.008000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 131
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 6
+      ip.checksum: 0xb670
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ Transmission Control Protocol
+         tcp.srcport: 40008
+         tcp.dstport: 443
+         tcp.seq: 1
+         tcp.ack: 0
+         tcp.hdr_len: 20
+         tcp.reserved: 0
+         tcp.flags: 0x18
+         tcp.window_size_value: 64240
+         tcp.checksum: 0x0
+         tcp.urgent_pointer: 0
+         tcp.flags.fin: false
+         tcp.flags.syn: false
+         tcp.flags.reset: false
+         tcp.flags.push: true
+         tcp.flags.ack: true
+         tcp.flags.urg: false
+         tcp.flags.ecn: false
+         tcp.flags.cwr: false
+         tcp.len: 91
+         └─ Transport Layer Security
+            tls.record.content_type: 22
+            tls.record.version: 771
+            tls.record.length: 86
+            tls.handshake.type: 1
+            tls.handshake.length: 82
+            tls.handshake.version: 771
+            tls.handshake.random: 0000000000000000000000000000000000000000000000000000000000000000
+            tls.handshake.session_id: 
+            tls.handshake.ciphersuite: 4865
+            tls.handshake.comp_methods: 00
+            tls.handshake.extensions_length: 39
+            tls.handshake.extension.type: 0
+            tls.handshake.extension.len: 17
+            tls.handshake.extensions_server_name_type: 0
+            tls.handshake.extensions_server_name: example.test
+            tls.handshake.extension.type: 16
+            tls.handshake.extension.len: 5
+            tls.handshake.extensions_alpn_str: h2
+            tls.handshake.extension.type: 43
+            tls.handshake.extension.len: 5
+            tls.handshake.extensions.supported_version: 772
+            tls.handshake.extensions.supported_version: 771
+Frame 10: 109 bytes on wire, 109 captured, 2023-11-14 22:13:20.009000000
+└─ Ethernet
+   eth.dst: ff:ff:ff:ff:ff:ff
+   eth.src: 02:00:00:00:00:01
+   eth.type: 0x800
+   └─ Internet Protocol v4
+      ip.version: 4
+      ip.hdr_len: 20
+      ip.dsfield.dscp: 0
+      ip.dsfield.ecn: 0
+      ip.len: 95
+      ip.id: 0x1
+      ip.flags.rb: 0
+      ip.flags.df: 1
+      ip.flags.mf: 0
+      ip.frag_offset: 0
+      ip.ttl: 64
+      ip.proto: 6
+      ip.checksum: 0xb694
+      ip.src: 192.0.2.1
+      ip.dst: 192.0.2.2
+      └─ Transmission Control Protocol
+         tcp.srcport: 40009
+         tcp.dstport: 443
+         tcp.seq: 1
+         tcp.ack: 0
+         tcp.hdr_len: 20
+         tcp.reserved: 0
+         tcp.flags: 0x18
+         tcp.window_size_value: 64240
+         tcp.checksum: 0x0
+         tcp.urgent_pointer: 0
+         tcp.flags.fin: false
+         tcp.flags.syn: false
+         tcp.flags.reset: false
+         tcp.flags.push: true
+         tcp.flags.ack: true
+         tcp.flags.urg: false
+         tcp.flags.ecn: false
+         tcp.flags.cwr: false
+         tcp.len: 55
+         └─ Transport Layer Security
+            tls.record.content_type: 22
+            tls.record.version: 771
+            tls.record.length: 50
+            tls.handshake.type: 2
+            tls.handshake.length: 46
+            tls.handshake.version: 771
+            tls.handshake.random: 0000000000000000000000000000000000000000000000000000000000000000
+            tls.handshake.session_id: 
+            tls.handshake.ciphersuite: 4865
+            tls.handshake.comp_method: 0
+            tls.handshake.extensions_length: 6
+            tls.handshake.extension.type: 43
+            tls.handshake.extension.len: 2
+            tls.handshake.extensions.supported_version: 772

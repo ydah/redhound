@@ -1,0 +1,39 @@
+# Generated from lib/redhound/filter/bpf/assembler.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    module BPF
+      # @api private
+      class Assembler
+        # @rbs () -> void
+        def initialize: () -> void
+
+        # @rbs () -> Symbol
+        def label: () -> Symbol
+
+        # @rbs (Symbol label) -> void
+        def mark: (Symbol label) -> void
+
+        # @rbs (Integer code, ?Integer k) -> void
+        def emit: (Integer code, ?Integer k) -> void
+
+        # @rbs (Symbol target) -> void
+        def jump: (Symbol target) -> void
+
+        # @rbs (Integer code, Integer k, Symbol yes, Symbol no) -> void
+        def branch: (Integer code, Integer k, Symbol yes, Symbol no) -> void
+
+        # @rbs () -> Array[[Integer, Integer, Integer, Integer]]
+        def assemble: () -> Array[[ Integer, Integer, Integer, Integer ]]
+
+        private
+
+        # Remove unreachable blocks and thread jumps through unconditional jumps.
+        # @rbs () -> void
+        def compact!: () -> void
+      end
+    end
+  end
+end

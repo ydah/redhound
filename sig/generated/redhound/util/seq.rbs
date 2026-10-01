@@ -1,0 +1,20 @@
+# Generated from lib/redhound/util/seq.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Util
+    # @api private
+    module Seq
+      MOD: ::Integer
+
+      # @rbs (Integer a, Integer b) -> Integer
+      def self.diff: (Integer a, Integer b) -> Integer
+
+      # @rbs (Integer a, Integer b) -> bool
+      def self.lt: (Integer a, Integer b) -> bool
+
+      # @rbs (Integer a, Integer b) -> Integer
+      def self.signed_diff: (Integer a, Integer b) -> Integer
+    end
+  end
+end

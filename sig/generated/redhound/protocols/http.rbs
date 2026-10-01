@@ -1,0 +1,36 @@
+# Generated from lib/redhound/protocols/http.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Http < StreamDissector
+      HEADER_LIMIT: ::Integer
+
+      TOKEN: ::Regexp
+
+      HEADERS: untyped
+
+      # @rbs (Context ctx, Cursor cursor) -> bool
+      def self.heuristic?: (Context ctx, Cursor cursor) -> bool
+
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Layer layer, String line, Integer offset, bool response) -> Integer
+      def start_line: (Layer layer, String line, Integer offset, bool response) -> Integer
+
+      # @rbs (Layer layer, String bytes, Integer pos, Integer ending) -> Hash[String, Array[String]]
+      def parse_headers: (Layer layer, String bytes, Integer pos, Integer ending) -> Hash[String, Array[String]]
+
+      # @rbs (Layer layer, String bytes, Integer pos) -> [String, Integer]
+      def chunked: (Layer layer, String bytes, Integer pos) -> [ String, Integer ]
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

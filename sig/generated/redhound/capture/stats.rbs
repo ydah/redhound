@@ -1,0 +1,25 @@
+# Generated from lib/redhound/capture/stats.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    class Stats
+      attr_accessor received: untyped
+
+      attr_accessor dropped: untyped
+
+      attr_accessor if_dropped: untyped
+
+      attr_accessor freeze_count: untyped
+
+      attr_accessor captured: untyped
+
+      # @rbs (?received: Integer, ?dropped: Integer, ?if_dropped: Integer, ?freeze_count: Integer, ?captured: Integer) -> void
+      def initialize: (?received: Integer, ?dropped: Integer, ?if_dropped: Integer, ?freeze_count: Integer, ?captured: Integer) -> void
+
+      # @rbs () -> Hash[Symbol, Integer]
+      def to_h: () -> Hash[Symbol, Integer]
+    end
+  end
+end

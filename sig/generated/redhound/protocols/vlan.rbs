@@ -1,0 +1,12 @@
+# Generated from lib/redhound/protocols/vlan.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Vlan < Dissector
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+  end
+end

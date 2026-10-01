@@ -1,0 +1,77 @@
+# Generated from lib/redhound/packet.rb with RBS::Inline
+
+module Redhound
+  # Captured immutable bytes, metadata, and lazily decoded protocol layers.
+  class Packet
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader data: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader timestamp_ns: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader original_length: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader linktype: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader interface: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader direction: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader number: untyped
+
+    # Capture bytes and metadata; timestamp_ns and lengths preserve kernel/file values.
+    attr_reader meta: untyped
+
+    # Override the dissection engine before accessing layers.
+    attr_accessor engine: untyped
+
+    # @rbs (String data, ?timestamp_ns: Integer, ?original_length: Integer?, ?linktype: (Integer | Symbol), ?interface: untyped, ?direction: Symbol?, ?number: Integer, ?meta: Hash[Symbol, untyped]) -> void
+    # Copy binary data and preserve capture metadata; reject impossible original lengths.
+    def initialize: (String data, ?timestamp_ns: Integer, ?original_length: Integer?, ?linktype: Integer | Symbol, ?interface: untyped, ?direction: Symbol?, ?number: Integer, ?meta: Hash[Symbol, untyped]) -> void
+
+    # @rbs () -> Integer
+    # Number of captured bytes.
+    def caplen: () -> Integer
+
+    # @rbs () -> bool
+    # Whether capture omitted bytes from the original packet.
+    def truncated?: () -> bool
+
+    # @rbs () -> Time
+    # Capture timestamp as a nanosecond-precision Time.
+    def time: () -> Time
+
+    # @rbs () -> Array[Layer]
+    # Decode the protocol chain once and return its Layers.
+    def layers: () -> Array[Layer]
+
+    # @rbs ((Symbol | String) key) -> untyped
+    # Select the first layer by symbol or decoded field by dotted name.
+    def []: (Symbol | String key) -> untyped
+
+    # @rbs (Symbol protocol) -> Array[Layer]
+    # Decode the protocol chain once and return its Layers.
+    def layers_of: (Symbol protocol) -> Array[Layer]
+
+    # @rbs (Symbol protocol) -> Layer?
+    # Return the last matching layer in the protocol chain.
+    def innermost: (Symbol protocol) -> Layer?
+
+    # @rbs (String name) -> Array[untyped]
+    # Return every decoded value of a repeated field.
+    def field_values: (String name) -> Array[untyped]
+
+    # @rbs () -> String
+    # Format a numeric one-line packet summary.
+    def summary: () -> String
+
+    # @rbs () -> Hash[Symbol, untyped]
+    # Return a JSON-compatible packet matching docs/json-schema.json.
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+end

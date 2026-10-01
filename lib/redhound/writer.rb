@@ -2,52 +2,34 @@
 # frozen_string_literal: true
 
 module Redhound
+  # Open pcap/pcapng outputs, optionally with bounded rotation.
   class Writer
-    # @rbs (filename: String) -> void
-    def initialize(filename:)
-      @filename = filename
-    end
+    # @rbs (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) -> untyped
+    # @rbs [T] (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) { (untyped) -> T } -> T
+    # Open a path or binary IO; close automatically with a block. See docs/API.md for options.
+    def self.open(output, linktype: :ethernet, format: nil, snaplen: 262_144, precision: :nano, packet_buffered: false, forbidden_input: nil, **options)
+      if forbidden_input && forbidden_input != '-' && output.is_a?(String) && output != '-'
+        same_path = ::File.expand_path(forbidden_input) == ::File.expand_path(output)
+        same_file = ::File.exist?(forbidden_input) && ::File.exist?(output) && ::File.identical?(forbidden_input, output)
+        raise ConfigurationError, 'input and output must be different files' if same_path || same_file
+      end
+      format ||= output.is_a?(String) && ::File.extname(output) == '.pcapng' ? :pcapng : :pcap
+      raise ArgumentError, "unknown capture file format: #{format}" unless %i[pcap pcapng].include?(format.to_sym)
 
-    # @rbs () -> void
-    def start
-      @file = File.open(@filename, 'wb')
-      @file.write(file_header)
-    end
+      options = options.merge(linktype:, format:, snaplen:, precision:, packet_buffered:, forbidden_input:)
+      writer = if options[:max_bytes] || options[:interval]
+                 File::RotatingWriter.new(output, **options)
+               else
+                 klass = format.to_sym == :pcapng ? File::PcapngWriter : File::PcapWriter
+                 klass.new(output, **options)
+               end
+      return writer unless block_given?
 
-    # @rbs (msg: String, ?time: Time) -> void
-    def write(msg:, time: Time.now)
-      @file.write(packet_record(time, msg.bytesize, msg.bytesize))
-      @file.write(msg)
-    end
-
-    # @rbs () -> void
-    def stop
-      @file.close
-    end
-
-    private
-
-    # @rbs () -> String
-    def file_header
-      [
-        0xa1b2c3d4, # Magic Number (little-endian)
-        2,          # Version Major
-        4,          # Version Minor
-        0,          # Timezone offset (GMT)
-        0,          # Timestamp accuracy
-        262_144,    # Snapshot length
-        1           # Link-layer header type (Ethernet)
-      ].pack('VvvVVVV')
-    end
-
-    # @rbs (Time timestamp, Integer captured_length, Integer original_length) -> String
-    def packet_record(timestamp, captured_length, original_length)
-      [
-        timestamp.to_i,           # Timestamp seconds
-        timestamp.usec || 0,      # Timestamp microseconds
-        captured_length,          # Captured packet length
-        original_length           # Original packet length
-      ].pack('VVVV')
+      begin
+        yield writer
+      ensure
+        writer.close
+      end
     end
   end
 end

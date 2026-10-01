@@ -1,0 +1,21 @@
+# Generated from lib/redhound/output/timestamp.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Timestamp
+      # @rbs (?style: Symbol, ?precision: Symbol) -> void
+      def initialize: (?style: Symbol, ?precision: Symbol) -> void
+
+      # @rbs (Packet packet) -> String
+      def format: (Packet packet) -> String
+
+      # @rbs (Integer ns) -> String
+      def fraction: (Integer ns) -> String
+
+      # @rbs (Integer ns) -> String
+      def seconds: (Integer ns) -> String
+    end
+  end
+end

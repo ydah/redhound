@@ -1,0 +1,15 @@
+# Generated from lib/redhound/capture/linux/cooked.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      module Cooked
+        # @rbs (SockaddrLL address) -> String
+        def self.header: (SockaddrLL address) -> String
+      end
+    end
+  end
+end

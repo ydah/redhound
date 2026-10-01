@@ -1,0 +1,48 @@
+# Generated from lib/redhound/filter/program.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # @api private
+    class Program
+      class KernelPacket < Struct[untyped]
+        attr_accessor data(): untyped
+
+        attr_accessor original_length(): untyped
+
+        attr_accessor meta(): untyped
+
+        def self.new: (?untyped data, ?untyped original_length, ?untyped meta) -> instance
+                    | (?data: untyped, ?original_length: untyped, ?meta: untyped) -> instance
+      end
+
+      attr_reader instructions: untyped
+
+      attr_reader linktype: untyped
+
+      # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions, ?linktype: Integer?, ?cooked_live: bool) -> void
+      def initialize: (Array[[ Integer, Integer, Integer, Integer ]] instructions, ?linktype: Integer?, ?cooked_live: bool) -> void
+
+      # @rbs (untyped packet) -> Integer
+      def evaluate: (untyped packet) -> Integer
+
+      # @rbs (untyped packet) -> bool
+      def match?: (untyped packet) -> bool
+
+      # Native struct sock_filter / struct bpf_insn bytes.
+      # @rbs () -> String
+      def packed: () -> String
+
+      alias serialize packed
+
+      alias to_binary packed
+
+      # @rbs (?format: Symbol) -> String
+      def disassemble: (?format: Symbol) -> String
+
+      # Includes a String reference retained by pack('P') until setsockopt/ioctl finishes.
+      # @rbs () -> String
+      def sock_fprog: () -> String
+    end
+  end
+end

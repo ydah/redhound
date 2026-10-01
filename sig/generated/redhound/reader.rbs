@@ -1,0 +1,7 @@
+# Generated from lib/redhound/reader.rb with RBS::Inline
+
+module Redhound
+  # Enumerable pcap/pcapng reader; inherited capture-source methods include stop and close.
+  class Reader < Capture::FileSource
+  end
+end

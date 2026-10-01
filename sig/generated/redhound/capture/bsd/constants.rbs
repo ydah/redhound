@@ -1,0 +1,40 @@
+# Generated from lib/redhound/capture/bsd/constants.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Bsd
+      # @api private
+      module Constants
+        # Verified against the macOS SDK's net/bpf.h on arm64 and 64-bit ioctl layout.
+        BIOCSBLEN: ::Integer
+
+        BIOCGBLEN: ::Integer
+
+        BIOCSETF: ::Integer
+
+        BIOCFLUSH: ::Integer
+
+        BIOCPROMISC: ::Integer
+
+        BIOCGDLT: ::Integer
+
+        BIOCSETIF: ::Integer
+
+        BIOCGSTATS: ::Integer
+
+        BIOCIMMEDIATE: ::Integer
+
+        BIOCSSEESENT: ::Integer
+
+        # Apple XNU bsd/net/bpf_private.h: extended headers expose direction at byte 19.
+        BIOCSEXTHDR: ::Integer
+
+        BIOCSDIRECTION: ::Integer
+
+        BPF_ALIGNMENT: ::Integer
+      end
+    end
+  end
+end

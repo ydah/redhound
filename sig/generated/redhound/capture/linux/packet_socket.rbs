@@ -1,0 +1,57 @@
+# Generated from lib/redhound/capture/linux/packet_socket.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      class PacketSocket < Source
+        attr_reader socket: untyped
+
+        attr_reader linktype: untyped
+
+        attr_reader interfaces: untyped
+
+        # @rbs (interface: String | Integer | Interface, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) -> void
+        def initialize: (interface: String | Integer | Interface, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) -> void
+
+        # @rbs (?timeout: Numeric?) -> Packet?
+        def next_packet: (?timeout: Numeric?) -> Packet?
+
+        # @rbs (untyped program) -> void
+        def attach_filter: (untyped program) -> void
+
+        # @rbs () -> Stats
+        def stats: () -> Stats
+
+        # @rbs () -> void
+        def close: () -> void
+
+        # @rbs () -> void
+        def close_resources: () -> void
+
+        # @rbs () -> void
+        def prime_timestamp: () -> void
+
+        # @rbs () -> Integer
+        def receive_snaplen: () -> Integer
+
+        # @rbs (Integer? buffer_size) -> void
+        def setup_receive_buffer: (Integer? buffer_size) -> void
+
+        # @rbs (SockaddrLL address) -> bool
+        def accept_direction?: (SockaddrLL address) -> bool
+
+        # @rbs (SockaddrLL address) -> Interface
+        def packet_interface: (SockaddrLL address) -> Interface
+
+        # @rbs () -> Integer
+        def interface_dropped: () -> Integer
+
+        # @rbs () -> Integer
+        def timestamp: () -> Integer
+      end
+    end
+  end
+end

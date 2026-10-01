@@ -1,0 +1,163 @@
+ip
+ip6
+arp
+rarp
+tcp
+udp
+icmp
+icmp6
+igmp
+sctp
+ip proto 6
+ip proto \tcp
+ip proto \udp
+ip proto \icmp
+ip proto \igmp
+ip6 proto 6
+ip6 proto \tcp
+ip6 proto \udp
+ip6 proto ipv6-icmp
+proto 17
+proto 58
+src host 192.0.2.1
+dst host 192.0.2.2
+host 192.0.2.1
+ip host 192.0.2.1
+arp host 192.0.2.1
+rarp host 192.0.2.1
+src or dst host 192.0.2.1
+src and dst host 192.0.2.1
+src net 192.0.2.0/24
+dst net 198.51.100.0/24
+net 192.0.2
+net 192.0
+net 192
+net 192.0.2.0 mask 255.255.255.0
+ip6 host 2001:db8::1
+ip6 src host 2001:db8::1
+ip6 dst host 2001:db8::2
+host 2001:db8::1
+ip6 net 2001:db8::/32
+ip6 src net 2001:db8::/64
+ip6 src and dst net 2001:db8::/32
+port 53
+port 80
+port 443
+port 12345
+src port 12345
+dst port 53
+src or dst port 80
+src and dst port 53
+tcp port 80
+tcp port 443
+tcp src port 40000
+tcp dst port 443
+udp port 53
+udp src port 12345
+udp dst port 53
+sctp port 443
+portrange 50-100
+src portrange 12000-13000
+dst portrange 50-100
+tcp portrange 80-443
+udp portrange 50-100
+port domain
+udp port domain
+tcp port http
+port 80 or 443
+udp dst port 53 or 80
+tcp dst port (80 or 443)
+src host (192.0.2.1 or 198.51.100.1)
+net 192.0.2.0/24 or 198.51.100.0/24
+ip and udp dst port 53
+ip6 and udp dst port 53
+ip or ip6
+ip or arp
+udp or tcp and dst port 443
+udp or (tcp and dst port 443)
+not ip
+not tcp
+not port 53
+not (tcp or udp)
+ip and not udp
+udp and not dst port 80
+host 192.0.2.1 and port 53
+src host 192.0.2.1 and dst host 192.0.2.2
+ip and (tcp or udp)
+(ip or ip6) and (port 53 or port 443)
+ip && udp && dst port 53
+ip || ip6
+!tcp && udp
+len >= 60
+len > 60
+len = 60
+len != 60
+len <= 80
+len < 80
+greater 60
+less 60
+ip[0] = 69
+ip[0] & 15 = 5
+(ip[0] & 15) * 4 = 20
+ip[2:2] > 40
+ip[2:2] >= 28
+ip[2:2] != 40
+ip[6:2] & 8191 = 0
+ip[8] = 64
+ip[9] = 17
+ip[12:4] = 0xc0000201
+ip[16:4] = 0xc0000202
+ip6[0] & 240 = 96
+ip6[6] = 17
+tcp[tcpflags] & tcp-syn != 0
+tcp[tcpflags] & (tcp-syn|tcp-fin) != 0
+tcp[tcpflags] & tcp-ack != 0
+tcp[0:2] = 40000
+tcp[2:2] = 443
+udp[0:2] = 12345
+udp[2:2] = 53
+udp[4:2] >= 8
+icmp[icmptype] = icmp-echo
+icmp[icmpcode] = 0
+ip[0] + 1 = 70
+ip[0] - 1 = 68
+ip[0] / 2 = 34
+ip[0] % 2 = 1
+ip[0] ^ 1 = 68
+ip[0] << 1 = 138
+ip[0] >> 1 = 34
+ip[0] | 1 = 69
+ip[0] & 0xff = 69
+ip[0] = ip[8] + 5
+ip[2:2] < len
+len / 2 >= 30
+len - 60 = 0
+ip[ip[0] & 15] = 0
+udp[udp[4:2] - 8] >= 0
+ip multicast
+ip6 multicast
+ip broadcast
+ether broadcast
+ether multicast
+ether src host 02:00:00:00:00:01
+ether dst host ff:ff:ff:ff:ff:ff
+ether host 02:00:00:00:00:01
+ether src and dst host 02:00:00:00:00:01
+ether proto \ip
+ether proto \ip6
+ether proto \arp
+ether[12:2] = 0x0800
+vlan
+vlan 0
+vlan 100
+vlan 200
+vlan and ip
+vlan 100 and udp port 53
+vlan 100 and ip6
+vlan 100 and vlan 200 and udp dst port 53
+vlan or ip
+not vlan
+(vlan 100 and tcp) or udp
+icmp6[0] = 128
+1 + 1 = 2
+-1 = 0xffffffff

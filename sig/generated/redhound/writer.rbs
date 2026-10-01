@@ -1,25 +1,12 @@
 # Generated from lib/redhound/writer.rb with RBS::Inline
 
 module Redhound
+  # Open pcap/pcapng outputs, optionally with bounded rotation.
   class Writer
-    # @rbs (filename: String) -> void
-    def initialize: (filename: String) -> void
-
-    # @rbs () -> void
-    def start: () -> void
-
-    # @rbs (msg: String, ?time: Time) -> void
-    def write: (msg: String, ?time: Time) -> void
-
-    # @rbs () -> void
-    def stop: () -> void
-
-    private
-
-    # @rbs () -> String
-    def file_header: () -> String
-
-    # @rbs (Time timestamp, Integer captured_length, Integer original_length) -> String
-    def packet_record: (Time timestamp, Integer captured_length, Integer original_length) -> String
+    # @rbs (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) -> untyped
+    # @rbs [T] (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) { (untyped) -> T } -> T
+    # Open a path or binary IO; close automatically with a block. See docs/API.md for options.
+    def self.open: (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) -> untyped
+                 | [T] (untyped output, ?linktype: Integer | Symbol | String, ?format: Symbol | String | nil, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?forbidden_input: String?, **untyped options) { (untyped) -> T } -> T
   end
 end

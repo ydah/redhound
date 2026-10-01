@@ -1,0 +1,58 @@
+# Generated from lib/redhound/capture/linux/constants.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      module Constants
+        AF_PACKET: ::Integer
+
+        SOL_PACKET: ::Integer
+
+        ETH_P_ALL: ::Integer
+
+        PACKET_ADD_MEMBERSHIP: ::Integer
+
+        PACKET_RX_RING: ::Integer
+
+        PACKET_STATISTICS: ::Integer
+
+        PACKET_VERSION: ::Integer
+
+        PACKET_IGNORE_OUTGOING: ::Integer
+
+        PACKET_MR_PROMISC: ::Integer
+
+        PACKET_OUTGOING: ::Integer
+
+        SO_ATTACH_FILTER: ::Integer
+
+        SO_RCVBUFFORCE: ::Integer
+
+        TPACKET_V3: ::Integer
+
+        SIOCGSTAMPNS: ::Integer
+
+        SIOCGIFHWADDR: ::Integer
+
+        SIOCGIFMTU: ::Integer
+
+        SIOCGIFFLAGS: ::Integer
+
+        TP_STATUS_USER: ::Integer
+
+        TP_STATUS_CSUMNOTREADY: ::Integer
+
+        TP_STATUS_VLAN_VALID: ::Integer
+
+        TP_STATUS_VLAN_TPID_VALID: ::Integer
+
+        TP_STATUS_CSUM_VALID: ::Integer
+
+        RECEIVE_SIZE: ::Integer
+      end
+    end
+  end
+end

@@ -1,0 +1,27 @@
+# Generated from lib/redhound/cli/runner.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module CLI
+    # @api private
+    class Runner
+      # @rbs (Hash[Symbol, untyped] options, ?out: untyped, ?err: untyped) -> void
+      def initialize: (Hash[Symbol, untyped] options, ?out: untyped, ?err: untyped) -> void
+
+      # @rbs () -> void
+      def run: () -> void
+
+      # @rbs () -> untyped
+      def formatter: () -> untyped
+
+      # @rbs () -> void
+      def install_signals: () -> void
+
+      # @rbs [T] () { () -> T } -> T
+      def read_capture: [T] () { () -> T } -> T
+
+      # @rbs () -> void
+      def statistics: () -> void
+    end
+  end
+end

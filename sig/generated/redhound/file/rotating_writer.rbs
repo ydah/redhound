@@ -1,0 +1,42 @@
+# Generated from lib/redhound/file/rotating_writer.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    class RotatingWriter
+      attr_reader path: untyped
+
+      # @rbs (String path, ?max_bytes: Integer?, ?interval: Numeric?, ?file_count: Integer?, ?post_rotate_command: String?, **untyped options) -> void
+      def initialize: (String path, ?max_bytes: Integer?, ?interval: Numeric?, ?file_count: Integer?, ?post_rotate_command: String?, **untyped options) -> void
+
+      # @rbs (Packet packet) -> self
+      def write: (Packet packet) -> self
+
+      alias << write
+
+      # @rbs (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+      def write_stats: (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+
+      # @rbs () -> Integer
+      def bytes_written: () -> Integer
+
+      # @rbs () -> void
+      def flush: () -> void
+
+      # @rbs () -> void
+      def close: () -> void
+
+      private
+
+      # @rbs () -> void
+      def rotate: () -> void
+
+      # @rbs () -> void
+      def open_next: () -> void
+
+      # @rbs () -> void
+      def run_command: () -> void
+    end
+  end
+end

@@ -1,0 +1,59 @@
+# Generated from lib/redhound/cursor.rb with RBS::Inline
+
+module Redhound
+  # Checked binary reads within an absolute packet slice.
+  class Cursor
+    # Internal exception for a checked read beyond the captured slice.
+    class Truncated < StandardError
+    end
+
+    # Underlying data and absolute start/end bounds.
+    attr_reader data: untyped
+
+    # Underlying data and absolute start/end bounds.
+    attr_reader start: untyped
+
+    # Underlying data and absolute start/end bounds.
+    attr_reader limit: untyped
+
+    # @rbs (String data, ?Integer start, ?Integer? limit) -> void
+    # Create a bounded view; reject invalid ranges.
+    def initialize: (String data, ?Integer start, ?Integer? limit) -> void
+
+    # @rbs () -> Integer
+    # Remaining slice length in bytes.
+    def remaining: () -> Integer
+
+    # @rbs (Integer off) -> Integer
+    # Read an unsigned byte.
+    def u8: (Integer off) -> Integer
+
+    # @rbs (Integer off) -> Integer
+    # Read an unsigned network-order 16-bit integer.
+    def u16: (Integer off) -> Integer
+
+    # @rbs (Integer off) -> Integer
+    # Read an unsigned network-order 32-bit integer.
+    def u32: (Integer off) -> Integer
+
+    # @rbs (Integer off) -> Integer
+    # Read an unsigned network-order 64-bit integer.
+    def u64: (Integer off) -> Integer
+
+    # @rbs (String template, Integer size, ?Integer off) -> Array[untyped]
+    # Unpack a checked fixed-width header.
+    def unpack: (String template, Integer size, ?Integer off) -> Array[untyped]
+
+    # @rbs (Integer off, Integer len) -> String
+    # Read a checked binary substring.
+    def bytes: (Integer off, Integer len) -> String
+
+    # @rbs (Integer from, Integer to) -> Cursor
+    # Create a child slice that cannot escape the parent bounds.
+    def sub: (Integer from, Integer to) -> Cursor
+
+    # @rbs (Integer off, Integer len) -> void
+    # Validate a relative offset and read length.
+    def check: (Integer off, Integer len) -> void
+  end
+end

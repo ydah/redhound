@@ -1,0 +1,10 @@
+# Generated from lib/redhound/filter.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Filter
+    # Compiles a pcap-filter subset without libpcap or external commands.
+    # @rbs (String expression, ?linktype: Symbol | Integer, ?snaplen: Integer, ?live: bool) -> Program
+    def self.compile: (String expression, ?linktype: Symbol | Integer, ?snaplen: Integer, ?live: bool) -> Program
+  end
+end

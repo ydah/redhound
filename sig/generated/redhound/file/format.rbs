@@ -1,0 +1,33 @@
+# Generated from lib/redhound/file/format.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    module Format
+      MAX_RECORD: untyped
+
+      PCAP_MAGICS: untyped
+
+      PCAPNG_MAGIC: untyped
+
+      # @rbs (untyped io, Integer length, ?eof: false) -> String
+      # @rbs (untyped io, Integer length, eof: true) -> String?
+      def self.read_exact: (untyped io, Integer length, ?eof: false) -> String
+                         | (untyped io, Integer length, eof: true) -> String?
+
+      # @rbs (Integer length) -> Integer
+      def self.padded: (Integer length) -> Integer
+
+      # @rbs (String data) -> String
+      def self.pad: (String data) -> String
+
+      # NULL carries a host-order address family; libpcap also normalizes it on read.
+      # @rbs (String data, Integer linktype, String integer_format) -> String
+      def self.normalize_null: (String data, Integer linktype, String integer_format) -> String
+
+      # @rbs (Integer caplen, Integer original_length, Integer snaplen) -> void
+      def self.check_lengths: (Integer caplen, Integer original_length, Integer snaplen) -> void
+    end
+  end
+end

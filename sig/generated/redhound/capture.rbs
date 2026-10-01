@@ -1,0 +1,14 @@
+# Generated from lib/redhound/capture.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @rbs (interface: String | Integer | Interface, ?backend: Symbol | String, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) -> Source
+    # @rbs [T] (interface: String | Integer | Interface, ?backend: Symbol | String, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) { (Source) -> T } -> T
+    def self.open: (interface: String | Integer | Interface, ?backend: Symbol | String, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) -> Source
+                 | [T] (interface: String | Integer | Interface, ?backend: Symbol | String, ?snaplen: Integer, ?promiscuous: bool, ?buffer_size: Integer?, ?direction: Symbol, ?filter: String?) { (Source) -> T } -> T
+
+    # @rbs () -> Array[Interface]
+    def self.interfaces: () -> Array[Interface]
+  end
+end

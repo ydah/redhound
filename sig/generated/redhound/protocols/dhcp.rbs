@@ -1,0 +1,28 @@
+# Generated from lib/redhound/protocols/dhcp.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Dhcp < Dissector
+      MESSAGE_TYPES: untyped
+
+      ADDRESS_OPTIONS: untyped
+
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Cursor cursor, Layer layer, Integer pos, Integer ending, untyped options) -> void
+      def read_options: (Cursor cursor, Layer layer, Integer pos, Integer ending, untyped options) -> void
+
+      # @rbs (Layer layer, Integer code, String value, Integer offset) -> void
+      def decode_option: (Layer layer, Integer code, String value, Integer offset) -> void
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

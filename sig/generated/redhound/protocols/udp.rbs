@@ -1,0 +1,18 @@
+# Generated from lib/redhound/protocols/udp.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Udp < Dissector
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

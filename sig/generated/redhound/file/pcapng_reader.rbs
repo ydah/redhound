@@ -1,0 +1,54 @@
+# Generated from lib/redhound/file/pcapng_reader.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    class PcapngReader
+      attr_reader interfaces: untyped
+
+      attr_reader stats: untyped
+
+      # @rbs (untyped io, String magic) -> void
+      def initialize: (untyped io, String magic) -> void
+
+      # @rbs () -> Integer
+      def linktype: () -> Integer
+
+      # @rbs () -> bool
+      def statistics?: () -> bool
+
+      # @rbs () -> Packet?
+      def next_packet: () -> Packet?
+
+      private
+
+      # @rbs () -> [Integer, String]?
+      def read_block: () -> [ Integer, String ]?
+
+      # @rbs (String body) -> void
+      def read_interface: (String body) -> void
+
+      # @rbs (String body) -> Packet
+      def read_enhanced: (String body) -> Packet
+
+      # @rbs (String body) -> Packet
+      def read_simple: (String body) -> Packet
+
+      # @rbs (String body) -> void
+      def read_statistics: (String body) -> void
+
+      # @rbs (String data, Capture::Interface interface, Integer original_length, Integer timestamp_ns, Symbol? direction, Hash[Symbol, untyped] meta) -> Packet
+      def make_packet: (String data, Capture::Interface interface, Integer original_length, Integer timestamp_ns, Symbol? direction, Hash[Symbol, untyped] meta) -> Packet
+
+      # @rbs (Integer index) -> Capture::Interface
+      def interface_at: (Integer index) -> Capture::Interface
+
+      # @rbs (String body, Integer offset) -> Hash[Integer, Array[String]]
+      def options: (String body, Integer offset) -> Hash[Integer, Array[String]]
+
+      # @rbs (String body, Integer size) -> void
+      def require_size: (String body, Integer size) -> void
+    end
+  end
+end

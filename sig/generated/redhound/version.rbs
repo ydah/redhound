@@ -1,5 +1,6 @@
 # Generated from lib/redhound/version.rb with RBS::Inline
 
 module Redhound
+  # Published gem version.
   VERSION: ::String
 end

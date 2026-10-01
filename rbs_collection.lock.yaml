@@ -1,6 +1,10 @@
 ---
 path: ".gem_rbs_collection"
 gems:
+- name: delegate
+  version: '0'
+  source:
+    type: stdlib
 - name: diff-lcs
   version: '1.5'
   source:
@@ -9,11 +13,23 @@ gems:
     revision: 2d0f5aed046c0822b3a0c163967b79fb5116b194
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
+- name: etc
+  version: '0'
+  source:
+    type: stdlib
 - name: fileutils
   version: '0'
   source:
     type: stdlib
 - name: ipaddr
+  version: '0'
+  source:
+    type: stdlib
+- name: json
+  version: '0'
+  source:
+    type: stdlib
+- name: optparse
   version: '0'
   source:
     type: stdlib
@@ -26,6 +42,14 @@ gems:
     remote: https://github.com/ruby/gem_rbs_collection.git
     repo_dir: gems
 - name: socket
+  version: '0'
+  source:
+    type: stdlib
+- name: tempfile
+  version: '0'
+  source:
+    type: stdlib
+- name: tmpdir
   version: '0'
   source:
     type: stdlib

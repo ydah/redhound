@@ -1,0 +1,50 @@
+# Generated from lib/redhound/file/pcapng_writer.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    class PcapngWriter
+      attr_reader bytes_written: untyped
+
+      attr_reader path: untyped
+
+      # @rbs (untyped output, ?linktype: Integer | Symbol | String, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?filter: String?, ?comment: String?, **untyped) -> void
+      def initialize: (untyped output, ?linktype: Integer | Symbol | String, ?snaplen: Integer, ?precision: Symbol, ?packet_buffered: bool, ?filter: String?, ?comment: String?, **untyped) -> void
+
+      # @rbs (Packet packet) -> self
+      def write: (Packet packet) -> self
+
+      alias << write
+
+      # @rbs (Packet packet) -> Integer
+      def record_size: (Packet packet) -> Integer
+
+      # @rbs (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+      def write_stats: (Capture::Stats stats, ?interface: Capture::Interface?) -> void
+
+      # @rbs () -> void
+      def flush: () -> void
+
+      # @rbs () -> void
+      def close: () -> void
+
+      private
+
+      # @rbs (Packet packet) -> Integer
+      def ensure_interface: (Packet packet) -> Integer
+
+      # @rbs (Packet packet) -> Integer
+      def packet_flags: (Packet packet) -> Integer
+
+      # @rbs (Integer timestamp) -> String
+      def timestamp_words: (Integer timestamp) -> String
+
+      # @rbs (Hash[Integer, String] values) -> String
+      def options: (Hash[Integer, String] values) -> String
+
+      # @rbs (Integer type, String body) -> void
+      def write_block: (Integer type, String body) -> void
+    end
+  end
+end

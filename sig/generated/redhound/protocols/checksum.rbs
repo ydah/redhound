@@ -1,0 +1,15 @@
+# Generated from lib/redhound/protocols/checksum.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    module Checksum
+      # @rbs (String bytes) -> Integer
+      def self.value: (String bytes) -> Integer
+
+      # @rbs (Context ctx, Layer layer, String bytes, ?Integer? proto) -> void
+      def self.verify: (Context ctx, Layer layer, String bytes, ?Integer? proto) -> void
+    end
+  end
+end

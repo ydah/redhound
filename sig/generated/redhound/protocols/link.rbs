@@ -1,0 +1,33 @@
+# Generated from lib/redhound/protocols/link.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Sll < Dissector
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+
+    # @api private
+    class Sll2 < Dissector
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+
+    # @api private
+    class Null < Dissector
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+
+    # @api private
+    class Raw < Dissector
+      # @rbs (Context ctx, Layer layer) -> untyped
+      def next_dissector: (Context ctx, Layer layer) -> untyped
+    end
+  end
+end

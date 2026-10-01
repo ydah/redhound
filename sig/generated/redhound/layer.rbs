@@ -1,0 +1,81 @@
+# Generated from lib/redhound/layer.rb with RBS::Inline
+
+module Redhound
+  # One decoded protocol header and its payload bounds, fields and diagnostics.
+  class Layer
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader protocol: untyped
+
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader offset: untyped
+
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader diagnostics: untyped
+
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader definitions: untyped
+
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader values: untyped
+
+    # Protocol identity, captured offset, decoded values and diagnostics.
+    attr_reader embedded: untyped
+
+    # Header size and absolute payload bounds used by child dissectors.
+    attr_accessor header_length: untyped
+
+    # Header size and absolute payload bounds used by child dissectors.
+    attr_accessor payload_offset: untyped
+
+    # Header size and absolute payload bounds used by child dissectors.
+    attr_accessor payload_end: untyped
+
+    # @rbs (Symbol protocol, Integer offset, Integer length, Integer limit, ?definitions: Array[untyped], ?values: Hash[Symbol, untyped], ?embedded: bool) -> void
+    # Create a bounded header with optional fixed field definitions and values.
+    def initialize: (Symbol protocol, Integer offset, Integer length, Integer limit, ?definitions: Array[untyped], ?values: Hash[Symbol, untyped], ?embedded: bool) -> void
+
+    # @rbs (Symbol key) -> untyped
+    # Read the raw value identified by a symbolic field key.
+    def []: (Symbol key) -> untyped
+
+    # @rbs () -> Integer
+    # Decoded header length in bytes.
+    def length: () -> Integer
+
+    # @rbs () -> bool
+    # Whether no bytes remain for a child protocol.
+    def payload_empty?: () -> bool
+
+    # @rbs () -> bool
+    # Whether an error or truncation stops the protocol chain.
+    def error?: () -> bool
+
+    # @rbs (Symbol severity, Symbol code, ?String message, ?String? field) -> Layer
+    # Append a structured diagnostic and return this layer.
+    def diagnose: (Symbol severity, Symbol code, ?String message, ?String? field) -> Layer
+
+    # @rbs (Symbol key, String name, untyped value, ?type: Symbol, ?offset: Integer, ?length: Integer, ?format: Symbol?, ?enum: untyped) -> Layer
+    # Append a dynamic field with its value, representation and location.
+    def add: (Symbol key, String name, untyped value, ?type: Symbol, ?offset: Integer, ?length: Integer, ?format: Symbol?, ?enum: untyped) -> Layer
+
+    # @rbs () -> Array[Field]
+    # Return Field objects for all fixed and dynamic definitions.
+    def fields: () -> Array[Field]
+
+    # @rbs (Symbol key) -> String
+    # Return escaped text for a single symbolic field.
+    def display: (Symbol key) -> String
+
+    # @rbs (String name) -> untyped
+    # Read the first decoded value with this dotted field name.
+    def field_value: (String name) -> untyped
+
+    # @rbs (String name) -> Array[untyped]
+    # Read the first decoded value with this dotted field name.
+    def field_values: (String name) -> Array[untyped]
+
+    # @rbs () -> Hash[Symbol, untyped]
+    # Return JSON fields, grouping repeated names into arrays.
+    def to_h: () -> Hash[Symbol, untyped]
+  end
+end

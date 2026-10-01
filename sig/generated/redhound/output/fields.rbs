@@ -1,0 +1,15 @@
+# Generated from lib/redhound/output/fields.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Fields
+      # @rbs (Array[String] names) -> void
+      def initialize: (Array[String] names) -> void
+
+      # @rbs (Packet packet, untyped io) -> void
+      def format: (Packet packet, untyped io) -> void
+    end
+  end
+end

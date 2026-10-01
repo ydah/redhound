@@ -1,0 +1,21 @@
+# Generated from lib/redhound/output/summary.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Summary
+      # @rbs (?timestamp: Symbol, ?precision: Symbol, ?link_layer: bool, ?quick: bool, ?verbosity: Integer, ?resolve_names: bool) -> void
+      def initialize: (?timestamp: Symbol, ?precision: Symbol, ?link_layer: bool, ?quick: bool, ?verbosity: Integer, ?resolve_names: bool) -> void
+
+      # @rbs (Packet packet) -> String
+      def line: (Packet packet) -> String
+
+      # @rbs (Packet packet, untyped io) -> void
+      def format: (Packet packet, untyped io) -> void
+
+      # @rbs (String ip) -> String
+      def address: (String ip) -> String
+    end
+  end
+end

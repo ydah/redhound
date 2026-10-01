@@ -1,0 +1,17 @@
+# Generated from lib/redhound/protocols/ntp.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Ntp < Dissector
+      MODES: untyped
+
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

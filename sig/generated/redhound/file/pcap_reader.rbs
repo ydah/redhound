@@ -1,0 +1,19 @@
+# Generated from lib/redhound/file/pcap_reader.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module File
+    # @api private
+    class PcapReader
+      attr_reader interfaces: untyped
+
+      attr_reader linktype: untyped
+
+      # @rbs (untyped io, String magic) -> void
+      def initialize: (untyped io, String magic) -> void
+
+      # @rbs () -> Packet?
+      def next_packet: () -> Packet?
+    end
+  end
+end

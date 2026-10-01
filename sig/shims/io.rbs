@@ -1,0 +1,7 @@
+class IO
+  def self.select: (Array[IO]?, ?Array[IO]?, ?Array[IO]?, ?Numeric?) -> [Array[IO], Array[IO], Array[IO]]?
+end
+
+module Shellwords
+  def self.split: (String) -> Array[String]
+end

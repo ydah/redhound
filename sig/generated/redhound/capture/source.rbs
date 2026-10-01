@@ -1,0 +1,44 @@
+# Generated from lib/redhound/capture/source.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    class Source
+      include Enumerable[Packet]
+
+      # @rbs () -> void
+      def initialize: () -> void
+
+      # @rbs () { (Packet) -> void } -> self
+      # @rbs () -> Enumerator[Packet, self]
+      def each_packet: () { (Packet) -> void } -> self
+                     | () -> Enumerator[Packet, self]
+
+      alias each each_packet
+
+      # @rbs (?timeout: Numeric?) -> Packet?
+      def next_packet: (?timeout: Numeric?) -> Packet?
+
+      # @rbs () -> Stats
+      def stats: () -> Stats
+
+      # @rbs () -> bool
+      def stopped?: () -> bool
+
+      # @rbs () -> void
+      def stop: () -> void
+
+      # @rbs () -> void
+      def close: () -> void
+
+      private
+
+      # @rbs (IO io, Numeric? deadline) -> bool
+      def wait_readable: (IO io, Numeric? deadline) -> bool
+
+      # @rbs (Numeric? timeout) -> Numeric?
+      def deadline_for: (Numeric? timeout) -> Numeric?
+    end
+  end
+end

@@ -1,0 +1,15 @@
+# Generated from lib/redhound/output/tree.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Tree
+      # @rbs (Packet packet, untyped io) -> void
+      def format: (Packet packet, untyped io) -> void
+
+      # @rbs (String text) -> String
+      def safe: (String text) -> String
+    end
+  end
+end

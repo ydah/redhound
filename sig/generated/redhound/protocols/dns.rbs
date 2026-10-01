@@ -1,0 +1,42 @@
+# Generated from lib/redhound/protocols/dns.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Protocols
+    # @api private
+    class Dns < StreamDissector
+      # @api private
+      class Malformed < StandardError
+      end
+
+      TYPES: untyped
+
+      # @rbs (Context ctx, Layer layer) -> void
+      def dissect: (Context ctx, Layer layer) -> void
+
+      # @rbs (Cursor cursor, Layer layer, Symbol variant) -> void
+      def message: (Cursor cursor, Layer layer, Symbol variant) -> void
+
+      # @rbs (Cursor cursor, Integer pos, ?Integer? limit, ?bool compression) -> [String, Integer]
+      def read_name: (Cursor cursor, Integer pos, ?Integer? limit, ?bool compression) -> [ String, Integer ]
+
+      # @rbs (Cursor cursor, Layer layer, Integer pos, Integer base, Symbol variant) -> Integer
+      def record: (Cursor cursor, Layer layer, Integer pos, Integer base, Symbol variant) -> Integer
+
+      # @rbs (Cursor cursor, Layer layer, Integer type, Integer pos, Integer ending, Integer base) -> void
+      def rdata: (Cursor cursor, Layer layer, Integer type, Integer pos, Integer ending, Integer base) -> void
+
+      # @rbs (Cursor cursor, Layer layer, Integer pos, Integer ending, Integer base) -> void
+      def service_binding: (Cursor cursor, Layer layer, Integer pos, Integer ending, Integer base) -> void
+
+      # @rbs (Cursor cursor, Layer layer, Integer pos, Integer ending, Integer base) -> void
+      def edns: (Cursor cursor, Layer layer, Integer pos, Integer ending, Integer base) -> void
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+
+      # @rbs (Layer layer) -> String
+      def summary: (Layer layer) -> String
+    end
+  end
+end

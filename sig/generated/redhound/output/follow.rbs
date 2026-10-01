@@ -1,0 +1,21 @@
+# Generated from lib/redhound/output/follow.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Output
+    # @api private
+    class Follow
+      # @rbs (String specification) -> void
+      def initialize: (String specification) -> void
+
+      # @rbs (Analysis::Flow flow, Integer direction, String data) -> void
+      def write: (Analysis::Flow flow, Integer direction, String data) -> void
+
+      # @rbs (untyped io) -> void
+      def format: (untyped io) -> void
+
+      # @rbs () -> void
+      def close: () -> void
+    end
+  end
+end

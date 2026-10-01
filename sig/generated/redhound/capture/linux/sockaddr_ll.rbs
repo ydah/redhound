@@ -1,0 +1,31 @@
+# Generated from lib/redhound/capture/linux/sockaddr_ll.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Capture
+    # @api private
+    module Linux
+      # @api private
+      class SockaddrLL
+        attr_reader protocol: untyped
+
+        attr_reader index: untyped
+
+        attr_reader hatype: untyped
+
+        attr_reader pkttype: untyped
+
+        attr_reader address: untyped
+
+        # @rbs (?protocol: Integer, ?index: Integer, ?hatype: Integer, ?pkttype: Integer, ?address: String) -> void
+        def initialize: (?protocol: Integer, ?index: Integer, ?hatype: Integer, ?pkttype: Integer, ?address: String) -> void
+
+        # @rbs () -> String
+        def to_sockaddr: () -> String
+
+        # @rbs (String bytes) -> SockaddrLL
+        def self.parse: (String bytes) -> SockaddrLL
+      end
+    end
+  end
+end

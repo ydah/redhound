@@ -1,0 +1,96 @@
+# Generated from lib/redhound/analysis/flow_table.rb with RBS::Inline
+
+module Redhound
+  # @api private
+  module Analysis
+    # @api private
+    class Flow
+      BASE_BYTES: ::Integer
+
+      attr_reader key: untyped
+
+      attr_reader id: untyped
+
+      attr_reader first_ns: untyped
+
+      attr_reader packets: untyped
+
+      attr_reader bytes: untyped
+
+      attr_reader streams: untyped
+
+      attr_reader applications: untyped
+
+      attr_reader acks: untyped
+
+      attr_reader keep_alives: untyped
+
+      attr_accessor last_ns: untyped
+
+      attr_accessor closed_ns: untyped
+
+      attr_accessor syn_ns: untyped
+
+      attr_accessor syn_direction: untyped
+
+      attr_accessor synack_ns: untyped
+
+      attr_accessor synack_seq: untyped
+
+      attr_accessor initial_rtt: untyped
+
+      attr_accessor accounted_bytes: untyped
+
+      # @rbs (untyped key, Integer id, Integer timestamp_ns) -> void
+      def initialize: (untyped key, Integer id, Integer timestamp_ns) -> void
+
+      # @rbs () -> bool
+      def closed?: () -> bool
+
+      # @rbs () -> Integer
+      def bytesize: () -> Integer
+    end
+
+    # @api private
+    class FlowTable
+      attr_reader evicted: untyped
+
+      attr_reader expired: untyped
+
+      attr_accessor on_remove: untyped
+
+      # @rbs (?max_flows: Integer) -> void
+      def initialize: (?max_flows: Integer) -> void
+
+      # @rbs (Packet packet) -> untyped
+      def update: (Packet packet) -> untyped
+
+      # @rbs (Integer now_ns) -> void
+      def advance: (Integer now_ns) -> void
+
+      # @rbs (Integer now_ns) -> void
+      def expire: (Integer now_ns) -> void
+
+      # @rbs () -> Flow?
+      def evict: () -> Flow?
+
+      # @rbs (Flow flow) -> void
+      def discard: (Flow flow) -> void
+
+      # @rbs (Flow flow) -> void
+      def account: (Flow flow) -> void
+
+      # @rbs () -> Integer
+      def size: () -> Integer
+
+      # @rbs () -> Array[Flow]
+      def values: () -> Array[Flow]
+
+      # @rbs () -> Integer
+      def bytesize: () -> Integer
+
+      # @rbs () -> Integer
+      def tcp_bytesize: () -> Integer
+    end
+  end
+end
