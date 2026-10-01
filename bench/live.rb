@@ -46,11 +46,13 @@ OptionParser.new do |parser|
   parser.on('--backend NAME', %w[compare socket ring]) { |value| options[:backends] = value == 'compare' ? %i[socket ring] : [value.to_sym] }
   parser.on('--out DIR') { |value| options[:out] = value }
   parser.on('--rotate', 'Bounded pcapng rotation; otherwise pcap writes go to /dev/null') { options[:rotate] = true }
+  parser.on('--verify-after', 'Measure capture/write alone; verify saved pcap after capture ends') { options[:verify_after] = true }
   parser.on('--rotation-interval SECONDS', Float) { |value| options[:rotation_interval] = value }
   parser.on('--sample SECONDS', Float) { |value| options[:sample] = value }
 end.parse!
 abort 'Linux is required' unless RUBY_PLATFORM.include?('linux')
 abort 'duration, rate and intervals must be finite and positive' unless options.values_at(:duration, :rate, :sample, :rotation_interval).all? { |value| value.positive? && value.finite? }
+abort '--verify-after cannot be combined with rotation' if options[:verify_after] && options[:rotate]
 abort 'result directory already exists; use a new --out directory' if File.exist?(File.join(options[:out], 'configuration.json'))
 FileUtils.mkdir_p(options[:out], mode: 0o700)
 capture_files = Dir[File.expand_path('../lib/redhound/{capture,file}/**/*.rb', __dir__)] + %w[capture.rb writer.rb packet.rb].map { |path| File.expand_path("../lib/redhound/#{path}", __dir__) }
@@ -105,6 +107,8 @@ begin
         writer = if options[:rotate]
                    Redhound::Writer.open(File.join(options[:out], "#{backend}.pcapng"), max_bytes: 64 << 20,
                                          interval: options[:rotation_interval], file_count: 3)
+                 elsif options[:verify_after]
+                   Redhound::Writer.open(File.join(options[:out], "#{backend}.pcap"))
                  else
                    sink = File.open(File::NULL, 'wb')
                    Redhound::Writer.open(sink)
@@ -122,19 +126,22 @@ begin
         next_sample = start
         sample_io = File.open(File.join(options[:out], "#{backend}-samples.jsonl"), 'wb', 0o600)
         max_rss = max_fds = 0
+        verify = lambda do |packet|
+          sequence = packet.data.unpack1('Q>', offset: 42)
+          invalid += 1 unless packet.caplen == 600 && packet.original_length == 600 && packet.data.byteslice(50, 6) == 'RHLOAD'
+          gaps += sequence - previous - 1 if previous && sequence > previous + 1
+          invalid += 1 if previous && sequence <= previous
+          previous = sequence
+          digest.update(packet.data)
+          timestamps << [sequence, packet.timestamp_ns] if sequence % 10_000 == 0
+        end
         while monotonic < deadline
           packet = source.next_packet(timeout: 0.1)
           if packet
             old_path = writer.path if options[:rotate]
             writer.write(packet)
             validate_file(old_path) if options[:rotate] && old_path != writer.path
-            sequence = packet.data.unpack1('Q>', offset: 42)
-            invalid += 1 unless packet.caplen == 600 && packet.original_length == 600 && packet.data.byteslice(50, 6) == 'RHLOAD'
-            gaps += sequence - previous - 1 if previous && sequence > previous + 1
-            invalid += 1 if previous && sequence <= previous
-            previous = sequence
-            digest.update(packet.data)
-            timestamps << [sequence, packet.timestamp_ns] if sequence % 10_000 == 0
+            verify.call(packet) unless options[:verify_after]
             count += 1
             last_capture_at = monotonic
           end
@@ -153,6 +160,13 @@ begin
         writer.write_stats(stats)
         writer.close
         writer = nil
+        if options[:verify_after]
+          verified = 0
+          Redhound.open(File.join(options[:out], "#{backend}.pcap")) do |reader|
+            reader.each { |packet| verify.call(packet); verified += 1 }
+          end
+          raise 'saved record count differs from captured count' unless verified == count
+        end
         Dir.glob(File.join(options[:out], "#{backend}_*.pcapng")).each { |path| validate_file(path) }
         elapsed = last_capture_at - start
         report = { backend: backend, captured: count, sequence_gaps: gaps, invalid: invalid, sha256: digest.hexdigest,
