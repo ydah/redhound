@@ -23,8 +23,10 @@ module Redhound
       end
       # @rbs (Context ctx, Layer layer) -> void
       def dissect(ctx, layer)
+        ctx.extension_count = 0
         layer.diagnose(:error, :malformed, 'IPv6 version is not 6') if layer[:version] != 6
         layer.payload_end = layer.offset + 40 + layer[:plen]
+        layer.payload_offset = layer.payload_end if layer[:nxt] == 59
       end
       # @rbs (Context ctx, Layer layer) -> untyped
       def next_dissector(ctx, layer) = ctx.registry.lookup('ip.proto', layer[:nxt])
@@ -39,7 +41,7 @@ module Redhound
         ctx.extension_count += 1
         return layer.diagnose(:error, :malformed, 'more than 16 IPv6 extensions') if ctx.extension_count > 16
         parent = ctx.layers.last
-        type = parent.protocol == :ipv6 ? parent[:nxt] : parent[:next]
+        type = parent.protocol == :ipv6 ? parent[:nxt] : parent.protocol == :ipv4 ? parent[:proto] : parent[:next]
         cursor = ctx.cursor
         nxt = cursor.u8(0)
         layer.add(:next, 'ipv6.nxt', nxt, length: 1)
@@ -49,11 +51,12 @@ module Redhound
         if type == 44
           flags = cursor.u16(2)
           layer.add(:fragment_offset, 'ipv6.fragment.offset', flags & 0xfff8, offset: 2, length: 2)
-          layer.add(:more, 'ipv6.fragment.more', flags & 1)
+          layer.add(:more, 'ipv6.fragment.more', flags & 1, offset: 2, length: 2)
           layer.add(:identification, 'ipv6.fragment.id', cursor.u32(4), offset: 4, length: 4)
         end
         layer.header_length = length
         layer.payload_offset += length
+        layer.payload_offset = layer.payload_end if nxt == 59
       end
       # @rbs (Context ctx, Layer layer) -> untyped
       def next_dissector(ctx, layer)

@@ -17,12 +17,17 @@ RSpec.describe 'v2 live capture', :live do
     receiver&.close
   end
 
-  it 'captures filtered UDP with kernel time, original length and bounded snaplen' do
-    backends = RUBY_PLATFORM.include?('linux') ? %i[socket ring] : [:bpf]
-    with_udp do |sender, port|
-      backends.each do |backend|
-        source = Redhound::Capture.open(interface: loopback, backend:, snaplen: 36, promiscuous: false,
-                                        filter: "udp dst port #{port}")
+  (RUBY_PLATFORM.include?('linux') ? %i[socket auto ring] : [:bpf]).each do |backend|
+    it "captures filtered UDP with kernel time, original length and bounded snaplen via #{backend}" do
+      with_udp do |sender, port|
+        begin
+          source = Redhound::Capture.open(interface: loopback, backend:, snaplen: 36, promiscuous: false,
+                                          filter: "udp dst port #{port}")
+        rescue Redhound::UnsupportedPlatform => error
+          raise unless backend == :ring
+
+          skip error.message
+        end
         begin
           sender.send('hello', 0, '127.0.0.1', port)
           packet = source.next_packet(timeout: 2)
@@ -49,19 +54,27 @@ RSpec.describe 'v2 live capture', :live do
     thread&.kill
   end
 
-  it 'captures any as Linux SLL2 with a physical interface identity' do
-    skip 'Linux-only interface' unless RUBY_PLATFORM.include?('linux')
-    with_udp do |sender, port|
-      source = Redhound::Capture.open(interface: 'any', backend: :ring, promiscuous: false, filter: "udp dst port #{port}")
-      begin
-        sender.send('any', 0, '127.0.0.1', port)
-        packet = source.next_packet(timeout: 2)
-        expect(packet.linktype).to eq(276)
-        expect(packet.interface.name).to eq('lo')
-        expect(packet.data.bytesize).to eq(51)
-        expect(packet.data.unpack1('N', offset: 4)).to eq(packet.interface.index)
-      ensure
-        source.close
+  %i[socket auto ring].each do |backend|
+    it "captures any as Linux SLL2 with a physical interface identity via #{backend}" do
+      skip 'Linux-only interface' unless RUBY_PLATFORM.include?('linux')
+      with_udp do |sender, port|
+        begin
+          source = Redhound::Capture.open(interface: 'any', backend:, promiscuous: false, filter: "udp dst port #{port}")
+        rescue Redhound::UnsupportedPlatform => error
+          raise unless backend == :ring
+
+          skip error.message
+        end
+        begin
+          sender.send('any', 0, '127.0.0.1', port)
+          packet = source.next_packet(timeout: 2)
+          expect(packet.linktype).to eq(276)
+          expect(packet.interface.name).to eq('lo')
+          expect(packet.data.bytesize).to eq(51)
+          expect(packet.data.unpack1('N', offset: 4)).to eq(packet.interface.index)
+        ensure
+          source.close
+        end
       end
     end
   end

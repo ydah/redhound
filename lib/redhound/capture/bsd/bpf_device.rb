@@ -51,7 +51,10 @@ module Redhound
         # @rbs (?timeout: Numeric?) -> Packet?
         def next_packet(timeout: nil)
           deadline = deadline_for(timeout)
+          polled = false
           until @stopped || @closed
+            return nil if polled && deadline && Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+            polled = true
             if @offset >= @records.bytesize
               return nil unless wait_readable(@device, deadline)
               result = @device.read_nonblock(@buffer_size, exception: false)

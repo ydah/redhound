@@ -25,13 +25,13 @@ RSpec.describe 'network fields compared with tshark', :differential do
     sll.pkttype sll.hatype sll.halen sll.etype sll.ifindex null.family
     ip.version ip.hdr_len ip.len ip.id ip.flags.df ip.flags.mf ip.frag_offset ip.ttl ip.proto ip.checksum
     ipv6.version ipv6.tclass ipv6.flow ipv6.plen ipv6.nxt ipv6.hlim ipv6.fragment.offset ipv6.fragment.more ipv6.fragment.id
-    icmp.type icmp.code icmp.checksum icmpv6.type icmpv6.code icmpv6.checksum
+    icmp.type icmp.code icmp.checksum icmp.ident icmp.seq icmp.mtu icmpv6.type icmpv6.code icmpv6.checksum
     icmpv6.echo.identifier icmpv6.echo.sequence_number icmpv6.nd.na.flag
     icmpv6.nd.ra.cur_hop_limit icmpv6.nd.ra.flag icmpv6.nd.ra.router_lifetime
     icmpv6.nd.ra.reachable_time icmpv6.nd.ra.retrans_timer icmpv6.opt.type icmpv6.opt.length
     icmpv6.opt.prefix.length icmpv6.opt.prefix.flag icmpv6.opt.prefix.valid_lifetime
     icmpv6.opt.prefix.preferred_lifetime icmpv6.opt.mtu
-    igmp.type igmp.version igmp.checksum igmp.num_src igmp.num_grp_recs igmp.record_type igmp.qrv igmp.qqic
+    igmp.type igmp.version igmp.max_resp igmp.checksum igmp.num_src igmp.num_grp_recs igmp.record_type igmp.qrv igmp.qqic
     udp.srcport udp.dstport udp.length udp.checksum tcp.srcport tcp.dstport tcp.seq tcp.ack tcp.hdr_len tcp.flags
     tcp.window_size_value tcp.checksum tcp.urgent_pointer tcp.options.mss_val tcp.options.wscale.shift
     tcp.options.timestamp.tsval tcp.options.timestamp.tsecr gre.flags gre.proto gre.key vxlan.vni

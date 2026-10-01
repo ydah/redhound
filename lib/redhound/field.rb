@@ -30,7 +30,7 @@ module Redhound
     # Decoded value; addresses are returned in human-readable text.
     def value
       case type
-      when :ipv4 then [@raw_value].pack('N').unpack('C4').join('.')
+      when :ipv4 then "#{(@raw_value >> 24) & 255}.#{(@raw_value >> 16) & 255}.#{(@raw_value >> 8) & 255}.#{@raw_value & 255}"
       when :ipv6 then IPAddr.new_ntoh(@raw_value).to_s
       when :mac then @raw_value.unpack('H2' * 6).join(':')
       else @raw_value

@@ -12,9 +12,13 @@ module Redhound
     # Copy binary data and preserve capture metadata; reject impossible original lengths.
     def initialize(data, timestamp_ns: 0, original_length: nil, linktype: 1, interface: nil, direction: nil, number: 1, meta: {})
       @data = data.b.freeze
-      @timestamp_ns, @original_length = timestamp_ns, original_length || data.bytesize
+      raise ArgumentError, 'timestamp_ns must be an Integer' unless timestamp_ns.is_a?(Integer)
+      raise ArgumentError, 'number must be a positive Integer' unless number.is_a?(Integer) && number.positive?
+      raise ArgumentError, 'direction must be in, out or nil' unless direction.nil? || direction == :in || direction == :out
+      @timestamp_ns, @original_length = timestamp_ns, original_length.nil? ? data.bytesize : original_length
+      raise ArgumentError, 'original length must be an Integer' unless @original_length.is_a?(Integer)
       raise ArgumentError, 'original length is shorter than captured length' if @original_length < data.bytesize
-      @linktype = linktype.is_a?(Integer) ? linktype : Capture::Linktype.resolve(linktype)
+      @linktype = Capture::Linktype.resolve(linktype)
       @interface, @direction, @number, @meta = interface, direction, number, meta.dup
       @engine = nil # @rbs Engine?
     end
@@ -56,8 +60,18 @@ module Redhound
     # Return a JSON-compatible packet matching docs/json-schema.json.
     def to_h
       { frame: { number: @number, time_epoch_ns: @timestamp_ns, time: time.utc.strftime('%Y-%m-%dT%H:%M:%S.') + format('%09dZ', time.nsec),
-                 caplen: caplen, len: @original_length, interface: @interface&.name&.dup&.force_encoding(Encoding::UTF_8)&.scrub, direction: @direction, linktype: @linktype },
-        layers: layers.map(&:to_h), diagnostics: layers.flat_map { |l| l.diagnostics.map { |d| { layer: l.protocol, severity: d.severity, code: d.code, message: d.message, field: d.field } } } }
+                 caplen: caplen, len: @original_length, interface: json_text(@interface&.name), direction: @direction, linktype: @linktype },
+        layers: layers.map(&:to_h), diagnostics: layers.flat_map { |l| l.diagnostics.map { |d| { layer: l.protocol, severity: d.severity, code: d.code, message: json_text(d.message), field: json_text(d.field) } } } }
+    end
+
+    private
+
+    # @rbs (String? text) -> String?
+    def json_text(text)
+      return nil unless text
+      utf8 = text.dup.force_encoding(Encoding::UTF_8)
+      return utf8 if utf8.valid_encoding?
+      text.unpack1('H*') #: String
     end
   end
 end

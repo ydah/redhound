@@ -8,6 +8,7 @@ module Redhound
     module BPF
       # @api private
       class VM
+        LOAD_FORMATS = { 0x00 => 'N', 0x08 => 'n', 0x10 => 'C' }.freeze
         # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> void
         def initialize(instructions)
           Validator.validate!(instructions)
@@ -34,9 +35,9 @@ module Redhound
                         if k >= 0xfffff000 && (code & 0xe0) == 0x20
                           ancillary(k, packet.meta)
                         else
-                          size = { 0x00 => 4, 0x08 => 2, 0x10 => 1 }.fetch(code & 0x18)
+                          size = 4 >> ((code & 0x18) >> 3)
                           return 0 if offset.negative? || offset + size > packet.data.bytesize
-                          packet.data.unpack1({ 4 => 'N', 2 => 'n', 1 => 'C' }.fetch(size), offset: offset)
+                          packet.data.unpack1(LOAD_FORMATS.fetch(code & 0x18), offset: offset)
                         end
                       end
               if code == 0xb1

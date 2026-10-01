@@ -21,6 +21,9 @@ module Redhound
       # @rbs (Integer sequence, String data, ?syn: bool, ?fin: bool, ?frame: Integer) -> Array[String]
       def push(sequence, data, syn: false, fin: false, frame: 0)
         @diagnostics, @deliveries, @gap_lengths = [], [], []
+        if @base_seq && ((syn && sequence == @base_seq) || (fin && Util::Seq.lt((sequence + data.bytesize) % Util::Seq::MOD, next_sequence)))
+          @diagnostics << :retransmission
+        end
         unless @base_seq
           @base_seq = sequence
           @expected = syn ? 1 : 0
@@ -115,7 +118,9 @@ module Redhound
       # @rbs () -> void
       def trim_history
         # Previously delivered bytes share the stream's bounded budget with holes.
-        limit = [@max_bytes - @queue.sum { |item| item[1].bytesize + 128 }, 0].max
+        # Ruby grows mutable String buffers geometrically. Reserve twice their
+        # length plus object storage so capacity also stays inside the budget.
+        limit = [(@max_bytes - @queue.sum { |item| item[1].bytesize * 2 + 168 } - 40) / 2, 0].max
         excess = @history.bytesize - limit
         if excess.positive?
           @history = @history.byteslice(excess..) #: String
@@ -123,7 +128,7 @@ module Redhound
         end
       end
       # @rbs () -> Integer
-      def bytesize = @history.bytesize + @queue.sum { |item| item[1].bytesize + 128 }
+      def bytesize = (@history.empty? ? 0 : @history.bytesize * 2 + 40) + @queue.sum { |item| item[1].bytesize * 2 + 168 }
       # @rbs () -> bool
       def pending? = !@queue.empty? || (!@fin && !@fin_offset.nil?)
       # @rbs () -> bool

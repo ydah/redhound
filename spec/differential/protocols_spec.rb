@@ -4,6 +4,7 @@ require 'json'
 require 'open3'
 require 'tmpdir'
 require 'yaml'
+require 'time'
 require_relative '../fixtures/generators/applications'
 
 RSpec.describe 'protocol fields compared with tshark', :differential do
@@ -23,6 +24,8 @@ RSpec.describe 'protocol fields compared with tshark', :differential do
       case type
       when 'int', 'hex' then value.is_a?(Integer) ? value : Integer(value, value.start_with?('0x') ? 16 : 10)
       when 'bool' then value == true || value == '1' || value == 'True'
+      when 'ntp_timestamp'
+        value.is_a?(Integer) ? Time.at((value >> 32) - 2_208_988_800, (value & 0xffffffff) * 1_000_000_000 / (1 << 32), :nsec).utc : Time.parse(value).utc
       else value.to_s
       end
     end

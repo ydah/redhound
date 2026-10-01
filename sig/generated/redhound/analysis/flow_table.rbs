@@ -27,6 +27,10 @@ module Redhound
 
       attr_reader http_methods: untyped
 
+      attr_reader probes: untyped
+
+      attr_reader probe_disabled: untyped
+
       attr_accessor last_ns: untyped
 
       attr_accessor closed_ns: untyped
@@ -73,8 +77,8 @@ module Redhound
       # @rbs (Integer now_ns) -> void
       def expire: (Integer now_ns) -> void
 
-      # @rbs () -> Flow?
-      def evict: () -> Flow?
+      # @rbs (?Symbol? type) -> Flow?
+      def evict: (?Symbol? type) -> Flow?
 
       # @rbs (Flow flow) -> void
       def discard: (Flow flow) -> void

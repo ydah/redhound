@@ -28,7 +28,16 @@ module Redhound
         @follow = follow ? Output::Follow.new(follow) : nil
         @tcp_reassembler = TcpReassembler.new(registry: registry, max_bytes: [tcp_bytes, max_state_bytes].min,
                                              stream_bytes: stream_bytes, protocol_streams: protocol_streams, follow: @follow)
-        @flows.on_remove = ->(flow) { @tcp_reassembler.finish_flow(flow) }
+        @removed_gaps, @removed_incomplete, @removed_bugs = 0, 0, 0
+        @flows.on_remove = lambda do |flow|
+          @tcp_reassembler.finish_flow(flow).each do |layer|
+            layer.diagnostics.each do |diagnostic|
+              @removed_gaps += 1 if diagnostic.code == :reassembly_gap
+              @removed_incomplete += 1 if diagnostic.code == :truncated
+              @removed_bugs += 1 if diagnostic.code == :dissector_bug
+            end
+          end
+        end
         specs = stats.uniq
         raise ConfigurationError, 'too many statistics specifications (maximum 64)' if specs.size > 64
         row_limit = [100_000, [((128 << 20) / [specs.size, 1].max) / 1024, 1].max].min
@@ -103,6 +112,9 @@ module Redhound
       # @rbs (untyped err) -> void
       def snapshot(err)
         @statistics.each { |stat| stat.format(err) }
+        err.puts("#{@removed_gaps} TCP reassembly_gap events during flow removal") if @removed_gaps.positive?
+        err.puts("#{@removed_incomplete} truncated application PDUs during flow removal") if @removed_incomplete.positive?
+        err.puts("#{@removed_bugs} dissector_bug events during flow removal") if @removed_bugs.positive?
         err.puts("#{@flows.evicted} flows evicted; #{@flows.expired} flows expired") if @flows.evicted.positive? || @flows.expired.positive?
         err.puts("#{@ip_reassembler.evicted} fragmented datagrams evicted; #{@ip_reassembler.expired} expired") if @ip_reassembler.evicted.positive? || @ip_reassembler.expired.positive?
       end
@@ -118,11 +130,27 @@ module Redhound
           end
           @flows.account(flow)
         end
+        incomplete = @ip_reassembler.finish
+        err.puts("#{incomplete} incomplete IP datagrams: reassembly_gap at EOF") if incomplete.positive?
         @follow&.format(out)
         snapshot(err)
       ensure
+        original_error = $!
         @finished = true
-        @follow&.close
+        @flows.values.each do |flow|
+          flow.streams.compact.each(&:release)
+          flow.applications.fill(nil)
+          flow.http_methods.each(&:clear)
+          flow.probes.each(&:clear)
+          flow.closed_ns ||= flow.last_ns
+          @flows.account(flow)
+        end
+        @ip_reassembler.finish
+        begin
+          @follow&.close
+        rescue StandardError
+          raise unless original_error
+        end
       end
     end
   end

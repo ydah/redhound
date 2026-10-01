@@ -5,7 +5,7 @@ module Redhound
   # Base class and declarative fixed-header DSL for custom protocols.
   class Dissector
     # Unpack formats and byte lengths supported by the header DSL.
-    TYPES = { uint8: ['C', 1], uint16: ['n', 2], uint32: ['N', 4], uint64: ['Q>', 8],
+    TYPES = { int8: ['c', 1], uint8: ['C', 1], uint16: ['n', 2], uint32: ['N', 4], uint64: ['Q>', 8],
               mac: ['a6', 6], ipv4: ['N', 4], ipv6: ['a16', 16] }.freeze
 
     # Build a single unpack template and its field descriptions.
@@ -27,6 +27,9 @@ module Redhound
         @length += size
         @index += 1
       end
+      # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a signed 8-bit field.
+      def int8(key, name, **opts) = field(:int8, key, name, **opts)
       # @rbs (Symbol key, String name, **untyped opts) -> void
       # Append an unsigned 8-bit field.
       def uint8(key, name, **opts) = field(:uint8, key, name, **opts)
@@ -112,17 +115,28 @@ module Redhound
     def parse(ctx, cursor)
       header = self.class.compiled_header
       length = header&.length || 0
-      raw = cursor.unpack(self.class.header_template, length)
+      truncated = cursor.remaining < length
+      raw = if truncated
+              cursor.bytes(0, cursor.remaining).unpack(self.class.header_template)
+            else
+              cursor.unpack(self.class.header_template, length)
+            end
       defs = header ? header.definitions.dup : Array.new
+      defs.select! { |d| d.offset + d.length <= cursor.remaining } if truncated
       values = {} #: Hash[Symbol, untyped]
       defs.each do |d|
         val = raw[d.index]
         val = ((val >> d.shift) & d.mask) * d.scale if d.shift
         values[d.key] = val
       end
-      layer = Layer.new(self.class.protocol_id, cursor.start, length, cursor.limit,
+      layer = Layer.new(self.class.protocol_id, cursor.start, truncated ? cursor.remaining : length, cursor.limit,
                         definitions: defs, values: values, embedded: ctx.embedded)
-      dissect(ctx, layer)
+      return layer.diagnose(:note, :truncated, "need #{length} header bytes, have #{cursor.remaining}") if truncated
+      begin
+        dissect(ctx, layer)
+      rescue Cursor::Truncated => e
+        layer.diagnose(:note, :truncated, e.message)
+      end
       layer
     end
     # @rbs (Context ctx, Layer layer) -> void

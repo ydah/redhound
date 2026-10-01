@@ -2,6 +2,7 @@
 
 require 'open3'
 require 'stringio'
+require 'tempfile'
 require_relative '../fixtures/generators/analysis'
 
 RSpec.describe 'stateful analysis compared with tshark', :differential do
@@ -74,6 +75,52 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
     session.finish(output, StringIO.new)
     expect(output.string).to eq(reference)
     expect(output.string).to eq("ab\0\xffefghijklmnopqrst".b)
+  end
+
+  it 'matches payload-free SYN and FIN retransmission flags' do
+    frames = [
+      analysis_tcp(seq: 99, flags: 2),
+      analysis_tcp(seq: 99, flags: 2, at: 100_000_000),
+      analysis_tcp(seq: 500, ack: 100, flags: 0x12, reverse: true, at: 200_000_000),
+      analysis_tcp(seq: 500, ack: 100, flags: 0x12, reverse: true, at: 300_000_000),
+      analysis_tcp(seq: 100, ack: 501, at: 400_000_000),
+      analysis_tcp(seq: 100, ack: 501, flags: 0x11, at: 500_000_000),
+      analysis_tcp(seq: 100, ack: 501, flags: 0x11, at: 600_000_000)
+    ]
+    Tempfile.create(['redhound-control-', '.pcap']) do |file|
+      writer = Redhound::File::PcapWriter.new(file)
+      frames.each { |frame| writer.write(frame) }
+      writer.flush
+      output, error, status = Open3.capture3('tshark', '-n', '-r', file.path, '-T', 'fields', '-e', 'tcp.analysis.retransmission')
+      expect(status.success?).to be(true), error
+      expected = output.lines.map { |line| !line.strip.empty? }
+      expect(expected).to eq([false, true, false, true, false, false, true])
+      session = Redhound::Analysis::Session.new(protocol_streams: false)
+      frames.each { |frame| session.update(frame) }
+      expect(frames.map { |frame| frame['tcp.analysis.retransmission'] == true }).to eq(expected)
+      session.finish(StringIO.new, StringIO.new)
+    end
+  end
+
+  it 'matches empty IO intervals between separated packets' do
+    frames = [analysis_tcp(seq: 99, flags: 2), analysis_tcp(seq: 100, at: 3_100_000_000)]
+    Tempfile.create(['redhound-intervals-', '.pcap']) do |file|
+      writer = Redhound::File::PcapWriter.new(file)
+      frames.each { |frame| writer.write(frame) }
+      writer.flush
+      output, error, status = Open3.capture3('tshark', '-n', '-r', file.path, '-q', '-z', 'io,stat,1')
+      expect(status.success?).to be(true), error
+      expected = output.lines.filter_map do |line|
+        match = /\|\s*(\d+)\s*<>\s*(?:Dur|\d+)\s*\|\s*(\d+)\s*\|\s*(\d+)\s*\|/.match(line)
+        [match[1].to_i, [match[2].to_i, match[3].to_i]] if match
+      end.to_h
+      expect(expected.values.map(&:first)).to eq([1, 0, 0, 1])
+      session = Redhound::Analysis::Session.new(stats: ['io,1'])
+      frames.each { |frame| session.update(frame) }
+      actual = session.statistics.first.to_h[:rows].to_h { |row| [row[:interval], row.values_at(:packets, :bytes)] }
+      expect(actual).to eq(expected)
+      session.finish(StringIO.new, StringIO.new)
+    end
   end
 
   it 'matches DNS IP fragments and split HTTP, TLS and DNS TCP fields on completion frames' do

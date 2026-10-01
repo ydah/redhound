@@ -91,3 +91,26 @@ Short aarch64 Linux checks on 2026-10-02, Ruby 3.4.11/YJIT, passed 50,000 pps
 with both backends (500,000 identical frames each) and 80,000 pps with the socket
 backend (800,000 frames), without kernel drops. These are short ARM measurements;
 they do not establish the one-hour ARM, x86_64 or 72-hour acceptance gates.
+
+## Adversarial x86_64 measurements
+
+On 2026-10-02, [run 36882408457](https://github.com/ydah/redhound/actions/runs/36882408457)
+measured an AMD EPYC 9V74 GitHub runner, Ruby 3.4.10/YJIT, one CPU:
+summary 35,526 pps, tree 20,740 pps and filter 182,368 pps. A separate Ruby 4.0.7
+runner measured 27,112 / 16,356 / 163,552 pps respectively. Runner variation
+prevents interpreting those differences as Ruby-version or code improvements.
+All three file throughput targets remain unmet.
+
+[Run 36882895764](https://github.com/ydah/redhound/actions/runs/36882895764)
+used Ruby 3.4 and `--verify-after`: the ring backend saved all 2,000,000 incoming
+600-byte frames at a requested 200,000 pps for ten seconds, with zero kernel
+drops, sequence gaps or invalid frames. The last block drained 51 ms after the
+sender deadline (198,979 pps including that drain). The earlier inline-verifying
+run dropped 401,324 frames; its additional byte-checking load is not a
+capture/write-only measurement.
+
+[Run 36882900621](https://github.com/ydah/redhound/actions/runs/36882900621)
+failed the 80,000 pps socket target on Ruby 4.0: 800,000 frames were sent,
+508,827 saved and 232,576 kernel drops reported, with more data pending after
+the allowed drain. Missing trailing packets count as failure even when they
+cannot appear as an internal sequence gap. Socket throughput remains open.

@@ -7,6 +7,9 @@ module Redhound
     # @api private
     module Format
       MAX_RECORD = 16 * 1024 * 1024
+      MAX_INTERFACES = 4096
+      MAX_INTERFACE_METADATA = 16 * 1024 * 1024
+      MAX_OPTIONS = 4096
       PCAP_MAGICS = {
         "\xd4\xc3\xb2\xa1".b => [:little, 1_000], "\xa1\xb2\xc3\xd4".b => [:big, 1_000],
         "\x4d\x3c\xb2\xa1".b => [:little, 1], "\xa1\xb2\x3c\x4d".b => [:big, 1]
@@ -19,7 +22,11 @@ module Redhound
         raise FileFormatError, "invalid record length #{length}" unless length.between?(0, MAX_RECORD)
         return ''.b if length.zero?
 
-        result = ''.b
+        result = io.read(length)
+        return result if result && result.bytesize == length
+        return nil if eof && (!result || result.empty?)
+
+        result ||= ''.b
         while result.bytesize < length
           part = io.read(length - result.bytesize)
           if !part || part.empty?

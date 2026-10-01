@@ -17,8 +17,8 @@ module Redhound
           bit :mode, 'ntp.flags.mode', 3, enum: MODES
         end
         uint8 :stratum, 'ntp.stratum'
-        uint8 :poll, 'ntp.ppoll'
-        uint8 :precision, 'ntp.precision'
+        int8 :poll, 'ntp.ppoll'
+        int8 :precision, 'ntp.precision'
         uint32 :rootdelay, 'ntp.rootdelay'
         uint32 :rootdispersion, 'ntp.rootdispersion'
         uint32 :refid, 'ntp.refid'
@@ -30,8 +30,6 @@ module Redhound
 
       # @rbs (Context ctx, Layer layer) -> void
       def dissect(ctx, layer)
-        layer.values[:poll] -= 256 if layer[:poll] >= 128
-        layer.values[:precision] -= 256 if layer[:precision] >= 128
         layer.diagnose(:error, :malformed, 'invalid NTP version or mode') unless layer[:vn].between?(1, 4) && layer[:mode].between?(1, 7)
         if ctx.cursor.remaining > 48
           layer.add(:extension, 'ntp.extension', ctx.cursor.bytes(48, ctx.cursor.remaining - 48),

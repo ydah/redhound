@@ -7,7 +7,7 @@ module Redhound
     # @api private
     class Flow
       BASE_BYTES = 4096
-      attr_reader :key, :id, :first_ns, :packets, :bytes, :streams, :applications, :acks, :keep_alives, :http_methods
+      attr_reader :key, :id, :first_ns, :packets, :bytes, :streams, :applications, :acks, :keep_alives, :http_methods, :probes, :probe_disabled
       attr_accessor :last_ns, :closed_ns, :syn_ns, :syn_direction, :synack_ns, :synack_seq, :initial_rtt, :accounted_bytes
       # @rbs (untyped key, Integer id, Integer timestamp_ns) -> void
       def initialize(key, id, timestamp_ns)
@@ -15,13 +15,15 @@ module Redhound
         @packets, @bytes, @streams, @applications, @acks = [0, 0], [0, 0], [nil, nil], [nil, nil], [nil, nil]
         @keep_alives = [false, false]
         @http_methods = [Array.new, Array.new] #: Array[untyped]
+        @probes = [Array.new, Array.new] #: Array[untyped]
+        @probe_disabled = [false, false]
         @closed_ns = @syn_ns = @syn_direction = @synack_ns = @synack_seq = @initial_rtt = nil # @rbs untyped
         @accounted_bytes = BASE_BYTES
       end
       # @rbs () -> bool
       def closed? = !@closed_ns.nil?
       # @rbs () -> Integer
-      def bytesize = BASE_BYTES + @streams.compact.sum(&:bytesize) + @applications.compact.sum(&:bytesize) + @http_methods.sum { |methods| methods.size * 16 }
+      def bytesize = BASE_BYTES + @streams.compact.sum(&:bytesize) + @applications.compact.sum(&:bytesize) + @http_methods.sum { |methods| methods.size * 16 } + @probes.sum { |parts| parts.sum { |data, _frame| data.bytesize * 2 + 128 } }
     end
 
     # @api private
@@ -82,9 +84,14 @@ module Redhound
           stale
         end
       end
-      # @rbs () -> Flow?
-      def evict
-        pair = @entries.shift
+      # @rbs (?Symbol? type) -> Flow?
+      def evict(type = nil)
+        pair = if type
+                 key = @entries.each_key.find { |item| item[0] == type }
+                 key ? [key, @entries.delete(key)] : nil
+               else
+                 @entries.shift
+               end
         return nil unless pair
         @evicted += 1
         discard(pair[1])

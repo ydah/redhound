@@ -50,7 +50,12 @@ module Redhound
           end
         end
       ensure
-        close
+        original_error = $!
+        begin
+          close
+        rescue StandardError
+          raise unless original_error
+        end
       end
       # @rbs () -> void
       def close = @file.close!

@@ -18,7 +18,7 @@ module Redhound
         return layer.diagnose(:error, :malformed, 'unsupported GRE version or routing') unless (flags & 0x4007).zero?
         len += 4 if flags & 0x8000 != 0
         if flags & 0x2000 != 0
-          layer.add(:key, 'gre.key', ctx.cursor.u32(len))
+          layer.add(:key, 'gre.key', ctx.cursor.u32(len), offset: len, length: 4)
           len += 4
         end
         len += 4 if flags & 0x1000 != 0
@@ -38,7 +38,7 @@ module Redhound
       end
       # @rbs (Context ctx, Layer layer) -> void
       def dissect(ctx, layer)
-        layer.add(:vni, 'vxlan.vni', layer[:vni_word] >> 8)
+        layer.add(:vni, 'vxlan.vni', layer[:vni_word] >> 8, offset: 4, length: 3)
         layer.diagnose(:error, :malformed, 'VXLAN I flag is unset') if layer[:flags] & 0x08000000 == 0
       end
       # @rbs (Context ctx, Layer layer) -> untyped

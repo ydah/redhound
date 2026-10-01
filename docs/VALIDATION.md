@@ -1,8 +1,76 @@
 # Release validation
 
+## Adversarial review after rc1
+
+The review checked the design, roadmap, work procedures and phase0 patch against
+the running implementation, rather than treating a green test suite as proof
+that every acceptance gate had passed. Reproduced failures included truncated
+headers losing readable fields, incorrect ICMP error fields and dynamic field
+locations, missed split HTTP identification, unreported reassembly loss at EOF
+and flow eviction, underestimated Ruby buffer capacity, unbounded pcapng
+metadata, source timeout violations and capture writer descriptor leaks.
+Regression checks accompany the fixes.
+
+The parser fuzz now retains each fixture's real link type during structured
+mutations. This prevents tests from stopping at an unrelated link header before
+reaching the mutated protocol. `ruby bench/analysis.rb` exercises default state
+limits with 60,000 conversations, 40,000 fragmented datagram identities and 80
+large TCP streams, checking every update and final buffer release. Its retained
+state accounting includes String capacity and object storage. Process RSS is
+reported separately: Ruby may retain allocator pages after state is released.
+
+The manual [Live acceptance workflow](../.github/workflows/acceptance.yml) and
+`bench/live.rb` record requested/sent/captured counts, gaps, byte digests, kernel
+timestamps, drops, RSS and descriptor counts. An insufficient sender rate fails
+the check. Controlled aarch64 runs passed 50,000 pps with simultaneous socket and
+ring capture and 80,000 pps with socket capture for ten seconds. These short
+checks do not replace the hour-long comparison or the x86_64 targets.
+
+Final local runtime validation on 2026-10-02 passed all 244 non-live examples on
+Linux, with only the macOS-specific interface test skipped. The complete macOS
+Rake task passed its 244 examples (20 tshark comparisons are run on Linux), RBS
+generation and Steep. Coverage gates passed; Linux measured 92.43% total line
+coverage. The strengthened one-million-case parser fuzz completed without an
+exception. Default state-pressure checks reached exactly 256 MiB accounted
+state without exceeding it and released IP/TCP buffers at EOF. Native RSS
+reached 308 MiB despite retaining only 107 MiB of Ruby heap before finalization;
+this is not reported as a 256 MiB process-RSS guarantee.
+
+Ruby 4.0 introduced an additional restriction in
+[`IO::Buffer.map`](https://docs.ruby-lang.org/en/4.0/IO/Buffer.html#method-c-map):
+it rejects files with zero size even when a mapping size is supplied. Linux
+AF_PACKET sockets have zero file size, so the pure-Ruby ring backend cannot map
+them on that runtime. Ruby 3.3/3.4 ring support remains available; Ruby 4.0 uses
+the socket backend. No C extension or Fiddle workaround is introduced. Ring
+availability on Ruby 4.0 remains an upstream API constraint on full acceptance.
+
+Long-running controlled tests started at 2026-10-01 14:55:57 UTC with a frozen
+capture implementation digest
+`084591da70d195146b37aff76de7ec9495085d045684decc26da6c34c4ebc20e`:
+
+| Check | Requested workload | Evidence directory | Earliest completion |
+| --- | --- | --- | --- |
+| aarch64 socket/ring comparison | 50,000 pps, 3,600 seconds | `tmp/acceptance-arm-hour-final` | 2026-10-01 15:55:58 UTC |
+| Bounded ring pcapng rotation | 100 pps, 259,200 seconds | `tmp/acceptance-rotation-72h-final` | 2026-10-04 14:55:58 UTC |
+
+These directories contain local private captures and are excluded from Git.
+Completion requires the final `result.json` to pass, inspection of the periodic
+resource samples, and successful external validation of rotated files. The
+controlled veth soak does not establish the separate busy physical-interface
+24-hour gate. Results and unfulfilled conditions are recorded explicitly below.
+
+The physical macOS en0 interface is active, but `/dev/bpf*` requires administrator
+access and `sudo -n` requires a password in this environment. The user could not
+start the privileged run, so the 24-hour physical-interface check has not begun.
+An independent three-second observation measured approximately 82 packets/s and
+21 kB/s; it does not establish a busy workload. `bench/soak.rb` is ready to record
+24-hour elapsed time, bounded private pcapng rotation, traffic rates, RSS and
+descriptor counts once capture privileges are available. Its one-second Linux
+smoke and interrupted-run checks passed, including capinfos/tshark file checks.
+
 ## 2.0.0.rc1
 
-The implementation covers the v2 roadmap: the packet/dissector API, network and
+The release candidate implements the functional parts of the v2 roadmap: the packet/dissector API, network and
 application protocols, Ruby cBPF compiler/VM, Linux socket/ring and macOS BPF
 backends, capture files/rotation/privilege drop, bounded stateful analysis,
 statistics, follow output and documentation. This is a release candidate,

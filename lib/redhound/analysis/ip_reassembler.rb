@@ -12,6 +12,7 @@ module Redhound
         raise ArgumentError, 'fragment limits must be positive' unless max_bytes.positive? && timeout_ns.positive?
         @max_bytes, @timeout_ns, @clock, @evicted, @expired = max_bytes, timeout_ns, 0, 0, 0
         @next_sweep = 0
+        @bytes = 0
         @entries, @discarded = {}, {} # @rbs untyped
       end
       # @rbs (Packet packet) -> untyped
@@ -21,6 +22,8 @@ module Redhound
           if layer.protocol == :ipv4 && layer[:src] && layer[:dst] && (layer[:mf] == 1 || layer[:frag_offset].to_i.positive?)
             return [layer, layer, [4, layer[:src], layer[:dst], layer[:proto], layer[:id]], layer[:frag_offset], layer[:mf] == 1]
           elsif layer.protocol == :ipv6_ext && layer[:type] == 44 && layer[:fragment_offset] && layer[:identification]
+            # RFC 6946: atomic fragments bypass queued fragments and tombstones.
+            next if layer[:fragment_offset].zero? && layer[:more] == 0
             network = layers.take(index).reverse.find { |item| item.protocol == :ipv6 }
             return [network, layer, [6, network[:src], network[:dst], layer[:identification]], layer[:fragment_offset], layer[:more] == 1] if network && network[:src] && network[:dst]
           end
@@ -38,7 +41,7 @@ module Redhound
         length = network.payload_end - fragment.payload_offset
         if offset + length > 65_535 || length.negative? || (more && (length.zero? || length % 8 != 0))
           fragment.diagnose(:error, :malformed, 'invalid IP fragment size or offset')
-          @entries.delete(key)
+          remove(key)
           return nil
         end
         if network.diagnostics.any? { |diagnostic| diagnostic.code == :truncated }
@@ -46,7 +49,7 @@ module Redhound
           return nil
         end
         data = packet.data.byteslice(fragment.payload_offset, length) #: String
-        state = @entries.delete(key) || { parts: Array.new, frames: Array.new, header: nil, next_offset: 6, next: fragment[:next], end: nil } #: untyped
+        state = remove(key) || { parts: Array.new, frames: Array.new, header: nil, next_offset: 6, next: fragment[:next], end: nil } #: untyped
         if key[0] == 6 && state[:next] != fragment[:next]
           fragment.diagnose(:error, :malformed, 'IPv6 fragments have inconsistent next headers')
           return nil
@@ -58,11 +61,13 @@ module Redhound
           fragment.diagnose(:warning, :fragment_overlap, 'overlapping IP fragments')
           if key[0] == 6
             @discarded[key] = @clock
+            @bytes += 128
             while @discarded.size > [4096, @max_bytes / 128].min
               @discarded.shift
+              @bytes -= 128
               @evicted += 1
             end
-            while bytesize > @max_bytes && @entries.shift
+            while bytesize > @max_bytes && remove_oldest
               @evicted += 1
             end
             return nil
@@ -103,12 +108,13 @@ module Redhound
           end
         end
         @entries[key] = state
+        @bytes += state_bytesize(state)
         if complete?(state)
-          @entries.delete(key)
+          remove(key)
           return virtual_packet(packet, state, key[0])
         end
         while bytesize > @max_bytes
-          removed = @entries.shift
+          removed = remove_oldest
           break unless removed
           @evicted += 1
           fragment.diagnose(:warning, :reassembly_gap, 'IP reassembly memory limit exceeded')
@@ -158,16 +164,43 @@ module Redhound
         @next_sweep = now_ns + 1_000_000_000
         @entries.delete_if do |_key, state|
           stale = now_ns - state[:time] >= @timeout_ns
-          @expired += 1 if stale
+          if stale
+            @expired += 1
+            @bytes -= state_bytesize(state)
+          end
           stale
         end
-        @discarded.delete_if { |_key, time| now_ns - time >= @timeout_ns }
+        @discarded.delete_if do |_key, time|
+          stale = now_ns - time >= @timeout_ns
+          @bytes -= 128 if stale
+          stale
+        end
       end
       # @rbs () -> Integer
-      def bytesize
-        @discarded.size * 128 + @entries.values.sum do |state|
-          512 + (state[:header]&.bytesize || 0) + state[:frames].size * 32 + state[:parts].sum { |_pos, bytes| bytes.bytesize + 128 }
-        end
+      def bytesize = @bytes
+      # @rbs (untyped state) -> Integer
+      def state_bytesize(state)
+        512 + (state[:header]&.bytesize || 0) * 2 + state[:frames].size * 32 + state[:parts].sum { |_pos, bytes| bytes.bytesize * 2 + 168 }
+      end
+      # @rbs (untyped key) -> untyped
+      def remove(key)
+        state = @entries.delete(key)
+        @bytes -= state_bytesize(state) if state
+        state
+      end
+      # @rbs () -> untyped
+      def remove_oldest
+        pair = @entries.shift
+        @bytes -= state_bytesize(pair[1]) if pair
+        pair
+      end
+      # @rbs () -> Integer
+      def finish
+        incomplete = @entries.size
+        @entries.clear
+        @discarded.clear
+        @bytes = 0
+        incomplete
       end
       # @rbs () -> Integer
       def size = @entries.size

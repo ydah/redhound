@@ -37,11 +37,15 @@ module Redhound
 
       # @rbs () -> Array[Interface]
       def self.all
-        Socket.getifaddrs.uniq(&:name).map do |address|
+        addresses = Socket.getifaddrs
+        addresses.uniq(&:name).map do |address|
           index = address.ifindex || 0
           interface = new(name: address.name, index:, flags: address.flags)
           if RUBY_PLATFORM.include?('linux')
             Linux::Ifreq.interface(address.name, index:)
+          elsif RUBY_PLATFORM.include?('darwin')
+            link = addresses.find { |entry| entry.name == address.name && entry.addr&.afamily == 18 }
+            Bsd::Ifreq.interface(address.name, index:, flags: address.flags, link_address: link&.addr&.to_sockaddr)
           else
             interface
           end

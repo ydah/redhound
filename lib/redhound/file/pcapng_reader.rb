@@ -17,6 +17,7 @@ module Redhound
         @packet_counts = {} #: Hash[Integer, Integer]
         @stats = Capture::Stats.new
         @number = 0
+        @interface_metadata = 0
         @magic = magic
         @integer_format = 'V'
         read_block
@@ -88,10 +89,11 @@ module Redhound
       # @rbs (String body) -> void
       def read_interface(body)
         require_size(body, 8)
+        raise FileFormatError, 'pcapng interface limit exceeded' if @interfaces.size >= Format::MAX_INTERFACES
         linktype, _reserved, snaplen = body.unpack(@integer_format == 'V' ? 'vvV' : 'nnN') #: [Integer, Integer, Integer]
         raise FileFormatError, 'invalid pcapng snaplen' if snaplen > Format::MAX_RECORD
 
-        opts = options(body, 8)
+        opts = options(body, 8, [2, 3, 9, 11, 14])
         resolution = opts.fetch(9, ["\x06".b]).fetch(0)
         raise FileFormatError, 'invalid pcapng timestamp resolution' unless resolution.bytesize == 1
 
@@ -105,6 +107,11 @@ module Redhound
         interface = Capture::Interface.new(name: opts.fetch(2, ["interface#{index}"]).fetch(0), index:, linktype:, snaplen:,
                                            description: opts[3]&.first, filter: filter_option && filter_option.getbyte(0) == 0 ? filter_option.byteslice(1..) : nil,
                                            meta: { timestamp_units: units, timestamp_offset: offset.unpack1(@integer_format == 'V' ? 'q<' : 'q>') })
+        metadata_size = 512 + interface.name.bytesize + (interface.description&.bytesize || 0) + (interface.filter&.bytesize || 0)
+        if @interface_metadata + metadata_size > Format::MAX_INTERFACE_METADATA
+          raise FileFormatError, 'pcapng interface metadata limit exceeded'
+        end
+        @interface_metadata += metadata_size
         @section_interfaces << interface
         @interfaces << interface
       end
@@ -116,7 +123,7 @@ module Redhound
         interface = interface_at(index)
         Format.check_lengths(caplen, original_length, interface.snaplen)
         require_size(body, 20 + Format.padded(caplen))
-        opts = options(body, 20 + Format.padded(caplen))
+        opts = options(body, 20 + Format.padded(caplen), [1, 2])
         flags_option = opts[2]&.first
         raise FileFormatError, 'invalid pcapng packet flags' if flags_option && flags_option.bytesize != 4
 
@@ -150,7 +157,7 @@ module Redhound
         require_size(body, 12)
         index = body.unpack1(@integer_format) #: Integer
         interface = interface_at(index)
-        opts = options(body, 12)
+        opts = options(body, 12, [4, 5, 7, 8])
         values = {} #: Hash[Symbol, Integer]
         { received: 4, dropped: 5, if_dropped: 7, captured: 8 }.each do |name, code|
           option = opts[code]&.first
@@ -181,9 +188,10 @@ module Redhound
         @section_interfaces.fetch(index) { raise FileFormatError, "pcapng references unknown interface #{index}" }
       end
 
-      # @rbs (String body, Integer offset) -> Hash[Integer, Array[String]]
-      def options(body, offset)
+      # @rbs (String body, Integer offset, Array[Integer] allowed) -> Hash[Integer, Array[String]]
+      def options(body, offset, allowed)
         result = {} #: Hash[Integer, Array[String]]
+        count = 0
         while offset < body.bytesize
           require_size(body, offset + 4)
           code, length = body.unpack(@integer_format == 'V' ? 'vv' : 'nn', offset:) #: [Integer, Integer]
@@ -192,9 +200,13 @@ module Redhound
             raise FileFormatError, 'invalid pcapng end of options' unless length.zero?
             break
           end
+          count += 1
+          raise FileFormatError, 'pcapng option count limit exceeded' if count > Format::MAX_OPTIONS
           require_size(body, offset + Format.padded(length))
-          value = body.byteslice(offset, length) #: String
-          (result[code] ||= []) << value
+          if allowed.include?(code)
+            value = body.byteslice(offset, length) #: String
+            (result[code] ||= []) << value
+          end
           offset += Format.padded(length)
         end
         result

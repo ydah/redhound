@@ -26,9 +26,9 @@ module Redhound
         value
       end
       # @rbs (Integer ns) -> String
-      def fraction(ns) = Kernel.format(@precision == :nano ? '%09d' : '%06d', @precision == :nano ? ns.abs % 1_000_000_000 : (ns.abs % 1_000_000_000) / 1000)
+      def fraction(ns) = Kernel.format(@precision == :nano ? '%09d' : '%06d', @precision == :nano ? ns % 1_000_000_000 : (ns % 1_000_000_000) / 1000)
       # @rbs (Integer ns) -> String
-      def seconds(ns) = "#{ns.negative? ? '-' : ''}#{ns.abs / 1_000_000_000}.#{fraction(ns)}"
+      def seconds(ns) = "#{ns.negative? ? '-' : ''}#{ns.abs / 1_000_000_000}.#{fraction(ns.abs)}"
     end
   end
 end

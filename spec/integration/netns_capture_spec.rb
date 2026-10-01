@@ -25,8 +25,14 @@ RSpec.describe 'Linux veth and VLAN capture', :live do
     port = receiver.addr[1]
     marker = "redhound-netns-#{Process.pid}"
     %i[socket ring].each do |backend|
-      sources << Redhound::Capture.open(interface: 'rh0', backend:, direction: :in, snaplen: 40,
-                                        promiscuous: false, filter: "udp dst port #{port}")
+      begin
+        sources << Redhound::Capture.open(interface: 'rh0', backend:, direction: :in, snaplen: 40,
+                                          promiscuous: false, filter: "udp dst port #{port}")
+      rescue Redhound::UnsupportedPlatform => error
+        raise unless backend == :ring
+
+        skip "socket/ring differential test unavailable: #{error.message}"
+      end
     end
     send_udp('10.99.0.1', port, marker)
     socket_packet, ring_packet = sources.map { |source| source.next_packet(timeout: 2) }

@@ -8,7 +8,8 @@ module Redhound
     class Tree
       # @rbs (Packet packet, untyped io) -> void
       def format(packet, io)
-        io.write("Frame #{packet.number}: #{packet.original_length} bytes on wire, #{packet.caplen} captured, #{packet.time.utc.strftime('%Y-%m-%d %H:%M:%S')}.#{Kernel.format('%09d', packet.time.nsec)}\n")
+        interface = packet.interface ? safe([packet.interface.name, packet.direction&.to_s&.capitalize].compact.join(' ')) + ', ' : ''
+        io.write("Frame #{packet.number}: #{packet.original_length} bytes on wire, #{packet.caplen} captured, #{interface}#{packet.time.utc.strftime('%Y-%m-%d %H:%M:%S')}.#{Kernel.format('%09d', packet.time.nsec)}\n")
         packet.layers.each_with_index do |layer, depth|
           klass = Registry.default.protocols[layer.protocol]
           indent = '   ' * depth

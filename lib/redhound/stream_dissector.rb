@@ -58,7 +58,7 @@ module Redhound
     end
 
     # @rbs () -> Integer
-    def bytesize = @buffers.sum(&:bytesize) + @origins.sum { |origins| origins.size * 64 }
+    def bytesize = @buffers.sum { |buffer| buffer.empty? ? 0 : buffer.bytesize * 2 + 40 } + @origins.sum { |origins| origins.size * 128 }
 
     # @rbs (Integer direction, Integer length) -> Array[Integer]
     def consume_origins(direction, length)
@@ -108,7 +108,7 @@ module Redhound
       response = header.start_with?('HTTP/')
       status = response ? header.split(' ', 3)[1].to_i : 0
       return head_end if response && (head_response || status.between?(100, 199) || [204, 304].include?(status))
-      lengths = header.scan(/\r\ncontent-length:[ \t]*([^\r\n]*)/in).flatten.flat_map { |value| value.split(',').map(&:strip) }
+      lengths = header.scan(/\r\ncontent-length:[ \t]*([^\r\n]*)/in).flatten.flat_map { |value| value.empty? ? [''] : value.split(',', -1).map(&:strip) }
       transfer = header.scan(/\r\ntransfer-encoding:[ \t]*([^\r\n]*)/in).flatten.join(',').downcase.split(',').map(&:strip)
       if (!lengths.empty? && !transfer.empty?) || lengths.uniq.size > 1 || lengths.any? { |value| !value.match?(/\A[0-9]+\z/n) }
         return head_end # The packet parser reports conflicting or invalid framing.

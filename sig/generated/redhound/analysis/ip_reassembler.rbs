@@ -33,6 +33,18 @@ module Redhound
       # @rbs () -> Integer
       def bytesize: () -> Integer
 
+      # @rbs (untyped state) -> Integer
+      def state_bytesize: (untyped state) -> Integer
+
+      # @rbs (untyped key) -> untyped
+      def remove: (untyped key) -> untyped
+
+      # @rbs () -> untyped
+      def remove_oldest: () -> untyped
+
+      # @rbs () -> Integer
+      def finish: () -> Integer
+
       # @rbs () -> Integer
       def size: () -> Integer
     end

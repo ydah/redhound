@@ -26,12 +26,16 @@ module Redhound
         opts = { 3 => RUBY_PLATFORM, 4 => "Redhound #{VERSION}" }
         opts[1] = comment if comment
         write_block(0x0a0d0d0a, [0x1a2b3c4d, 1, 0, 0xffff_ffff_ffff_ffff].pack('VvvQ<') + options(opts))
+      rescue StandardError, Interrupt
+        @io.close if @owned && @io && !@io.closed?
+        raise
       end
 
       # @rbs (Packet packet) -> self
       def write(packet)
         raise IOError, 'writer is closed' if @closed
         raise FileFormatError, 'pcapng timestamp must be nonnegative' if packet.timestamp_ns.negative?
+        raise FileFormatError, 'packet original length exceeds unsigned 32-bit range' unless packet.original_length <= 0xffff_ffff
 
         index = ensure_interface(packet)
         data = packet.data.byteslice(0, @snaplen)
@@ -76,20 +80,23 @@ module Redhound
       def close
         return if @closed
 
-        @interfaces.each_value do |index|
-          stats = @statistics[index]
-          start_time, end_time = @start_times.fetch(index, 0), @end_times.fetch(index, 0)
-          opts = { 2 => timestamp_words(start_time), 3 => timestamp_words(end_time),
-                   8 => [@counts.fetch(index, 0)].pack('Q<') }
-          if stats
-            opts[4], opts[5], opts[7] = [stats.received].pack('Q<'), [stats.dropped].pack('Q<'), [stats.if_dropped].pack('Q<')
-            opts[6] = [stats.captured].pack('Q<')
+        begin
+          @interfaces.each_value do |index|
+            stats = @statistics[index]
+            start_time, end_time = @start_times.fetch(index, 0), @end_times.fetch(index, 0)
+            opts = { 2 => timestamp_words(start_time), 3 => timestamp_words(end_time),
+                     8 => [@counts.fetch(index, 0)].pack('Q<') }
+            if stats
+              opts[4], opts[5], opts[7] = [stats.received].pack('Q<'), [stats.dropped].pack('Q<'), [stats.if_dropped].pack('Q<')
+              opts[6] = [stats.captured].pack('Q<')
+            end
+            write_block(5, [index].pack('V') + timestamp_words(end_time) + options(opts))
           end
-          write_block(5, [index].pack('V') + timestamp_words(end_time) + options(opts))
+          @io.flush
+        ensure
+          @closed = true
+          @io.close if @owned && !@io.closed?
         end
-        @io.flush
-        @io.close if @owned
-        @closed = true
       end
 
       private
@@ -99,14 +106,15 @@ module Redhound
         interface = packet.interface
         key = [interface&.object_id || 0, packet.linktype]
         return @interfaces[key] if @interfaces.key?(key)
+        raise FileFormatError, 'pcapng interface limit exceeded' if @interfaces.size >= Format::MAX_INTERFACES
 
         index = @interfaces.size
-        @interfaces[key] = index
         opts = { 2 => interface&.name || "interface#{index}", 9 => "\x09".b, 12 => RUBY_PLATFORM }
         opts[3] = interface.description if interface&.description
-        expression = interface&.filter || @filter
+        expression = @filter || interface&.filter
         opts[11] = "\0" + expression if expression
         write_block(1, [packet.linktype, 0, @snaplen].pack('vvV') + options(opts))
+        @interfaces[key] = index
         index
       end
 

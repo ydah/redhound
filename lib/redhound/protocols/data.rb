@@ -6,11 +6,13 @@ module Redhound
   module Protocols
     # @api private
     class Data < Dissector
+      LENGTH_FIELD = FieldDefinition.new(:length, 'data.len', :uint, 0, 0, 0, nil, nil, 1, nil, nil)
       protocol :data, name: 'Data', short: 'DATA'
       # @rbs (Context ctx, Layer layer) -> void
       def dissect(ctx, layer)
         length = ctx.cursor.remaining
-        layer.add(:length, 'data.len', length)
+        layer.definitions << LENGTH_FIELD
+        layer.values[:length] = length
         layer.add(:data, 'data.data', ctx.cursor.bytes(0, length), type: :bytes, length: length)
         layer.payload_offset = layer.payload_end
       end

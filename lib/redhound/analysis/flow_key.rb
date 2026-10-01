@@ -27,7 +27,13 @@ module Redhound
                     layers.reverse.find { |item| %i[ipv4 ipv6].include?(item.protocol) }
                   end
         return nil unless network && network[:src] && network[:dst]
-        proto = type || (transport ? transport.protocol : network.protocol)
+        proto = type || transport&.protocol
+        unless proto
+          position = layers.index(network) #: Integer
+          extensions = layers.drop(position + 1).take_while { |item| item.protocol == :ipv6_ext }
+          number = network.protocol == :ipv4 ? network[:proto] : extensions.last&.[](:next) || network[:nxt]
+          proto = "ip_proto_#{number}".to_sym
+        end
         if %i[tcp udp].include?(proto)
           return nil unless transport && transport[:srcport] && transport[:dstport]
           ports = [transport[:srcport], transport[:dstport]]

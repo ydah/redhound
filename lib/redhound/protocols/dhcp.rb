@@ -53,7 +53,7 @@ module Redhound
         end
         options.each do |code, entries|
           value = entries.map { |entry| entry[0] }.join
-          decode_option(layer, code, value, entries.first[1])
+          decode_option(layer, code, value, entries)
         end
       rescue Cursor::Truncated => e
         layer.diagnose(:note, :truncated, e.message)
@@ -83,37 +83,53 @@ module Redhound
         end
       end
 
-      # @rbs (Layer layer, Integer code, String value, Integer offset) -> void
-      def decode_option(layer, code, value, offset)
+      # @rbs (Layer layer, Integer code, String value, untyped entries) -> void
+      def decode_option(layer, code, value, entries)
+        offset = entries.first[1]
         length = value.bytesize
         if ADDRESS_OPTIONS.key?(code)
           valid = length.positive? && length % 4 == 0 && (![1, 50, 54].include?(code) || length == 4)
           return layer.diagnose(:error, :bad_length, "invalid DHCP option #{code} length") unless valid
           (length / 4).times do |i|
-            put(layer, "dhcp.option.#{ADDRESS_OPTIONS[code]}", value.unpack1('N', offset: i * 4), :ipv4, offset + i * 4, 4)
+            put(layer, "dhcp.option.#{ADDRESS_OPTIONS[code]}", value.unpack1('N', offset: i * 4), :ipv4, offset + i * 4, 4, entries)
           end
         else
           case code
           when 53, 52
             return layer.diagnose(:error, :bad_length, "invalid DHCP option #{code} length") unless length == 1
-            put(layer, code == 53 ? 'dhcp.option.dhcp' : 'dhcp.option.overload', value.getbyte(0), :uint, offset, 1)
+            put(layer, code == 53 ? 'dhcp.option.dhcp' : 'dhcp.option.overload', value.getbyte(0), :uint, offset, 1, entries)
           when 51
             return layer.diagnose(:error, :bad_length, 'invalid DHCP lease length') unless length == 4
-            put(layer, 'dhcp.option.ip_address_lease_time', value.unpack1('N'), :uint, offset, 4)
+            put(layer, 'dhcp.option.ip_address_lease_time', value.unpack1('N'), :uint, offset, 4, entries)
           when 55
-            length.times { |i| put(layer, 'dhcp.option.request_list_item', value.getbyte(i), :uint, offset + i, 1) }
+            length.times { |i| put(layer, 'dhcp.option.request_list_item', value.getbyte(i), :uint, offset + i, 1, entries) }
           when 61
             return layer.diagnose(:error, :bad_length, 'DHCP client ID must include type and identifier') if length < 2
-            put(layer, 'dhcp.option.client_id', value, :bytes, offset, length)
-            put(layer, 'dhcp.option.client_id.type', value.getbyte(0), :uint, offset, 1)
-            put(layer, 'dhcp.option.client_id.hw_mac_addr', value.byteslice(1, 6), :mac, offset + 1, 6) if length == 7 && value.getbyte(0) == 1
-          when 12 then put(layer, 'dhcp.option.hostname', value, :string, offset, length)
+            put(layer, 'dhcp.option.client_id', value, :bytes, offset, length, entries)
+            put(layer, 'dhcp.option.client_id.type', value.getbyte(0), :uint, offset, 1, entries)
+            put(layer, 'dhcp.option.client_id.hw_mac_addr', value.byteslice(1, 6), :mac, offset + 1, 6, entries) if length == 7 && value.getbyte(0) == 1
+          when 12 then put(layer, 'dhcp.option.hostname', value, :string, offset, length, entries)
           end
         end
       end
 
-      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
-      def put(layer, name, value, type, offset, length)
+      # @rbs (untyped entries, Integer logical) -> Integer
+      def wire_offset(entries, logical)
+        entries.each do |bytes, pos|
+          return pos + logical if logical < bytes.bytesize
+          logical -= bytes.bytesize
+        end
+        entries.last[1] + entries.last[0].bytesize
+      end
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length, ?untyped entries) -> void
+      def put(layer, name, value, type, offset, length, entries = nil)
+        if entries
+          logical = offset - entries.first[1]
+          first = wire_offset(entries, logical)
+          ending = length.zero? ? first : wire_offset(entries, logical + length - 1) + 1
+          offset, length = first, ending - first
+        end
         layer.add("#{name}_#{layer.definitions.length}".to_sym, name, value, type: type, offset: offset, length: length)
       end
 

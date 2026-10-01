@@ -28,6 +28,13 @@ module Redhound
         # @rbs () -> void
         def close: () -> void
 
+        # Positive filter returns select packets; the source applies its configured snaplen.
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> Array[[Integer, Integer, Integer, Integer]]
+        def receive_filter: (Array[[ Integer, Integer, Integer, Integer ]] instructions) -> Array[[ Integer, Integer, Integer, Integer ]]
+
+        # @rbs () -> void
+        def warn_vlan_offload: () -> void
+
         # @rbs () -> void
         def close_resources: () -> void
 

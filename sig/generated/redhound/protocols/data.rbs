@@ -5,6 +5,8 @@ module Redhound
   module Protocols
     # @api private
     class Data < Dissector
+      LENGTH_FIELD: untyped
+
       # @rbs (Context ctx, Layer layer) -> void
       def dissect: (Context ctx, Layer layer) -> void
 

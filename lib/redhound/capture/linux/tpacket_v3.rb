@@ -11,7 +11,10 @@ module Redhound
         # @rbs (?timeout: Numeric?) -> Packet?
         def next_packet(timeout: nil)
           deadline = deadline_for(timeout)
+          polled = false
           until @stopped || @closed
+            return nil if polled && deadline && Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+            polled = true
             unless @pending_count.positive?
               base = @current_block * @block_size
               unless (u32(base + 8) & Constants::TP_STATUS_USER).positive?
@@ -102,6 +105,8 @@ module Redhound
           begin
             Warning[:experimental] = false
             @ring = IO::Buffer.map(@socket, @block_size * @block_count, 0)
+          rescue ArgumentError => error
+            raise UnsupportedPlatform, "Ruby #{RUBY_VERSION} IO::Buffer.map cannot map a packet socket: #{error.message}"
           ensure
             Warning[:experimental] = experimental
           end

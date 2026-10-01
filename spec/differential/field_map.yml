@@ -59,6 +59,9 @@
 - {name: ntp.flags.mode, normalize: int}
 - {name: ntp.stratum, normalize: int}
 - {name: ntp.precision, normalize: int}
+# NTP's API preserves the unsigned 32.32 wire timestamp; tshark renders UTC.
+# The controlled fixture lies in NTP era 0 and normalization truncates to ns.
+- {name: ntp.xmt, normalize: ntp_timestamp}
 - {name: http.request.method, normalize: string}
 - {name: http.request.uri, normalize: string}
 - {name: http.request.version, normalize: string}

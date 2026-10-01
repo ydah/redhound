@@ -1,4 +1,4 @@
-Frame 1: 315 bytes on wire, 315 captured, 2023-11-14 22:13:20.000000000
+Frame 1: 315 bytes on wire, 315 captured, pcap, 2023-11-14 22:13:20.000000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -97,7 +97,7 @@ Frame 1: 315 bytes on wire, 315 captured, 2023-11-14 22:13:20.000000000
             dns.srv.weight: 2
             dns.srv.port: 443
             dns.srv.target: service.example.test
-Frame 2: 128 bytes on wire, 128 captured, 2023-11-14 22:13:20.001000000
+Frame 2: 128 bytes on wire, 128 captured, pcap, 2023-11-14 22:13:20.001000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -163,7 +163,7 @@ Frame 2: 128 bytes on wire, 128 captured, 2023-11-14 22:13:20.001000000
             dns.resp.edns0_version: 0
             dns.resp.z: 32768
             dns.resp.z.do: true
-Frame 3: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.002000000
+Frame 3: 72 bytes on wire, 72 captured, pcap, 2023-11-14 22:13:20.002000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -208,7 +208,7 @@ Frame 3: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.002000000
             dns.qry.type: 1
             dns.qry.class: 1
             dns.qry.qu: false
-Frame 4: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.003000000
+Frame 4: 72 bytes on wire, 72 captured, pcap, 2023-11-14 22:13:20.003000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -249,7 +249,7 @@ Frame 4: 72 bytes on wire, 72 captured, 2023-11-14 22:13:20.003000000
             dns.qry.name: example.test
             dns.qry.type: 1
             dns.qry.class: 1
-Frame 5: 292 bytes on wire, 292 captured, 2023-11-14 22:13:20.004000000
+Frame 5: 292 bytes on wire, 292 captured, pcap, 2023-11-14 22:13:20.004000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -299,7 +299,7 @@ Frame 5: 292 bytes on wire, 292 captured, 2023-11-14 22:13:20.004000000
             dhcp.option.value: 686f7374
             dhcp.option.dhcp: 1
             dhcp.option.hostname: host
-Frame 6: 90 bytes on wire, 90 captured, 2023-11-14 22:13:20.005000000
+Frame 6: 90 bytes on wire, 90 captured, pcap, 2023-11-14 22:13:20.005000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -339,7 +339,7 @@ Frame 6: 90 bytes on wire, 90 captured, 2023-11-14 22:13:20.005000000
             ntp.org: 0
             ntp.rec: 0
             ntp.xmt: 16750372456547483648
-Frame 7: 96 bytes on wire, 96 captured, 2023-11-14 22:13:20.006000000
+Frame 7: 96 bytes on wire, 96 captured, pcap, 2023-11-14 22:13:20.006000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -385,7 +385,7 @@ Frame 7: 96 bytes on wire, 96 captured, 2023-11-14 22:13:20.006000000
             http.request.uri: /test
             http.request.version: HTTP/1.1
             http.host: example.test
-Frame 8: 95 bytes on wire, 95 captured, 2023-11-14 22:13:20.007000000
+Frame 8: 95 bytes on wire, 95 captured, pcap, 2023-11-14 22:13:20.007000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -432,7 +432,7 @@ Frame 8: 95 bytes on wire, 95 captured, 2023-11-14 22:13:20.007000000
             http.response.phrase: OK
             http.content_length: 3
             http.file_data: 616263
-Frame 9: 145 bytes on wire, 145 captured, 2023-11-14 22:13:20.008000000
+Frame 9: 145 bytes on wire, 145 captured, pcap, 2023-11-14 22:13:20.008000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -496,7 +496,7 @@ Frame 9: 145 bytes on wire, 145 captured, 2023-11-14 22:13:20.008000000
             tls.handshake.extension.len: 5
             tls.handshake.extensions.supported_version: 772
             tls.handshake.extensions.supported_version: 771
-Frame 10: 109 bytes on wire, 109 captured, 2023-11-14 22:13:20.009000000
+Frame 10: 109 bytes on wire, 109 captured, pcap, 2023-11-14 22:13:20.009000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01

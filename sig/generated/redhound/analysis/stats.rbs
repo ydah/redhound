@@ -38,6 +38,9 @@ module Redhound
 
         # @rbs () -> Hash[Symbol, untyped]
         def to_h: () -> Hash[Symbol, untyped]
+
+        # @rbs (Integer interval) -> Hash[Symbol, Integer]
+        def interval_row: (Integer interval) -> Hash[Symbol, Integer]
       end
 
       # @api private

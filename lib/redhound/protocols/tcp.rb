@@ -53,17 +53,25 @@ module Redhound
           return layer.diagnose(:error, :bad_length, 'truncated TCP option') if pos + 2 > hlen
           len = cursor.u8(pos + 1)
           return layer.diagnose(:error, :bad_length, 'invalid TCP option length') if len < 2 || pos + len > hlen
+          valid = case kind
+                  when 2 then len == 4
+                  when 3 then len == 3
+                  when 4 then len == 2
+                  when 5 then len >= 10 && (len - 2) % 8 == 0
+                  when 8 then len == 10
+                  when 34 then len == 2 || len.between?(6, 18)
+                  else true
+                  end
+          return layer.diagnose(:error, :bad_length, "invalid TCP option #{kind} length") unless valid
           case kind
-          when 2 then layer.add(:mss, 'tcp.options.mss_val', cursor.u16(pos + 2)) if len == 4
-          when 3 then layer.add(:wscale, 'tcp.options.wscale.shift', cursor.u8(pos + 2)) if len == 3
-          when 4 then layer.add(:sack_permitted, 'tcp.options.sack_perm', true, type: :boolean) if len == 2
-          when 5 then layer.add(:sack, 'tcp.options.sack', cursor.bytes(pos + 2, len - 2), type: :bytes)
+          when 2 then layer.add(:mss, 'tcp.options.mss_val', cursor.u16(pos + 2), offset: pos + 2, length: 2)
+          when 3 then layer.add(:wscale, 'tcp.options.wscale.shift', cursor.u8(pos + 2), offset: pos + 2, length: 1)
+          when 4 then layer.add(:sack_permitted, 'tcp.options.sack_perm', true, type: :boolean, offset: pos, length: 2)
+          when 5 then layer.add(:sack, 'tcp.options.sack', cursor.bytes(pos + 2, len - 2), type: :bytes, offset: pos + 2, length: len - 2)
           when 8
-            if len == 10
-              layer.add(:tsval, 'tcp.options.timestamp.tsval', cursor.u32(pos + 2))
-              layer.add(:tsecr, 'tcp.options.timestamp.tsecr', cursor.u32(pos + 6))
-            end
-          when 34 then layer.add(:tfo, 'tcp.options.tfo.cookie', cursor.bytes(pos + 2, len - 2), type: :bytes)
+            layer.add(:tsval, 'tcp.options.timestamp.tsval', cursor.u32(pos + 2), offset: pos + 2, length: 4)
+            layer.add(:tsecr, 'tcp.options.timestamp.tsecr', cursor.u32(pos + 6), offset: pos + 6, length: 4)
+          when 34 then layer.add(:tfo, 'tcp.options.tfo.cookie', cursor.bytes(pos + 2, len - 2), type: :bytes, offset: pos + 2, length: len - 2)
           end
           pos += len
         end

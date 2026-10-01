@@ -32,6 +32,7 @@ module Redhound
           end
           @socket.bind(SockaddrLL.new(index: @interface.index).to_sockaddr)
           prime_timestamp
+          warn_vlan_offload
           if direction == :in
             begin
               @socket.setsockopt(Constants::SOL_PACKET, Constants::PACKET_IGNORE_OUTGOING, [1].pack('i'))
@@ -50,11 +51,16 @@ module Redhound
         # @rbs (?timeout: Numeric?) -> Packet?
         def next_packet(timeout: nil)
           deadline = deadline_for(timeout)
+          polled = false
           until @stopped || @closed
-            return nil unless wait_readable(@socket, deadline)
-
+            return nil if polled && deadline && Process.clock_gettime(Process::CLOCK_MONOTONIC) >= deadline
+            polled = true
             result = @socket.recvfrom_nonblock(Constants::RECEIVE_SIZE, exception: false)
-            next if result == :wait_readable
+            if result == :wait_readable
+              return nil unless wait_readable(@socket, deadline)
+
+              next
+            end
 
             data, address_info = result
             address = SockaddrLL.parse(address_info.to_sockaddr)
@@ -78,10 +84,7 @@ module Redhound
         def attach_filter(program)
           instructions = program ? program.instructions : [[0x06, 0, 0, receive_snaplen]] #: Array[[Integer, Integer, Integer, Integer]]
           Filter::BPF::Validator.validate!(instructions)
-          instructions = instructions.map do |instruction|
-            code, jt, jf, k = instruction #: [Integer, Integer, Integer, Integer]
-            [code, jt, jf, code == 0x06 && k.positive? ? receive_snaplen : k]
-          end
+          instructions = receive_filter(instructions)
           packed = instructions.map { |instruction| instruction.pack('S C C L') }.join
           @socket.setsockopt(::Socket::SOL_SOCKET, Constants::SO_ATTACH_FILTER, [instructions.size, packed].pack('S x6 P'))
         end
@@ -112,6 +115,47 @@ module Redhound
 
         protected
 
+        # Positive filter returns select packets; the source applies its configured snaplen.
+        # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> Array[[Integer, Integer, Integer, Integer]]
+        def receive_filter(instructions)
+          unless instructions.any? { |instruction| instruction[0] == 0x16 }
+            return instructions.map do |code, jt, jf, k|
+              [code, jt, jf, code == 0x06 && k.positive? ? receive_snaplen : k]
+            end
+          end
+
+          assembler = Filter::BPF::Assembler.new
+          labels = instructions.map { assembler.label }
+          accepted, rejected = assembler.label, assembler.label
+          instructions.each_with_index do |(code, jt, jf, k), index|
+            assembler.mark(labels.fetch(index))
+            if code == 0x16
+              assembler.branch(0x15, 0, rejected, accepted)
+            elsif code == 5
+              assembler.jump(labels.fetch(index + 1 + k))
+            elsif Filter::BPF::Validator::JUMPS.include?(code)
+              assembler.branch(code, k, labels.fetch(index + 1 + jt), labels.fetch(index + 1 + jf))
+            else
+              assembler.emit(code, code == 6 && k.positive? ? receive_snaplen : k)
+            end
+          end
+          assembler.mark(accepted)
+          assembler.emit(6, receive_snaplen)
+          assembler.mark(rejected)
+          assembler.emit(6, 0)
+          result = assembler.assemble
+          Filter::BPF::Validator.validate!(result)
+          result
+        end
+
+        # @rbs () -> void
+        def warn_vlan_offload
+          return unless instance_of?(PacketSocket) && [1, 276].include?(@linktype) && !@interface.loopback?
+
+          name = @interface.name == 'any' ? '<interface>' : @interface.name
+          warn "redhound: socket capture cannot restore stripped VLAN tags; disable receive VLAN offload with ethtool -K #{name} rxvlan off on the receiving interface"
+        end
+
         # @rbs () -> void
         def close_resources
           @socket.close if @socket && !@socket.closed?
@@ -135,8 +179,8 @@ module Redhound
           @socket.setsockopt(::Socket::SOL_SOCKET, ::Socket::SO_RCVBUF, [buffer_size].pack('i'))
           begin
             @socket.setsockopt(::Socket::SOL_SOCKET, Constants::SO_RCVBUFFORCE, [buffer_size].pack('i'))
-          rescue Errno::EPERM, Errno::EACCES, Errno::ENOPROTOOPT
-            # SO_RCVBUF already applied without CAP_NET_ADMIN.
+          rescue Errno::EPERM, Errno::EACCES, Errno::ENOPROTOOPT => error
+            warn "redhound: SO_RCVBUFFORCE unavailable (#{error.message}); using SO_RCVBUF with the system limit"
           end
         end
 

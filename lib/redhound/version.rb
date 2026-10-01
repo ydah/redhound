@@ -3,5 +3,5 @@
 
 module Redhound
   # Published gem version.
-  VERSION = '2.0.0.rc1'
+  VERSION = '2.0.0.rc2'
 end

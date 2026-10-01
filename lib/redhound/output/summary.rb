@@ -15,18 +15,33 @@ module Redhound
       # @rbs (Packet packet) -> String
       def line(packet)
         parts = [@timestamp.format(packet)]
+        if packet.interface
+          parts << [packet.interface.name, packet.direction&.to_s&.capitalize].compact.join(' ')
+        end
         if @link_layer && (eth = packet[:eth])
           parts << "#{eth.display(:src)} > #{eth.display(:dst)}, ethertype #{eth.display(:type)}, length #{packet.original_length}:"
         end
-        network = packet.layers.find { |l| %i[ipv4 ipv6].include?(l.protocol) && !l.embedded }
-        transport = packet.layers.find { |l| %i[tcp udp].include?(l.protocol) && !l.embedded }
+        network = nil #: Layer?
+        transport = nil #: Layer?
+        layer = nil #: Layer?
+        packet.layers.each do |current|
+          next if current.embedded
+          case current.protocol
+          when :ipv4, :ipv6
+            network, transport, layer = current, nil, nil
+          when :tcp, :udp
+            transport = layer = current
+          when :data, :raw, :eth, :vlan, :ipv6_ext, :sll, :sll2, :null
+          else layer = current
+          end
+        end
         if network
           src, dst = address(network.display(:src)), address(network.display(:dst))
           src += ".#{transport[:srcport]}" if transport
           dst += ".#{transport[:dstport]}" if transport
           parts << "#{network.protocol == :ipv4 ? 'IP' : 'IP6'} #{src} > #{dst}:"
         end
-        layer = packet.layers.reverse.find { |l| !%i[data raw eth vlan ipv4 ipv6 ipv6_ext sll sll2 null].include?(l.protocol) && !l.embedded } || packet.layers.last
+        layer ||= packet.layers.last
         klass = layer && Registry.default.protocols[layer.protocol]
         parts << if @quick && transport
                    "#{transport.protocol.to_s.upcase}, length #{[transport.payload_end - transport.payload_offset, 0].max}"
@@ -37,6 +52,15 @@ module Redhound
                  end
         if @verbosity.positive? && network
           parts << "ttl #{network[:ttl] || network[:hlim]}"
+          parts << "id #{network.display(:id)}, length #{network[:len]}" if network.protocol == :ipv4
+          parts << "checksum #{network.display(:checksum)}" if network[:checksum]
+          if transport
+            parts << "#{transport.protocol} checksum #{transport.display(:checksum)}"
+            options = transport.fields.select { |field| field.name.start_with?('tcp.options.') }
+            unless options.empty?
+              parts << 'options [' + options.map { |field| "#{field.name.delete_prefix('tcp.options.')} #{field.display}" }.join(', ') + ']'
+            end
+          end
         end
         diagnostics = packet.layers.flat_map(&:diagnostics)
         parts << diagnostics.map { |d| "[#{d.code}]" }.join(' ') unless diagnostics.empty?

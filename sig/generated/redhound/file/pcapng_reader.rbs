@@ -44,8 +44,8 @@ module Redhound
       # @rbs (Integer index) -> Capture::Interface
       def interface_at: (Integer index) -> Capture::Interface
 
-      # @rbs (String body, Integer offset) -> Hash[Integer, Array[String]]
-      def options: (String body, Integer offset) -> Hash[Integer, Array[String]]
+      # @rbs (String body, Integer offset, Array[Integer] allowed) -> Hash[Integer, Array[String]]
+      def options: (String body, Integer offset, Array[Integer] allowed) -> Hash[Integer, Array[String]]
 
       # @rbs (String body, Integer size) -> void
       def require_size: (String body, Integer size) -> void

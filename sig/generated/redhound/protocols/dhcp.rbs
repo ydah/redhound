@@ -15,11 +15,14 @@ module Redhound
       # @rbs (Cursor cursor, Layer layer, Integer pos, Integer ending, untyped options) -> void
       def read_options: (Cursor cursor, Layer layer, Integer pos, Integer ending, untyped options) -> void
 
-      # @rbs (Layer layer, Integer code, String value, Integer offset) -> void
-      def decode_option: (Layer layer, Integer code, String value, Integer offset) -> void
+      # @rbs (Layer layer, Integer code, String value, untyped entries) -> void
+      def decode_option: (Layer layer, Integer code, String value, untyped entries) -> void
 
-      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
-      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length) -> void
+      # @rbs (untyped entries, Integer logical) -> Integer
+      def wire_offset: (untyped entries, Integer logical) -> Integer
+
+      # @rbs (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length, ?untyped entries) -> void
+      def put: (Layer layer, String name, untyped value, Symbol type, Integer offset, Integer length, ?untyped entries) -> void
 
       # @rbs (Layer layer) -> String
       def summary: (Layer layer) -> String

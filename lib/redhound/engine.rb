@@ -29,6 +29,9 @@ module Redhound
         break if layer.error?
         klass = next_klass || Protocols::Data
       end
+      if packet.meta[:possible_truncation]
+        ctx.layers.first.diagnose(:warn, :capture_truncated, 'receive buffer limit reached; original packet length is unknown')
+      end
       ctx.layers
     end
 

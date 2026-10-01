@@ -17,7 +17,7 @@ ipv6: Internet Protocol v6 ipv6.version ipv6.tclass ipv6.flow ipv6.plen ipv6.nxt
 ipv6_ext: IPv6 extension
 udp: User Datagram Protocol udp.srcport udp.dstport udp.length udp.checksum
 tcp: Transmission Control Protocol tcp.srcport tcp.dstport tcp.seq tcp.ack tcp.hdr_len tcp.reserved tcp.flags tcp.window_size_value tcp.checksum tcp.urgent_pointer
-icmp: Internet Control Message Protocol icmp.type icmp.code icmp.checksum icmp.ident icmp.seq
+icmp: Internet Control Message Protocol icmp.type icmp.code icmp.checksum
 icmpv6: ICMPv6 / Neighbor Discovery icmpv6.type icmpv6.code icmpv6.checksum
 igmp: Internet Group Management Protocol igmp.type igmp.max_resp igmp.checksum
 gre: Generic Routing Encapsulation gre.flags gre.proto
@@ -37,9 +37,18 @@ ClientHello/ServerHello metadata including SNI, ALPN and supported versions.
 DNS includes mDNS/LLMNR and TCP framing. IPv6 supports Hop-by-Hop, Routing,
 Fragment, Destination and AH headers; ESP stops dissection. GRE and VXLAN
 encapsulations decode inner packet layers.
+ICMP identifiers/sequences are emitted for echo, timestamp, and address-mask
+messages; fragmentation-needed errors expose `icmp.mtu` instead. IGMP reserved
+report bytes are not labeled as maximum-response times. NTP timestamps such as
+`ntp.xmt` preserve the unsigned 32.32 wire integer; their era-dependent calendar
+interpretation is left to the caller.
 
 Dissectors use checked cursors and parent payload boundaries. Truncation,
 malformed lengths, checksum failures and reassembly gaps are available as
 structured diagnostics. Checksum verification is enabled by `-v` or
 `Engine.new(verify_checksums: true)`; outgoing/offloaded packets are marked
 unverified.
+IPv6 No Next Header terminates the chain, and the 16-extension limit applies
+independently to each encapsulated IPv6 header. Variable wire fields carry source
+ranges; [API.md](API.md) describes compression, concatenation, and reassembly
+span semantics.

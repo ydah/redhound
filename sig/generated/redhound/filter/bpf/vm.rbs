@@ -7,6 +7,8 @@ module Redhound
     module BPF
       # @api private
       class VM
+        LOAD_FORMATS: untyped
+
         # @rbs (Array[[Integer, Integer, Integer, Integer]] instructions) -> void
         def initialize: (Array[[ Integer, Integer, Integer, Integer ]] instructions) -> void
 

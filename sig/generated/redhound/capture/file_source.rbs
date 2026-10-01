@@ -5,6 +5,18 @@ module Redhound
   module Capture
     # @api private
     class FileSource < Source
+      class ReadStopped < StandardError
+      end
+
+      # Nonregular inputs need bounded polling so Source#stop can interrupt an idle pipe.
+      class StreamInput
+        # @rbs (IO io, Source source) -> void
+        def initialize: (IO io, Source source) -> void
+
+        # @rbs (Integer length) -> String?
+        def read: (Integer length) -> String?
+      end
+
       attr_reader reader: untyped
 
       # @rbs (untyped input, ?filter: String?) -> void
@@ -18,6 +30,9 @@ module Redhound
       # @rbs (?timeout: Numeric?) -> Packet?
       def next_packet: (?timeout: Numeric?) -> Packet?
 
+      # @rbs (Filter::Program? program) -> void
+      def attach_filter: (Filter::Program? program) -> void
+
       # @rbs () -> Integer
       def linktype: () -> Integer
 
@@ -28,7 +43,16 @@ module Redhound
       def stats: () -> Stats
 
       # @rbs () -> void
+      def stop: () -> void
+
+      # @rbs () -> void
       def close: () -> void
+
+      private
+
+      # A single bounded worker preserves partial records across caller timeouts.
+      # @rbs (Numeric? timeout) -> (Packet | nil | :wait_readable)
+      def read_packet: (Numeric? timeout) -> (Packet | nil | :wait_readable)
     end
   end
 end

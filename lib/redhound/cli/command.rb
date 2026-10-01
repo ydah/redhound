@@ -16,7 +16,7 @@ module Redhound
         elsif values[:version]
           out.puts("Redhound #{VERSION}")
         elsif values[:list_interfaces]
-          Capture.interfaces.each { |i| out.puts("#{i.index}.#{i.name} [#{i.flags & 1 != 0 ? 'Up' : 'Down'}]#{i.mac ? " #{i.mac}" : ''}#{i.mtu ? " mtu #{i.mtu}" : ''}") }
+          Capture.interfaces.each { |i| out.puts(i.to_s) }
         elsif values[:list_protocols]
           Registry.default.protocols.each_value do |klass|
             fields = klass.compiled_header&.definitions&.map(&:name) || []

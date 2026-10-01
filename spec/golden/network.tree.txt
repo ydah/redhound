@@ -1,4 +1,4 @@
-Frame 1: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.000000000
+Frame 1: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.000000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -13,7 +13,7 @@ Frame 1: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.000000000
       arp.src.proto_ipv4: 192.0.2.1
       arp.dst.hw_mac: 00:00:00:00:00:00
       arp.dst.proto_ipv4: 192.0.2.2
-Frame 2: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.001000000
+Frame 2: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.001000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -42,7 +42,7 @@ Frame 2: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.001000000
          └─ Data
             data.len: 7
             data.data: 6e6574776f726b
-Frame 3: 69 bytes on wire, 69 captured, 2023-11-14 22:13:20.002000000
+Frame 3: 69 bytes on wire, 69 captured, pcap, 2023-11-14 22:13:20.002000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -64,7 +64,7 @@ Frame 3: 69 bytes on wire, 69 captured, 2023-11-14 22:13:20.002000000
          └─ Data
             data.len: 7
             data.data: 6e6574776f726b
-Frame 4: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.003000000
+Frame 4: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.003000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -98,7 +98,7 @@ Frame 4: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.003000000
             └─ Data
                data.len: 7
                data.data: 6e6574776f726b
-Frame 5: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.004000000
+Frame 5: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.004000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -137,7 +137,7 @@ Frame 5: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.004000000
                └─ Data
                   data.len: 7
                   data.data: 6e6574776f726b
-Frame 6: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.005000000
+Frame 6: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.005000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -172,7 +172,7 @@ Frame 6: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.005000000
             └─ Data
                data.len: 7
                data.data: 6e6574776f726b
-Frame 7: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.006000000
+Frame 7: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.006000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -184,7 +184,7 @@ Frame 7: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.006000000
       └─ Data
          data.len: 7
          data.data: 7061796c6f6164
-Frame 8: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.007000000
+Frame 8: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.007000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -214,7 +214,7 @@ Frame 8: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.007000000
          └─ Data
             data.len: 7
             data.data: 6e6574776f726b
-Frame 9: 105 bytes on wire, 105 captured, 2023-11-14 22:13:20.008000000
+Frame 9: 105 bytes on wire, 105 captured, pcap, 2023-11-14 22:13:20.008000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -248,7 +248,7 @@ Frame 9: 105 bytes on wire, 105 captured, 2023-11-14 22:13:20.008000000
                      └─ Data
                         data.len: 7
                         data.data: 6e6574776f726b
-Frame 10: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.009000000
+Frame 10: 77 bytes on wire, 77 captured, pcap, 2023-11-14 22:13:20.009000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -276,7 +276,7 @@ Frame 10: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.009000000
             └─ Data
                data.len: 7
                data.data: 6e6574776f726b
-Frame 11: 71 bytes on wire, 71 captured, 2023-11-14 22:13:20.010000000
+Frame 11: 71 bytes on wire, 71 captured, pcap, 2023-11-14 22:13:20.010000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -293,7 +293,7 @@ Frame 11: 71 bytes on wire, 71 captured, 2023-11-14 22:13:20.010000000
       └─ Data
          data.len: 17
          data.data: 0000007b00000001656e63727970746564
-Frame 12: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.011000000
+Frame 12: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.011000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -323,7 +323,7 @@ Frame 12: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.011000000
          └─ Data
             data.len: 4
             data.data: 70696e67
-Frame 13: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.012000000
+Frame 13: 77 bytes on wire, 77 captured, pcap, 2023-11-14 22:13:20.012000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -348,8 +348,6 @@ Frame 13: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.012000000
          icmp.type: Destination Unreachable (3)
          icmp.code: Port Unreachable (3)
          icmp.checksum: 0xe855
-         icmp.ident: 0
-         icmp.seq: 0
          └─ Internet Protocol v4 (embedded)
             ip.version: 4
             ip.hdr_len: 20
@@ -374,7 +372,7 @@ Frame 13: 77 bytes on wire, 77 captured, 2023-11-14 22:13:20.012000000
                └─ Data (embedded)
                   data.len: 7
                   data.data: 6e6574776f726b
-Frame 14: 66 bytes on wire, 66 captured, 2023-11-14 22:13:20.013000000
+Frame 14: 66 bytes on wire, 66 captured, pcap, 2023-11-14 22:13:20.013000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -397,7 +395,7 @@ Frame 14: 66 bytes on wire, 66 captured, 2023-11-14 22:13:20.013000000
          └─ Data
             data.len: 4
             data.data: 70696e67
-Frame 15: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.014000000
+Frame 15: 86 bytes on wire, 86 captured, pcap, 2023-11-14 22:13:20.014000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -419,7 +417,7 @@ Frame 15: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.014000000
          icmpv6.opt.type: 1
          icmpv6.opt.length: 1
          icmpv6.opt.linkaddr: 02:00:00:00:00:01
-Frame 16: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.015000000
+Frame 16: 86 bytes on wire, 86 captured, pcap, 2023-11-14 22:13:20.015000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -445,7 +443,7 @@ Frame 16: 86 bytes on wire, 86 captured, 2023-11-14 22:13:20.015000000
          icmpv6.opt.type: 2
          icmpv6.opt.length: 1
          icmpv6.opt.linkaddr: 02:00:00:00:00:02
-Frame 17: 62 bytes on wire, 62 captured, 2023-11-14 22:13:20.016000000
+Frame 17: 62 bytes on wire, 62 captured, pcap, 2023-11-14 22:13:20.016000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -463,7 +461,7 @@ Frame 17: 62 bytes on wire, 62 captured, 2023-11-14 22:13:20.016000000
          icmpv6.type: Router Solicitation (133)
          icmpv6.code: 0
          icmpv6.checksum: 8008
-Frame 18: 110 bytes on wire, 110 captured, 2023-11-14 22:13:20.017000000
+Frame 18: 110 bytes on wire, 110 captured, pcap, 2023-11-14 22:13:20.017000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -500,7 +498,7 @@ Frame 18: 110 bytes on wire, 110 captured, 2023-11-14 22:13:20.017000000
          icmpv6.opt.type: 5
          icmpv6.opt.length: 1
          icmpv6.opt.mtu: 1500
-Frame 19: 94 bytes on wire, 94 captured, 2023-11-14 22:13:20.018000000
+Frame 19: 94 bytes on wire, 94 captured, pcap, 2023-11-14 22:13:20.018000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -520,7 +518,7 @@ Frame 19: 94 bytes on wire, 94 captured, 2023-11-14 22:13:20.018000000
          icmpv6.checksum: 49074
          icmpv6.nd.rd.target_address: 2001:db8::1
          icmpv6.rd.na.destination_address: 2001:db8::2
-Frame 20: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.019000000
+Frame 20: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.019000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -543,11 +541,10 @@ Frame 20: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.019000000
       ip.dst: 192.0.2.2
       └─ Internet Group Management Protocol
          igmp.type: 18
-         igmp.max_resp: 0
          igmp.checksum: 65020
          igmp.version: 1
          igmp.maddr: 239.1.1.1
-Frame 21: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.020000000
+Frame 21: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.020000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -574,7 +571,7 @@ Frame 21: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.020000000
          igmp.checksum: 63996
          igmp.version: 2
          igmp.maddr: 239.1.1.1
-Frame 22: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.021000000
+Frame 22: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.021000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -606,7 +603,7 @@ Frame 22: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.021000000
          igmp.qqic: 125
          igmp.num_src: 1
          igmp.saddr: 192.0.2.1
-Frame 23: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.022000000
+Frame 23: 60 bytes on wire, 60 captured, pcap, 2023-11-14 22:13:20.022000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -629,7 +626,6 @@ Frame 23: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.022000000
       ip.dst: 192.0.2.2
       └─ Internet Group Management Protocol
          igmp.type: 34
-         igmp.max_resp: 0
          igmp.checksum: 11001
          igmp.version: 3
          igmp.num_grp_recs: 1
@@ -637,7 +633,7 @@ Frame 23: 60 bytes on wire, 60 captured, 2023-11-14 22:13:20.022000000
          igmp.maddr: 239.1.1.1
          igmp.num_src: 1
          igmp.saddr: 192.0.2.1
-Frame 24: 78 bytes on wire, 78 captured, 2023-11-14 22:13:20.023000000
+Frame 24: 78 bytes on wire, 78 captured, pcap, 2023-11-14 22:13:20.023000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -683,7 +679,7 @@ Frame 24: 78 bytes on wire, 78 captured, 2023-11-14 22:13:20.023000000
          tcp.options.timestamp.tsval: 123456
          tcp.options.timestamp.tsecr: 654321
          tcp.len: 0
-Frame 25: 70 bytes on wire, 70 captured, 2023-11-14 22:13:20.024000000
+Frame 25: 70 bytes on wire, 70 captured, pcap, 2023-11-14 22:13:20.024000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -726,7 +722,7 @@ Frame 25: 70 bytes on wire, 70 captured, 2023-11-14 22:13:20.024000000
          tcp.options.sack: 000003e8000007d0
          tcp.options.tfo.cookie: 61626364
          tcp.len: 0
-Frame 26: 85 bytes on wire, 85 captured, 2023-11-14 22:13:20.025000000
+Frame 26: 85 bytes on wire, 85 captured, pcap, 2023-11-14 22:13:20.025000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -775,7 +771,7 @@ Frame 26: 85 bytes on wire, 85 captured, 2023-11-14 22:13:20.025000000
                └─ Data
                   data.len: 7
                   data.data: 6e6574776f726b
-Frame 27: 98 bytes on wire, 98 captured, 2023-11-14 22:13:20.026000000
+Frame 27: 98 bytes on wire, 98 captured, pcap, 2023-11-14 22:13:20.026000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01
@@ -827,7 +823,7 @@ Frame 27: 98 bytes on wire, 98 captured, 2023-11-14 22:13:20.026000000
                   └─ Data
                      data.len: 7
                      data.data: 6e6574776f726b
-Frame 28: 110 bytes on wire, 110 captured, 2023-11-14 22:13:20.027000000
+Frame 28: 110 bytes on wire, 110 captured, pcap, 2023-11-14 22:13:20.027000000
 └─ Ethernet
    eth.dst: ff:ff:ff:ff:ff:ff
    eth.src: 02:00:00:00:00:01

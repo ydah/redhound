@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+## 2.0.0.rc2 - 2026-10-02
+
+### Bug fixes
+
+- Preserve readable fields in truncated headers and correct ICMP errors, IGMP reports, signed NTP precision, IPv6 extension boundaries and variable field locations.
+- Reject malformed TCP options and empty or conflicting HTTP Content-Length values; recognize HTTP when its first line spans segments on nonstandard ports.
+- Report incomplete IP/TCP data at EOF and flow eviction, distinguish retransmitted SYN/FIN packets, and handle IPv6 atomic fragments independently.
+- Account for retained buffer capacity when enforcing reassembly limits, bound pcapng interface metadata, and release analysis buffers even when output fails.
+- Keep capture timeouts and stopping responsive under rejected traffic and idle stdin, preserve partial input records across timeouts, and support replacing file-source filters.
+- Preserve wire lengths with attached filters, close capture files after write failures, and prevent metadata errors from corrupting pcapng interface numbering.
+- Correct macOS interface MAC/MTU and loopback link types; include interface and direction in packet output and show checksum/TCP options with verbose summaries.
+- Preserve negative and expanded-year timestamps and emit valid JSON for invalid UTF-8 diagnostics and interface names; reject invalid packet metadata before file serialization.
+- Include empty intervals in IO statistics and keep unknown IP protocol conversations separate.
+- Fall back to socket capture when Ruby 4.0 cannot map a packet ring, and explain unavailable explicit ring capture and receive-buffer/VLAN limitations.
+
 ## 2.0.0.rc1 - 2026-10-01
 
 ### Breaking changes

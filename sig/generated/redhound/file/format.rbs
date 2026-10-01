@@ -7,6 +7,12 @@ module Redhound
     module Format
       MAX_RECORD: untyped
 
+      MAX_INTERFACES: ::Integer
+
+      MAX_INTERFACE_METADATA: untyped
+
+      MAX_OPTIONS: ::Integer
+
       PCAP_MAGICS: untyped
 
       PCAPNG_MAGIC: untyped

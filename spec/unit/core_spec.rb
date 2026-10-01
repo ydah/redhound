@@ -78,4 +78,13 @@ RSpec.describe 'packet model and dissection' do
     packet = Redhound.dissect(ether(ipv4(tcp("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n", dport: 9996), proto: 6)))
     expect(packet['http.host']).to eq('example.com')
   end
+
+  it 'validates capture metadata before binary file serialization can wrap it' do
+    [-1, 65536].each { |value| expect { Redhound::Packet.new('x', linktype: value) }.to raise_error(ArgumentError) }
+    [0, 65535].each { |value| expect(Redhound::Packet.new('x', linktype: value).linktype).to eq(value) }
+    expect { Redhound::Packet.new('x', timestamp_ns: 1.5) }.to raise_error(ArgumentError)
+    expect { Redhound::Packet.new('x', number: 0) }.to raise_error(ArgumentError)
+    expect { Redhound::Packet.new('x', direction: :inout) }.to raise_error(ArgumentError)
+    expect { Redhound::Packet.new('x', original_length: 1.5) }.to raise_error(ArgumentError)
+  end
 end

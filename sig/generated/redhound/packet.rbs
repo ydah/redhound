@@ -73,5 +73,10 @@ module Redhound
     # @rbs () -> Hash[Symbol, untyped]
     # Return a JSON-compatible packet matching docs/json-schema.json.
     def to_h: () -> Hash[Symbol, untyped]
+
+    private
+
+    # @rbs (String? text) -> String?
+    def json_text: (String? text) -> String?
   end
 end

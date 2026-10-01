@@ -12,6 +12,7 @@ require_relative 'capture/linux/cooked'
 require_relative 'capture/linux/packet_socket'
 require_relative 'capture/linux/tpacket_v3'
 require_relative 'capture/bsd/constants'
+require_relative 'capture/bsd/ifreq'
 require_relative 'capture/bsd/bpf_device'
 require_relative 'file/format'
 require_relative 'file/pcap_reader'
@@ -38,7 +39,7 @@ module Redhound
                    if RUBY_PLATFORM.include?('x86_64')
                      begin
                        Linux::TPacketV3.new(interface:, **options)
-                     rescue SystemCallError, IO::Buffer::AccessError, IO::Buffer::AllocationError, NotImplementedError => error
+                     rescue SystemCallError, IO::Buffer::AccessError, IO::Buffer::AllocationError, NotImplementedError, UnsupportedPlatform => error
                        warn "redhound: ring backend unavailable (#{error.message}); using socket"
                        Linux::PacketSocket.new(interface:, **options)
                      end

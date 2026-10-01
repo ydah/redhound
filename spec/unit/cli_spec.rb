@@ -67,6 +67,35 @@ RSpec.describe 'command line' do
     end
   end
 
+  it 'reports SIGUSR1 statistics while waiting for more stdin capture data' do
+    skip 'SIGUSR1 is unavailable' unless Signal.list.key?('USR1')
+    Dir.mktmpdir do |dir|
+      path = File.join(dir, 'capture.pcap')
+      exe = File.expand_path('../../exe/redhound', __dir__)
+      input, output, error, child = Open3.popen3(RbConfig.ruby, exe, '-r', '-', '-w', path, '-q')
+      input.binmode
+      input.write([0xa1b23c4d, 2, 4, 0, 0, 262144, 1].pack('VvvV4'))
+      input.flush
+      Timeout.timeout(3) { sleep 0.01 until File.exist?(path) }
+      Process.kill('USR1', child.pid)
+      report = Timeout.timeout(3) do
+        loop do
+          line = error.gets
+          raise 'child exited without a statistics report' unless line
+          break line if line.include?('packets captured')
+        end
+      end
+      expect(report).to include('0 packets captured')
+      Process.kill('TERM', child.pid)
+      expect(Timeout.timeout(3) { child.value }).to be_success
+    ensure
+      input&.close
+      child&.value
+      output&.close
+      error&.close
+    end
+  end
+
   it 'records the CLI capture filter in pcapng interface descriptions' do
     Dir.mktmpdir do |dir|
       input = File.expand_path('../fixtures/pcap/applications.pcap', __dir__)
@@ -75,6 +104,27 @@ RSpec.describe 'command line' do
       expect(status).to eq(0)
       Redhound.open(output) { |reader| expect(reader.interfaces.first.filter).to eq('udp') }
     end
+  end
+
+  it 'records the current filter when filtering a previously filtered pcapng file' do
+    Dir.mktmpdir do |dir|
+      input = File.join(dir, 'input.pcapng')
+      output = File.join(dir, 'output.pcapng')
+      Redhound::Writer.open(input, filter: 'ip') do |writer|
+        writer << Redhound::Packet.new(ether(ipv4(udp('x'))))
+      end
+      status = Redhound::CLI::Command.new.run(['-r', input, '-w', output, 'udp'], out: StringIO.new, err: StringIO.new)
+      expect(status).to eq(0)
+      Redhound.open(output) { |reader| expect(reader.interfaces.first.filter).to eq('udp') }
+    end
+  end
+
+  it 'lists interface running and loopback state' do
+    interface = Redhound::Capture::Interface.new(name: 'lo0', index: 1, flags: 0x49)
+    allow(Redhound::Capture).to receive(:interfaces).and_return([interface])
+    out = StringIO.new
+    expect(Redhound::CLI::Command.new.run(['-D'], out:, err: StringIO.new)).to eq(0)
+    expect(out.string).to eq("1.lo0 [Up, Running, Loopback]\n")
   end
 
   it 'restores signal handlers even if source shutdown fails' do

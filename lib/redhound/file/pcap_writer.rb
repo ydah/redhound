@@ -24,12 +24,16 @@ module Redhound
         @closed = false
         magic = precision == :nano ? 0xa1b23c4d : 0xa1b2c3d4
         write_bytes([magic, 2, 4, 0, 0, snaplen, @linktype].pack('VvvV4'))
+      rescue StandardError, Interrupt
+        @io.close if @owned && @io && !@io.closed?
+        raise
       end
 
       # @rbs (Packet packet) -> self
       def write(packet)
         raise IOError, 'writer is closed' if @closed
         raise FileFormatError, 'pcap cannot store multiple link types; use pcapng' unless packet.linktype == @linktype
+        raise FileFormatError, 'packet original length exceeds unsigned 32-bit range' unless packet.original_length <= 0xffff_ffff
 
         seconds, nanos = packet.timestamp_ns.divmod(1_000_000_000)
         raise FileFormatError, 'pcap timestamp exceeds unsigned 32-bit seconds' unless seconds.between?(0, 0xffff_ffff)
@@ -56,9 +60,12 @@ module Redhound
       def close
         return if @closed
 
-        @io.flush
-        @io.close if @owned
-        @closed = true
+        begin
+          @io.flush
+        ensure
+          @closed = true
+          @io.close if @owned && !@io.closed?
+        end
       end
 
       private

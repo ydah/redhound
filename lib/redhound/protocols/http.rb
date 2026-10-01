@@ -37,7 +37,7 @@ module Redhound
           headers = parse_headers(layer, bytes, first + 2, ending + 2)
           return if layer.error?
           body_start = ending + 4
-          length_values = headers.fetch('content-length', []).flat_map { |value| value.split(',').map(&:strip) }
+          length_values = headers.fetch('content-length', []).flat_map { |value| value.empty? ? [''] : value.split(',', -1).map(&:strip) }
           unless length_values.all? { |value| value.match?(/\A[0-9]+\z/n) } && length_values.uniq.length <= 1
             return layer.diagnose(:error, :malformed, 'conflicting or invalid Content-Length')
           end
@@ -108,13 +108,14 @@ module Redhound
           end
           name = name.downcase
           value = line.byteslice(colon + 1..) #: String
+          leading = (value[/\A[ \t]*/n] || '').bytesize
           value = value.sub(/\A[ \t]*/n, '').sub(/[ \t]*\z/n, '')
           (headers[name] ||= []) << value
           key = name.tr('-', '_')
           if HEADERS.include?(key)
             numeric = key == 'content_length' && value.match?(/\A[0-9]+\z/n)
             put(layer, "http.#{key}", numeric ? value.to_i : value, numeric ? :uint : :string,
-                pos + colon + 1, line.bytesize - colon - 1)
+                pos + colon + 1 + leading, value.bytesize)
           else
             put(layer, 'http.request.line', line, :string, pos, line.bytesize)
           end

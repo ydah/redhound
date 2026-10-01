@@ -26,6 +26,10 @@ module Redhound
       def field: (Symbol type, Symbol key, String name, **untyped opts) -> void
 
       # @rbs (Symbol key, String name, **untyped opts) -> void
+      # Append a signed 8-bit field.
+      def int8: (Symbol key, String name, **untyped opts) -> void
+
+      # @rbs (Symbol key, String name, **untyped opts) -> void
       # Append an unsigned 8-bit field.
       def uint8: (Symbol key, String name, **untyped opts) -> void
 

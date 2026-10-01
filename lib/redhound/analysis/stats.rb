@@ -38,6 +38,7 @@ module Redhound
           result = to_h
           io.puts("#{result[:kind]}#{result[:type] ? ",#{result[:type]}" : ''}")
           result[:rows].each { |item| io.puts(item.map { |name, value| "#{name}=#{value.is_a?(Array) ? value.join(':') : value}" }.join(' ')) }
+          io.puts("#{result[:omitted_intervals]} earlier IO intervals omitted") if result[:omitted_intervals] && result[:omitted_intervals].positive?
           io.puts("#{@evicted} statistics rows evicted") if @evicted.positive?
         end
         # @rbs () -> Hash[Symbol, untyped]
@@ -58,12 +59,23 @@ module Redhound
           @start_ns ||= packet.timestamp_ns
           start = @start_ns #: Integer
           interval = [(packet.timestamp_ns - start) / @interval_ns, 0].max
-          item = row(interval) { { interval: interval, start_ns: start + interval * @interval_ns, end_ns: start + (interval + 1) * @interval_ns, packets: 0, bytes: 0 } }
+          item = row(interval) { interval_row(interval) }
           item[:packets] += 1
           item[:bytes] += packet.original_length
         end
         # @rbs () -> Hash[Symbol, untyped]
-        def to_h = { kind: :io, interval_ns: @interval_ns, rows: @rows.values.sort_by { |item| item[:interval] } }
+        def to_h
+          return { kind: :io, interval_ns: @interval_ns, rows: [] } if @rows.empty?
+          last = @rows.keys.max #: Integer
+          first = [@rows.keys.min, last - @max_rows + 1].max #: Integer
+          rows = (first..last).map { |interval| @rows[interval] || interval_row(interval) }
+          { kind: :io, interval_ns: @interval_ns, omitted_intervals: first, rows: rows }
+        end
+        # @rbs (Integer interval) -> Hash[Symbol, Integer]
+        def interval_row(interval)
+          start = @start_ns || 0
+          { interval: interval, start_ns: start + interval * @interval_ns, end_ns: start + (interval + 1) * @interval_ns, packets: 0, bytes: 0 }
+        end
       end
 
       # @api private

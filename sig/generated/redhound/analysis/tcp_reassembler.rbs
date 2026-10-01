@@ -14,6 +14,18 @@ module Redhound
       # @rbs (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> Array[Layer]
       def deliver: (Flow flow, Integer direction, TcpStream stream, untyped application, Packet? packet) -> Array[Layer]
 
+      # @rbs (Flow flow, Integer direction, String data, Integer origin, Packet? packet) -> Array[Layer]
+      def application_data: (Flow flow, Integer direction, String data, Integer origin, Packet? packet) -> Array[Layer]
+
+      # @rbs (untyped klass, Flow flow, Integer direction, Layer layer) -> untyped
+      def create_application: (untyped klass, Flow flow, Integer direction, Layer layer) -> untyped
+
+      # @rbs (Flow flow, Integer direction, untyped application, Symbol method, *untyped arguments) -> Array[Layer]
+      def invoke: (Flow flow, Integer direction, untyped application, Symbol method, *untyped arguments) -> Array[Layer]
+
+      # @rbs (Flow flow, Integer direction, Symbol protocol, StandardError error) -> Layer
+      def application_error: (Flow flow, Integer direction, Symbol protocol, StandardError error) -> Layer
+
       # @rbs (Packet packet, Array[Layer] layers) -> void
       def attach: (Packet packet, Array[Layer] layers) -> void
 

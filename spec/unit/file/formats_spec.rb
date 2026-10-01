@@ -36,6 +36,15 @@ RSpec.describe 'capture file formats' do
     expect { Redhound::Reader.new(StringIO.new(bytes)).to_a }.to raise_error(Redhound::FileFormatError)
   end
 
+  it 'assembles short stream reads and distinguishes clean EOF from a partial record' do
+    io = StringIO.new('abcde')
+    allow(io).to receive(:read).and_wrap_original { |method, size| method.call([size, 2].min) }
+    expect(Redhound::File::Format.read_exact(io, 5)).to eq('abcde')
+    expect(Redhound::File::Format.read_exact(io, 1, eof: true)).to be_nil
+    io.rewind
+    expect { Redhound::File::Format.read_exact(io, 6, eof: true) }.to raise_error(Redhound::FileFormatError, /truncated/)
+  end
+
   it 'normalizes foreign-endian NULL headers before applying capture filters' do
     %i[little big].each do |endian|
       word = endian == :little ? 'V' : 'N'
@@ -94,6 +103,99 @@ RSpec.describe 'capture file formats' do
         expect(File.stat(path).mode & 0o777).to eq(0o600)
       end
     end
+  end
+
+  it 'rejects packet original lengths that cannot fit capture file records' do
+    %i[pcap pcapng].each do |format|
+      io = StringIO.new
+      writer = Redhound::Writer.open(io, format:)
+      expect { writer << packet(original_length: 1 << 32) }.to raise_error(Redhound::FileFormatError, /original length/)
+      writer.close
+    end
+  end
+
+  it 'closes owned output files when final flushing fails' do
+    Dir.mktmpdir do |dir|
+      %i[pcap pcapng].each do |format|
+        writer = Redhound::Writer.open(File.join(dir, "capture.#{format}"))
+        opened = writer.instance_variable_get(:@io)
+        allow(opened).to receive(:flush).and_raise(IOError, 'disk failure')
+        expect { writer.close }.to raise_error(IOError, 'disk failure')
+        expect(opened).to be_closed
+        expect { writer.close }.not_to raise_error
+      end
+    end
+  end
+
+  it 'closes owned output files when writing the header fails' do
+    Dir.mktmpdir do |dir|
+      %i[pcap pcapng].each do |format|
+        opened = nil
+        path = File.join(dir, "capture.#{format}")
+        allow(File).to receive(:open).and_call_original
+        allow(File).to receive(:open).with(path, File::WRONLY | File::CREAT | File::TRUNC, 0o600).and_wrap_original do |method, *args|
+          opened = method.call(*args)
+          allow(opened).to receive(:write).and_raise(IOError, 'disk failure')
+          opened
+        end
+        expect { Redhound::Writer.open(path) }.to raise_error(IOError, 'disk failure')
+        expect(opened).to be_closed
+      end
+    end
+  end
+
+  it 'keeps pcapng interface IDs valid after rejecting oversized interface metadata' do
+    io = StringIO.new
+    writer = Redhound::Writer.open(io, format: :pcapng)
+    invalid = Redhound::Capture::Interface.new(name: 'x' * 65_536)
+    expect { writer << packet(interface: invalid) }.to raise_error(Redhound::FileFormatError, /option/)
+    writer << packet
+    writer.close
+    reader = Redhound.open(StringIO.new(io.string))
+    expect(reader.to_a.map(&:data)).to eq(['packet'])
+    expect(reader.interfaces.map(&:name)).to eq(['interface0'])
+  end
+
+  it 'bounds retained pcapng interfaces across sections without evicting old IDs' do
+    sections = 3.times.map do |index|
+      io = StringIO.new
+      Redhound::Writer.open(io, format: :pcapng) do |writer|
+        writer << packet(interface: Redhound::Capture::Interface.new(name: "if#{index}"))
+      end
+      io.string
+    end
+    stub_const('Redhound::File::Format::MAX_INTERFACES', 2)
+    reader = Redhound.open(StringIO.new(sections.join))
+    expect { reader.to_a }.to raise_error(Redhound::FileFormatError, /interface limit/)
+    expect(reader.interfaces.map(&:name)).to eq(%w[if0 if1])
+  end
+
+  it 'bounds retained pcapng interface metadata' do
+    io = StringIO.new
+    Redhound::Writer.open(io, format: :pcapng) do |writer|
+      2.times { writer << packet(interface: Redhound::Capture::Interface.new(name: 'x' * 100)) }
+    end
+    stub_const('Redhound::File::Format::MAX_INTERFACE_METADATA', 1024)
+    reader = Redhound.open(StringIO.new(io.string))
+    expect { reader.to_a }.to raise_error(Redhound::FileFormatError, /interface metadata limit/)
+    expect(reader.interfaces.size).to eq(1)
+  end
+
+  it 'bounds pcapng writer interface state and keeps the existing file readable' do
+    stub_const('Redhound::File::Format::MAX_INTERFACES', 2)
+    io = StringIO.new
+    writer = Redhound::Writer.open(io, format: :pcapng)
+    2.times { |index| writer << packet(interface: Redhound::Capture::Interface.new(name: "if#{index}")) }
+    expect { writer << packet(interface: Redhound::Capture::Interface.new(name: 'if2')) }.to raise_error(Redhound::FileFormatError, /interface limit/)
+    writer.close
+    expect(Redhound.open(StringIO.new(io.string)).to_a.size).to eq(2)
+  end
+
+  it 'bounds the number of tiny pcapng options before building option objects' do
+    block = ->(type, body) { [type, body.bytesize + 12].pack('V2') + body + [body.bytesize + 12].pack('V') }
+    section = block.call(0x0a0d0d0a, [0x1a2b3c4d, 1, 0, -1].pack('Vvvq<'))
+    interface = block.call(1, [1, 0, 262144].pack('vvV') + [999, 0].pack('vv') * 4097 + "\0" * 4)
+    expect { Redhound.open(StringIO.new(section + interface)) }.to raise_error(Redhound::FileFormatError, /option count limit/)
   end
 
   it 'round trips multiple pcapng interfaces, comments, flags and statistics' do
