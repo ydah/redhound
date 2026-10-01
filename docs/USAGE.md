@@ -71,7 +71,7 @@ success, 1 on capture/file failures and 2 on invalid arguments.
 
 ## Platforms and limits
 
-Linux `auto` uses TPACKET_V3 on x86_64 and falls back to the socket backend when
+Linux `auto` uses TPACKET_V3 on x86_64 and aarch64 and falls back to the socket backend when
 mapping is unavailable. Other Linux architectures default to sockets; `ring`
 can be selected explicitly. macOS uses BPF, with native timestamp precision
 reported by the device. Linux socket capture cannot recover NIC-stripped VLAN

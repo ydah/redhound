@@ -48,6 +48,9 @@ these medians; caller-owned IO, pipes and stdin retain their existing read paths
 
 These ARM measurements show the local effect of the change and do not establish
 the separate x86_64 throughput gates.
+Avoiding an unnecessary escape copy for printable summary lines further improved
+three alternating-run medians from 92,378 to 95,648 pps and removed 400,000
+allocations per 200,000 packets. Unsafe bytes retain identical escaping.
 
 The design's initial targets apply to x86_64, one core and YJIT: summary 100,000
 pps, tree 30,000 pps, VM 300,000 pps; live ring 200,000 pps and socket 80,000 pps
@@ -90,7 +93,8 @@ sudo ruby --yjit bench/live.rb --duration 259200 --rate 100 --backend ring --rot
 
 Use an allowed CPU number from `/proc/self/status` when CPU 0 is unavailable.
 `--mixed` alternates valid TCP and UDP frames with matching IPv4/TCP checksums.
-`--cpu` pins capture processes only; the sender retains its available CPUs.
+`--cpu` pins capture processes and selects another allowed CPU for the sender,
+avoiding the capture CPU's SMT siblings when another core is available.
 Verification checks every saved frame against its complete expected bytes,
 requires the sequence to start at zero and end at the sent count minus one,
 and rejects timestamps outside the capture window. The comparison also requires
@@ -157,3 +161,27 @@ the 30-second run sent only 2,129,920 of 2,400,000 requested frames, saved
 951,018 and reported 1,115,538 kernel drops. File summary measured 41,856 pps.
 That run failed both generation and capture conditions. These hardware-dependent
 figures are retained rather than attributed solely to the Ruby version.
+
+With the sender pinned to CPU 2 and capture to CPU 0,
+[Ruby 3.4 socket run 36887746688](https://github.com/ydah/redhound/actions/runs/36887746688)
+again saved all 800,000 mixed frames with zero drops, gaps, invalid records or
+final drain. [Ruby 3.4 ring run 36887736344](https://github.com/ydah/redhound/actions/runs/36887736344)
+saved all 1,319,600 generated frames without drops, but generation fell short of
+the requested 2,000,000; this cannot establish the 200,000 pps ring target.
+[Ruby 4.0 socket run 36887741886](https://github.com/ydah/redhound/actions/runs/36887741886)
+sent 800,000, saved 514,053 and reported 228,674 kernel drops, so it failed.
+The stronger harness retains each run's CPU topology, implementation/harness
+digests and failures. The full x86_64 performance gate remains open.
+
+## Completed one-hour aarch64 comparison
+
+On 2026-10-02, Ruby 3.4.11/YJIT on aarch64 Linux captured 180,000,000 numbered
+600-byte UDP frames per backend over 3,600 seconds at 50,000 pps. Socket and ring
+had zero drops and gaps, identical complete-byte digests, and 18,000 matching
+kernel timestamp samples with zero difference. Ring drained its last block
+47.638 ms after the deadline. Descriptor counts stayed at 10/11; the periodic
+resource samples and final reports are in `tmp/acceptance-arm-hour-final`.
+This used the frozen implementation/harness described in
+[release validation](../docs/VALIDATION.md), rather than the new mixed-workload
+single-core benchmark. It completes P6-06's sustained backend comparison;
+automatic ring selection is now enabled on aarch64 when mapping is available.

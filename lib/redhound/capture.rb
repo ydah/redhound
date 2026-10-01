@@ -36,7 +36,7 @@ module Redhound
                  when :socket then Linux::PacketSocket.new(interface:, **options)
                  when :ring then Linux::TPacketV3.new(interface:, **options)
                  when :auto
-                   if RUBY_PLATFORM.include?('x86_64')
+                   if RUBY_PLATFORM.start_with?('x86_64-', 'aarch64-', 'arm64-')
                      begin
                        Linux::TPacketV3.new(interface:, **options)
                      rescue SystemCallError, IO::Buffer::AccessError, IO::Buffer::AllocationError, NotImplementedError, UnsupportedPlatform => error

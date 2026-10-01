@@ -68,6 +68,15 @@ resource samples, and successful external validation of rotated files. The
 controlled veth soak does not establish the separate busy physical-interface
 24-hour gate. Results and unfulfilled conditions are recorded explicitly below.
 
+The one-hour aarch64 comparison completed successfully: each backend captured
+all 180,000,000 frames with zero drops/gaps and the same complete-byte digest.
+All 18,000 paired timestamp samples were identical. Ring final drain was
+47.638 ms; descriptor counts remained 10/11. Last-half-hour RSS ranged from
+31.2–40.2 MiB for sockets and 86.5–86.6 MiB for rings. P6-06 is complete, so
+aarch64/arm64 Linux now tries ring capture automatically, retaining socket
+fallback when mapping is unavailable. This does not complete the separate
+72-hour rotation soak or the mixed x86_64 throughput gates.
+
 The physical macOS en0 interface is active, but `/dev/bpf*` requires administrator
 access and `sudo -n` requires a password in this environment. The user could not
 start the privileged run, so the 24-hour physical-interface check has not begun.
@@ -123,8 +132,6 @@ for throughput figures and measurement limits.
 
 - Run a 24-hour continuous capture stability check.
 - Run a 72-hour rotation soak and record RSS, descriptor counts and drop rates.
-- Run an hour of high-load aarch64 socket/ring comparison before changing its
-  automatic backend default.
 - Confirm x86_64 single-core throughput and live drop targets on the specified
   workload; file benchmarks alone cannot establish loss-free live throughput.
 - Keep rc1 available for two weeks, classify reports, and fix critical/high

@@ -4,6 +4,10 @@
 
 ## 2.0.0.rc2 - 2026-10-02
 
+### Features
+
+- Use the ring backend automatically on aarch64 Linux when mapping is available.
+
 ### Bug fixes
 
 - Improve file reading and packet summary throughput while keeping stdin responsive.

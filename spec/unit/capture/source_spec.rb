@@ -241,19 +241,43 @@ RSpec.describe Redhound::Capture do
     expect { source.send(:setup_receive_buffer, nil) }.to raise_error(Redhound::UnsupportedPlatform, /IO::Buffer\.map.*packet socket.*Invalid negative or zero file size/)
   end
 
+  it 'uses the ring automatically on validated Linux architectures' do
+    source = double('ring capture')
+    %w[x86_64-linux aarch64-linux arm64-linux].each do |platform|
+      stub_const('RUBY_PLATFORM', platform)
+      expect(described_class::Linux::TPacketV3).to receive(:new).and_return(source)
+      expect(described_class::Linux::PacketSocket).not_to receive(:new)
+      expect(described_class.open(interface: 'lo')).to eq(source)
+    end
+  end
+
+  it 'keeps automatic socket capture on unvalidated Linux architectures' do
+    source = double('socket capture')
+    %w[riscv64-linux ppc64le-linux aarch64_be-linux].each do |platform|
+      stub_const('RUBY_PLATFORM', platform)
+      expect(described_class::Linux::TPacketV3).not_to receive(:new)
+      expect(described_class::Linux::PacketSocket).to receive(:new).and_return(source)
+      expect(described_class.open(interface: 'lo')).to eq(source)
+    end
+  end
+
   it 'falls back automatically when Ruby cannot map a packet socket' do
-    stub_const('RUBY_PLATFORM', 'x86_64-linux')
     source = double('socket capture')
     allow(described_class::Linux::TPacketV3).to receive(:new).and_raise(Redhound::UnsupportedPlatform, 'IO::Buffer.map cannot map a packet socket')
-    expect(described_class::Linux::PacketSocket).to receive(:new).with(interface: 'lo', snaplen: 262144, promiscuous: true, buffer_size: nil, direction: :inout, filter: nil).and_return(source)
-    expect { expect(described_class.open(interface: 'lo')).to eq(source) }.to output(/ring backend unavailable.*using socket/).to_stderr
+    %w[x86_64-linux aarch64-linux arm64-linux].each do |platform|
+      stub_const('RUBY_PLATFORM', platform)
+      expect(described_class::Linux::PacketSocket).to receive(:new).with(interface: 'lo', snaplen: 262144, promiscuous: true, buffer_size: nil, direction: :inout, filter: nil).and_return(source)
+      expect { expect(described_class.open(interface: 'lo')).to eq(source) }.to output(/ring backend unavailable.*using socket/).to_stderr
+    end
   end
 
   it 'keeps invalid ring configuration errors visible instead of falling back' do
-    stub_const('RUBY_PLATFORM', 'x86_64-linux')
     allow(described_class::Linux::TPacketV3).to receive(:new).and_raise(ArgumentError, 'buffer size must be positive')
     expect(described_class::Linux::PacketSocket).not_to receive(:new)
-    expect { described_class.open(interface: 'lo', buffer_size: -1) }.to raise_error(ArgumentError, 'buffer size must be positive')
+    %w[x86_64-linux aarch64-linux arm64-linux].each do |platform|
+      stub_const('RUBY_PLATFORM', platform)
+      expect { described_class.open(interface: 'lo', buffer_size: -1) }.to raise_error(ArgumentError, 'buffer size must be positive')
+    end
   end
 
   it 'reads macOS BPF record alignment, truncation and extended direction metadata' do
