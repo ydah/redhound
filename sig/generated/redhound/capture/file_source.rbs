@@ -8,6 +8,15 @@ module Redhound
       class ReadStopped < StandardError
       end
 
+      # @api private
+      class FileInput
+        # @rbs (::File io) -> void
+        def initialize: (::File io) -> void
+
+        # @rbs (Integer length) -> String?
+        def read: (Integer length) -> String?
+      end
+
       # Nonregular inputs need bounded polling so Source#stop can interrupt an idle pipe.
       class StreamInput
         # @rbs (IO io, Source source) -> void

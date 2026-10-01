@@ -8,6 +8,38 @@ module Redhound
     class FileSource < Source
       class ReadStopped < StandardError; end
 
+      # @api private
+      class FileInput
+        # @rbs (::File io) -> void
+        def initialize(io)
+          @io, @buffer, @offset = io, ''.b, 0
+        end
+
+        # @rbs (Integer length) -> String?
+        def read(length)
+          ending = @offset + length
+          if ending <= @buffer.bytesize
+            result = @buffer.byteslice(@offset, length)
+            @offset = ending
+            return result
+          end
+          result = @buffer.byteslice(@offset..) || ''.b
+          while result.bytesize < length
+            begin
+              @buffer = @io.readpartial(65_536)
+            rescue EOFError
+              @buffer, @offset = ''.b, 0
+              return result.empty? ? nil : result
+            end
+            amount = [length - result.bytesize, @buffer.bytesize].min #: Integer
+            result << @buffer.byteslice(0, amount)
+            @offset = amount
+          end
+          result
+        end
+      end
+      private_constant :FileInput
+
       # Nonregular inputs need bounded polling so Source#stop can interrupt an idle pipe.
       class StreamInput
         # @rbs (IO io, Source source) -> void
@@ -37,7 +69,14 @@ module Redhound
         @owned = input.is_a?(String) && input != '-'
         @io = input.is_a?(String) ? (input == '-' ? $stdin : ::File.open(input, 'rb')) : input
         @io.binmode if @io.respond_to?(:binmode)
-        reader_io = @io.is_a?(IO) && !@io.stat.file? ? StreamInput.new(@io, self) : @io
+        regular = @io.is_a?(IO) && @io.stat.file?
+        reader_io = if @owned && regular
+                      FileInput.new(@io)
+                    elsif @io.is_a?(IO) && !regular
+                      StreamInput.new(@io, self)
+                    else
+                      @io
+                    end
         @stream = reader_io.is_a?(StreamInput)
         @packets = nil # @rbs Thread::SizedQueue[Packet | StandardError]?
         @reader_thread = nil # @rbs Thread?
