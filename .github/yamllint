@@ -1,0 +1,21 @@
+extends: default
+
+ignore: |
+  .bundle/
+  .git/
+  .idea/
+  .gem_rbs_collection/
+  .rbs_collection/
+  coverage/
+  tmp/
+  rbs_collection.lock.yaml
+
+rules:
+  document-start:
+    present: false
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+  comments:
+    min-spaces-from-content: 1
+  line-length:
+    max: 200
