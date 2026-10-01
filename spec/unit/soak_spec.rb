@@ -11,15 +11,15 @@ RSpec.describe RedhoundSoak do
       options = described_class.options(['--interface', 'lo0', '--duration', '0.03', '--sample', '0.01', '--out', destination])
       source = double('source', linktype: 1, stats: Redhound::Capture::Stats.new(captured: 1, received: 1), close: nil)
       packet = Redhound::Packet.new(ether(ipv4(udp('soak'))))
+      now = 0.0
+      allow(described_class).to receive(:monotonic) { now }
+      allow(described_class).to receive(:resources).and_return(rss: 1234, fds: 4)
       count = 0
       allow(source).to receive(:next_packet) do |timeout:|
+        expect(timeout).to be_between(0.0, 0.1)
+        now += 0.01
         count += 1
-        if count == 1
-          packet
-        else
-          sleep(timeout)
-          nil
-        end
+        count == 1 ? packet : nil
       end
       allow(Redhound::Capture).to receive(:open).and_return(source)
       allow(described_class).to receive(:validate_file).and_return({ passed: true })
@@ -28,6 +28,7 @@ RSpec.describe RedhoundSoak do
       expect(report['elapsed']).to be >= 0.03
       expect(report['captured']).to eq(1)
       expect(report['average_pps']).to be_positive
+      expect(report.values_at('max_rss', 'max_fds')).to eq([1234, 4])
       expect(report['busy_accepted']).to eq(false)
       path = Dir[File.join(destination, '*.pcapng')].fetch(0)
       expect(File.stat(path).mode & 0o777).to eq(0o600)
