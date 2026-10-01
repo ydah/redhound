@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'open3'
 
 RSpec.describe 'v2 live capture', :live do
   let(:loopback) { RUBY_PLATFORM.include?('darwin') ? 'lo0' : 'lo' }
@@ -62,5 +63,29 @@ RSpec.describe 'v2 live capture', :live do
         source.close
       end
     end
+  end
+
+  it 'drops user and group privileges permanently after capture setup' do
+    skip 'root is required for privilege dropping' unless Process.uid.zero?
+    library = File.expand_path('../../lib', __dir__)
+    code = <<~RUBY
+      require 'redhound'
+      require 'etc'
+      account = Etc.getpwnam('nobody')
+      source = Redhound::Capture.open(interface: #{loopback.inspect}, promiscuous: false)
+      begin
+        Redhound::CLI::Privileges.drop('nobody')
+        abort 'wrong identity' unless Process.uid == account.uid && Process.gid == account.gid
+        begin
+          Process::Sys.setuid(0)
+          abort 'root can be regained'
+        rescue Errno::EPERM
+        end
+      ensure
+        source.close
+      end
+    RUBY
+    _out, err, status = Open3.capture3(RbConfig.ruby, '-I', library, '-e', code)
+    expect(status.success?).to be(true), err
   end
 end

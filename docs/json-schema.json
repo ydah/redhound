@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ydah/redhound/blob/main/docs/json-schema.json",
+  "title": "Redhound packet",
+  "description": "One packet object emitted by Packet#to_h, NDJSON, or an element of the JSON output array. Nanosecond timestamps and lengths are integers; byte fields use hexadecimal strings; repeated fields use arrays.",
+  "type": "object",
+  "required": ["frame", "layers", "diagnostics"],
+  "additionalProperties": false,
+  "properties": {
+    "frame": {
+      "type": "object",
+      "required": ["number", "time_epoch_ns", "time", "caplen", "len", "interface", "direction", "linktype"],
+      "additionalProperties": false,
+      "properties": {
+        "number": { "type": "integer", "minimum": 1 },
+        "time_epoch_ns": { "type": "integer" },
+        "time": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{9}Z$" },
+        "caplen": { "type": "integer", "minimum": 0 },
+        "len": { "type": "integer", "minimum": 0 },
+        "interface": { "type": ["string", "null"] },
+        "direction": { "enum": ["in", "out", null] },
+        "linktype": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "layers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["protocol", "offset", "length", "embedded", "fields"],
+        "additionalProperties": false,
+        "properties": {
+          "protocol": { "type": "string" },
+          "offset": { "type": "integer", "minimum": 0 },
+          "length": { "type": "integer", "minimum": 0 },
+          "embedded": { "type": "boolean" },
+          "fields": { "type": "object", "additionalProperties": { "$ref": "#/$defs/fieldValue" } }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["layer", "severity", "code", "message", "field"],
+        "additionalProperties": false,
+        "properties": {
+          "layer": { "type": "string" },
+          "severity": { "enum": ["note", "warn", "warning", "error"] },
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "field": { "type": ["string", "null"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fieldValue": {
+      "anyOf": [
+        { "type": ["string", "number", "boolean", "null"] },
+        { "type": "array", "items": { "$ref": "#/$defs/fieldValue" } }
+      ]
+    }
+  }
+}

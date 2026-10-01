@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0.rc1 - 2026-10-01
+
 ### Breaking changes
 
 - Replace the Analyzer/Builder/L2/L3/L4 API with Packet, Layer, Field and the Dissector DSL; use `Redhound.open`, `Redhound.capture` and `Redhound.dissect` for library integrations.

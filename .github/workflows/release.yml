@@ -1,0 +1,67 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions: {}
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Verify version and user-facing changes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          test "$RELEASE_TAG" = "v$(ruby -Ilib -rredhound/version -e 'print Redhound::VERSION')"
+          ruby script/release-notes.rb "${RELEASE_TAG#v}" > "$RUNNER_TEMP/release-notes.md"
+          base="$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)"
+          if git diff --quiet "$base" HEAD -- lib exe ':!lib/redhound/version.rb'; then
+            echo 'No runtime changes since the previous release; refusing a documentation-only release.' >&2
+            exit 1
+          fi
+      - name: Test and build
+        run: |
+          bundle exec rbs collection install --frozen
+          bundle exec rake
+          git diff --exit-code sig/
+          gem build --strict redhound.gemspec --output redhound.gem
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          args=()
+          if [[ "${RELEASE_TAG#v}" =~ [a-zA-Z] ]]; then args+=(--prerelease --latest=false); fi
+          gh release create "$RELEASE_TAG" redhound.gem --verify-tag --title "$RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" "${args[@]}"
+
+  rubygems:
+    needs: release
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: release
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - uses: rubygems/release-gem@7f9650160c1a4e7989fdc9855807bdbd421d8b6b # v1.4.1

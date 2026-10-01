@@ -1,0 +1,4 @@
+--hide-api private
+--tag rbs
+--tag type
+lib/**/*.rb

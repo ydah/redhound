@@ -1,46 +1,95 @@
 name: Test
-
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-
+  workflow_dispatch:
+  schedule:
+    - cron: '17 18 * * *'
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }}
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        ruby:
-          - '3.3'
-          - '3.4'
-          - '4.0'
-          - head
+        ruby: ['3.3', '3.4', '4.0', head]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
-      - name: Install RBS collection
-        run: bundle exec rbs collection install --frozen
-      - name: Run the default task (spec, rbs-inline, steep)
-        run: bundle exec rake
-      - name: Check generated RBS is committed
-        run: git diff --exit-code sig/
-
+      - run: bundle exec rbs collection install --frozen
+      - run: REDHOUND_COVERAGE_GATE=1 bundle exec rake
+      - run: git diff --exit-code sig/
   live:
-    runs-on: ubuntu-latest
-    name: Live capture (sudo)
+    runs-on: ${{ matrix.os }}
+    name: Live capture (${{ matrix.os }})
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
         with:
           ruby-version: '3.4'
           bundler-cache: true
-      - name: Run live specs as root
-        run: sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 bundle exec rspec --tag live
+      - run: sudo -E env "PATH=$PATH" REDHOUND_LIVE=1 bundle exec rspec --tag live
+  differential:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Install packet inspection tools
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y tcpdump tshark
+      - run: bundle exec rspec spec/differential
+  fuzz:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - run: FUZZ_ITERATIONS=1000000 bundle exec rspec spec/fuzz
+  benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - run: ruby bench/generate.rb
+      - name: Measure throughput
+        run: |
+          ruby --yjit bench/dissect.rb --format summary | tee summary.txt
+          ruby --yjit bench/dissect.rb --format tree
+          ruby --yjit bench/dissect.rb --format filter
+          ruby --yjit bench/dissect.rb --format write
+          pps=$(awk '{print $2}' summary.txt)
+          if (( pps < 100000 )); then echo "::warning::Summary throughput $pps pps is below the 100000 pps release target"; fi
+          if git cat-file -e HEAD^:bench/dissect.rb 2>/dev/null; then
+            mkdir "$RUNNER_TEMP/previous"
+            git archive HEAD^ lib bench | tar -x -C "$RUNNER_TEMP/previous"
+            ruby --yjit "$RUNNER_TEMP/previous/bench/dissect.rb" --format summary tmp/bench.pcap | tee previous.txt
+            previous=$(awk '{print $2}' previous.txt)
+            if (( pps * 100 < previous * 85 )); then echo "::warning::Summary throughput regressed more than 15% ($previous -> $pps pps)"; fi
+          fi
