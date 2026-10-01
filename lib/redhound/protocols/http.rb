@@ -109,7 +109,8 @@ module Redhound
           name = name.downcase
           value = line.byteslice(colon + 1..) #: String
           leading = (value[/\A[ \t]*/n] || '').bytesize
-          value = value.sub(/\A[ \t]*/n, '').sub(/(?<![ \t])[ \t]+\z/n, '')
+          trailing = value.rindex(/[^ \t]/n)
+          value = value.byteslice(leading, trailing ? trailing + 1 - leading : 0) #: String
           (headers[name] ||= []) << value
           key = name.tr('-', '_')
           if HEADERS.include?(key)
