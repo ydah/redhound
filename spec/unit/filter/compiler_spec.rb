@@ -24,6 +24,14 @@ RSpec.describe Redhound::Filter do
     expect(described_class.compile('not tcp and udp').match?(dns)).to be true
   end
 
+  it 'restricts IPv4 multicast to the 224.0.0.0/4 destination range' do
+    program = described_class.compile('ip multicast')
+    %w[223.255.255.255 224.0.0.0 239.255.255.255 240.0.0.0 255.255.255.255].each do |destination|
+      packet = filter_packet(ether(ipv4(udp('x'.b), dst: destination)))
+      expect(program.match?(packet)).to eq(destination.start_with?('224.', '239.'))
+    end
+  end
+
   it 'rejects noninitial IPv4 fragments for transport offsets' do
     fragment = ether(ipv4(udp('x'.b)))
     fragment[20, 2] = [1].pack('n')
