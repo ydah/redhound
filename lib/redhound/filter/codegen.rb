@@ -257,7 +257,7 @@ module Redhound
         if proto == 'ip6'
           return conjunction(family('ip6'), test(network + 24, 1, :eq, 0xff))
         end
-        condition = type == :broadcast ? disjunction(test(network + 16, 4, :eq, 0), test(network + 16, 4, :eq, 0xffffffff)) : test(network + 16, 1, :ge, 0xe0)
+        condition = type == :broadcast ? disjunction(test(network + 16, 4, :eq, 0), test(network + 16, 4, :eq, 0xffffffff)) : conjunction(test(network + 16, 1, :ge, 0xe0), test(network + 16, 1, :le, 0xef))
         conjunction(family('ip'), condition)
       end
 
