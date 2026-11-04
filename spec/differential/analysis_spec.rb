@@ -160,6 +160,7 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
       reference = tshark(:stats, '-q', '-z', "endpoints,#{type}").lines.filter_map do |line|
         parts = line.split
         next unless parts[0]&.match?(/\A[0-9a-f:.]+\z/) && parts[1]&.match?(/\A\d+\z/)
+        parts = parts.reject { |part| part == 'bytes' }
         address = parts.shift
         port = %i[tcp udp].include?(type) ? parts.shift.to_i : 0
         [ [address, port], parts.drop(2).map(&:to_i) ]
@@ -190,9 +191,13 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
       path = path.take(depth) + [match[2] == 'ip' ? :ipv4 : match[2].to_sym]
       [path, [match[3].to_i, match[4].to_i]]
     end.to_h
-    session, = analyzed(:stats, stats: ['io,1', 'phs'])
+    session, packets = analyzed(:stats, stats: ['io,1', 'phs'])
     actual_intervals = session.statistics[0].to_h[:rows].to_h { |row| [row[:interval], row.values_at(:packets, :bytes)] }
-    actual_hierarchy = session.statistics[1].to_h[:rows].to_h { |row| [row[:path], row.values_at(:packets, :bytes)] }
+    # TShark includes frame metadata above the dissected protocol layers.
+    actual_hierarchy = { [:frame] => [packets.length, packets.sum(&:original_length)] }
+    session.statistics[1].to_h[:rows].each do |row|
+      actual_hierarchy[[:frame, *row[:path]]] = row.values_at(:packets, :bytes)
+    end
     expect(actual_intervals).to eq(intervals)
     expect(actual_hierarchy).to eq(hierarchy)
     session.finish(StringIO.new, StringIO.new)
