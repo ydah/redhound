@@ -91,7 +91,7 @@ RSpec.describe 'network fields compared with tshark', :differential do
   it 'matches every network family, options, embedded packets and tunnels in the committed corpus' do
     path = File.expand_path('../fixtures/pcap/network.pcap', __dir__)
     packets = Redhound.open(path).to_a
-    json, error, status = Open3.capture3('tshark', '-n', '-r', path, '-T', 'json', '--no-duplicate-keys')
+    json, error, status = Open3.capture3('tshark', '-n', '-r', '-', '-T', 'json', '--no-duplicate-keys', stdin_data: File.binread(path), binmode: true)
     expect(status.success?).to be(true), error
     reference = JSON.parse(json)
     expect(reference.length).to eq(packets.length)

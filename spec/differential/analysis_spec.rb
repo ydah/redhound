@@ -11,7 +11,7 @@ RSpec.describe 'stateful analysis compared with tshark', :differential do
   def corpus(name) = File.expand_path("../fixtures/pcap/analysis-#{name}.pcap", __dir__)
 
   def tshark(name, *arguments)
-    output, error, status = Open3.capture3('tshark', '-n', '-r', corpus(name), *arguments)
+    output, error, status = Open3.capture3('tshark', '-n', '-r', '-', *arguments, stdin_data: File.binread(corpus(name)), binmode: true)
     expect(status.success?).to be(true), error
     output
   end
